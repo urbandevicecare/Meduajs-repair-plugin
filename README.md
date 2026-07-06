@@ -1,5 +1,8 @@
 # Medusa Repair Module
 
+[![NPM Version](https://img.shields.io/npm/v/@enomshop/repair-module.svg)](https://www.npmjs.com/package/@enomshop/repair-module)
+[![Medusa Plugin](https://img.shields.io/badge/Medusa-Plugin-violet.svg)](https://docs.medusajs.com)
+
 A complete Repair Management System for Medusa, ideal for device repair shops. Features include customer tracking, parts management, real-time chat, cost approval flows, warranty tracking, and in-depth reporting.
 
 ## Key Features  
