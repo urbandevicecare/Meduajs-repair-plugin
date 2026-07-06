@@ -25,7 +25,7 @@ When adding new features or statuses (like the recent `refunded` status update),
 
 Run the following commands from your main Medusa backend directory:
 ```bash
-npx medusa db:generate medusajs-repairshop-plugin
+npx medusa db:generate repair
 npx medusa db:migrate
 ```
 
