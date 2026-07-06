@@ -15,17 +15,39 @@ A complete Repair Management System for Medusa, ideal for device repair shops. F
 - **Notifications & Chat:** Built-in two-way messaging between technicians and customers. Status changes trigger full notification channels natively including standard admin feed alerts.
 - **Reporting & Media:** Upload Defect photos or videos directly to repair tickets. Deep analytics provide insights into average repair times and revenue.
 
+## Installation
+
+1. Install the plugin using your package manager:
+```bash
+npm install medusajs-repairshop-plugin
+# or
+yarn add medusajs-repairshop-plugin
+```
+
+2. Add the plugin to your Medusa backend's `medusa-config.ts` (or `medusa-config.js`) file inside the `modules` array:
+```typescript
+module.exports = defineConfig({
+  projectConfig: {
+    // ... your standard project config
+  },
+  modules: [
+    {
+      resolve: "medusajs-repairshop-plugin"
+    }
+  ]
+})
+```
+
 ## Development & Usage
 
 - Navigate to `/app/repairs` in your admin panel to check-in devices or edit ongoing repairs. 
 - The module securely integrates with the primary Medusa modules (Authentication, Product, Inventory, Customer, and Notifications).
 
 ### Database Migrations
-When adding new features or statuses (like the recent `refunded` status update), you must generate and apply database migrations. Since plugins do not have their own database connection, migrations must be executed from your **main Medusa backend** where the module is installed.
+Since the plugin introduces new data models (like `repair_ticket`), you must apply its database migrations to your main Medusa backend. The plugin ships with pre-generated migrations.
 
-Run the following commands from your main Medusa backend directory:
+Run the following command from your main Medusa backend directory:
 ```bash
-npx medusa db:generate repair
 npx medusa db:migrate
 ```
 
