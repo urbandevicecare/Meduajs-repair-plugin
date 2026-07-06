@@ -24,13 +24,13 @@ npm install medusajs-repairshop-plugin
 yarn add medusajs-repairshop-plugin
 ```
 
-2. Add the plugin to your Medusa backend's `medusa-config.ts` (or `medusa-config.js`) file inside the `modules` array:
+2. Add the plugin to your Medusa backend's `medusa-config.ts` (or `medusa-config.js`) file inside the `plugins` array:
 ```typescript
 module.exports = defineConfig({
   projectConfig: {
     // ... your standard project config
   },
-  modules: [
+  plugins: [
     {
       resolve: "medusajs-repairshop-plugin"
     }
