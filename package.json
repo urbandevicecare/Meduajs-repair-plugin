@@ -1,7 +1,7 @@
 {
-  "name": "repair",
-  "version": "0.1.0",
-  "description": "medusajs repair module",
+  "name": "repair", 
+  "version": "0.1.1",
+  "description": "medusajs repair module", 
   "author": "Medusa (https://medusajs.com)",
   "license": "MIT",
   "files": [
