@@ -45,7 +45,7 @@ function getRepairStatusTemplate(data: any) {
   const { ticket_number, status, device, total_estimate, approval_url } = data;
   const customerName = data.customer?.first_name || "Valued Customer";
   
-  let text = `[Urban Device Care Ltd] Dear ${customerName},\n\nYour repair ticket #${ticket_number} for your ${device || "device"} is now: ${status.replace("_", " ")}.`;
+  let text = `[Urban Device Care Ltd (OBO Apple Solaris)] Hi ${customerName}, your repair #${ticket_number} (${device || "device"}) is: ${status.replace("_", " ")}.`;
   let html = `<div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-w-lg: 600px; margin: 0 auto;">
     <h2 style="color: #2563eb;">Repair Status Update</h2>
     <p>Dear ${customerName},</p>
@@ -57,14 +57,14 @@ function getRepairStatusTemplate(data: any) {
       style: "currency",
       currency: currency,
     }).format(Number(total_estimate));
-    text += `\nEstimated total cost: ${formattedEstimate}.`;
+    text += ` Cost: ${formattedEstimate}.`;
     html += `<div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #2563eb; margin: 20px 0;">
       <p style="margin: 0; font-size: 16px;"><strong>Estimated Total Cost:</strong> ${formattedEstimate}</p>
     </div>`;
   }
 
   if (data.pdf_url) {
-    text += `\n\nDownload your PDF document here: ${data.pdf_url}`;
+    text += ` Doc: ${data.pdf_url}`;
     html += `<p style="margin-top: 15px;"><a href="${data.pdf_url}" style="color: #2563eb; font-weight: bold; text-decoration: underline;">📄 Download PDF Document</a></p>`;
   }
 
@@ -72,18 +72,17 @@ function getRepairStatusTemplate(data: any) {
     const approveLink = approval_url.includes("?") ? `${approval_url}&action=approve` : `${approval_url}?action=approve`;
     const rejectLink = approval_url.includes("?") ? `${approval_url}&action=reject` : `${approval_url}?action=reject`;
 
-    text += `\n\nKindly approve or reject the repair costs to allow us to proceed:\nApprove: ${approveLink}\nReject: ${rejectLink}`;
+    text += ` Approve: ${approveLink} or Reject: ${rejectLink}`;
     html += `<p>Kindly review and approve or reject the repair costs so we can proceed:</p>
       <div style="margin-top: 25px; display: flex; gap: 10px;">
         <a href="${approveLink}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Approve Repair</a>
         <a href="${rejectLink}" style="background-color: #ef4444; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Reject</a>
       </div>`;
   } else if (approval_url) {
-    text += `\n\nYou can track your repair progress here: ${approval_url}`;
+    text += ` Track: ${approval_url}`;
     html += `<p style="margin-top: 25px;"><a href="${approval_url}" style="color: #2563eb; text-decoration: underline; font-weight: 500;">Track your repair progress here</a>.</p>`;
   }
 
-  text += `\n\nThank you for choosing us.\n\nBest Regards,\nUrban Device Care Ltd (OBO Apple Solaris)`;
   html += `<p style="margin-top: 30px;">Thank you for choosing us.</p>
     <p>Best Regards,<br/><strong>Urban Device Care Ltd (OBO Apple Solaris)</strong></p>
   </div>`;
@@ -95,7 +94,7 @@ function getRepairComplianceTemplate(data: any) {
   const { ticket_number, device, compliance_url } = data;
   const customerName = data.customer?.first_name || "Valued Customer";
   
-  const text = `[Urban Device Care Ltd] Dear ${customerName},\n\nAction Required for your Repair Ticket #${ticket_number}.\n\nKindly accept our Repair Terms & Conditions and/or Data Wipe Consent before we can proceed with your device repair (${device}).\n\nPlease review and accept the terms using this secure link: ${compliance_url}\n\nThank you for your prompt action.\n\nBest Regards,\nUrban Device Care Ltd (OBO Apple Solaris)`;
+  const text = `[Urban Device Care Ltd (OBO Apple Solaris)] Hi ${customerName}, please accept terms for repair #${ticket_number} (${device}) here: ${compliance_url}`;
 
   const html = `<div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-w-lg: 600px; margin: 0 auto;">
     <h2 style="color: #d97706;">Action Required: Repair Ticket #${ticket_number}</h2>
@@ -114,7 +113,7 @@ function getRepairReminderTemplate(data: any) {
   const { ticket_number, status, device, nudge_message, approval_url } = data;
   const customerName = data.customer?.first_name || "Valued Customer";
 
-  const text = `[Urban Device Care Ltd] Dear ${customerName},\n\nReminder for your Repair Ticket #${ticket_number} (${device}): ${nudge_message}\n\nCurrent Status: ${status.replace("_", " ")}\nTrack or take action here: ${approval_url}\n\nThank you,\n\nUrban Device Care Ltd (OBO Apple Solaris)`;
+  const text = `[Urban Device Care Ltd (OBO Apple Solaris)] Hi ${customerName}, Reminder for repair #${ticket_number} (${device}): ${nudge_message}. Track/Action: ${approval_url}`;
 
   const html = `<div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-w-lg: 600px; margin: 0 auto;">
     <h2 style="color: #2563eb;">Repair Reminder: Ticket #${ticket_number}</h2>
