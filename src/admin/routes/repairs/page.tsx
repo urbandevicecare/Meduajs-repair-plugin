@@ -46,18 +46,40 @@ const RepairsPage = () => {
     email_notifications_enabled: true,
     sms_notifications_enabled: true,
     whatsapp_notifications_enabled: true,
+    zoho_books_enabled: false,
+    zoho_client_id: "",
+    zoho_client_secret: "",
+    zoho_refresh_token: "",
+    zoho_organization_id: "",
+    paystack_enabled: false,
+    paystack_public_key: "",
+    paystack_secret_key: "",
+    company_name: "Repair Shop",
+    storefront_url: "",
   });
 
   const loadSettings = () => {
     fetch("/admin/repairs/settings", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
-        if (data.settings) setSettings(data.settings);
+        if (data.settings) {
+          setSettings({
+            ...data.settings,
+            zoho_client_id: data.settings.zoho_client_id || "",
+            zoho_client_secret: data.settings.zoho_client_secret || "",
+            zoho_refresh_token: data.settings.zoho_refresh_token || "",
+            zoho_organization_id: data.settings.zoho_organization_id || "",
+            paystack_public_key: data.settings.paystack_public_key || "",
+            paystack_secret_key: data.settings.paystack_secret_key || "",
+            company_name: data.settings.company_name || "Repair Shop",
+            storefront_url: data.settings.storefront_url || "",
+          });
+        }
       })
       .catch((err) => console.error(err));
   };
 
-  const updateSettings = async (key: string, value: boolean) => {
+  const updateSettings = async (key: string, value: boolean | string) => {
     const newSettings = { ...settings, [key]: value };
     setSettings(newSettings);
     try {
@@ -257,14 +279,35 @@ const RepairsPage = () => {
       return matchesSearch && matchesStatus;
     });
 
+  const [activeTab, setActiveTab] = useState("tickets");
+
   return (
     <Container className="p-0 overflow-hidden">
-      <Tabs defaultValue="tickets">
-        <Tabs.List className="px-6 pt-4 border-b border-ui-border-base">
-          <Tabs.Trigger value="tickets">Tickets</Tabs.Trigger>
-          <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
-        </Tabs.List>
-        <Tabs.Content value="tickets" className="p-6">
+      <div className="flex border-b border-ui-border-base px-6 pt-2 space-x-6">
+        <button
+          onClick={() => setActiveTab("tickets")}
+          className={`pb-3 text-sm font-medium transition-colors ${
+            activeTab === "tickets"
+              ? "border-b-2 border-ui-fg-base text-ui-fg-base"
+              : "text-ui-fg-subtle hover:text-ui-fg-base"
+          }`}
+        >
+          Tickets
+        </button>
+        <button
+          onClick={() => setActiveTab("settings")}
+          className={`pb-3 text-sm font-medium transition-colors ${
+            activeTab === "settings"
+              ? "border-b-2 border-ui-fg-base text-ui-fg-base"
+              : "text-ui-fg-subtle hover:text-ui-fg-base"
+          }`}
+        >
+          Settings
+        </button>
+      </div>
+      
+      {activeTab === "tickets" && (
+        <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <Heading level="h1">Repair Tickets</Heading>
         <FocusModal open={createModalOpen} onOpenChange={setCreateModalOpen}>
@@ -577,9 +620,37 @@ const RepairsPage = () => {
           </Table.Body>
         </Table>
       )}
-        </Tabs.Content>
-        <Tabs.Content value="settings" className="p-6">
-          <div className="flex flex-col gap-y-6 max-w-2xl">
+      </div>
+      )}
+      
+      {activeTab === "settings" && (
+        <div className="flex flex-col gap-6 w-full max-w-2xl p-6">
+          <div>
+            <Heading level="h2">General Settings</Heading>
+            <div className="flex flex-col gap-4 mt-4">
+              <div className="flex flex-col gap-2">
+                <Text size="small" className="font-medium text-ui-fg-base">Company Name</Text>
+                <Text size="small" className="text-ui-fg-subtle">Displayed in notifications and SMS messages.</Text>
+                <Input 
+                  placeholder="e.g. Urban Device Care Ltd" 
+                  value={settings.company_name} 
+                  onChange={(e) => updateSettings("company_name", e.target.value)} 
+                />
+              </div>
+              <div className="flex flex-col gap-2 mt-2">
+                <Text size="small" className="font-medium text-ui-fg-base">Storefront URL</Text>
+                <Text size="small" className="text-ui-fg-subtle">Base URL for tracking links (e.g. http://localhost:8000).</Text>
+                <Input 
+                  placeholder="e.g. https://store.example.com" 
+                  value={settings.storefront_url} 
+                  onChange={(e) => updateSettings("storefront_url", e.target.value)} 
+                />
+              </div>
+            </div>
+            <div className="border-b border-ui-border-base my-6" />
+          </div>
+
+          <div>
             <Heading level="h2">Notification Settings</Heading>
             <Text className="text-ui-fg-subtle">
               Configure which channels are enabled for automated repair notifications. (Note: Medusa must have a provider configured for these channels to actually send them).
@@ -608,8 +679,107 @@ const RepairsPage = () => {
               </div>
             </div>
           </div>
-        </Tabs.Content>
-      </Tabs>
+
+          <hr className="my-8" />
+          
+          <div className="flex flex-col gap-y-6 max-w-2xl">
+            <Heading level="h2">Zoho Books Integration</Heading>
+            <Text className="text-ui-fg-subtle">
+              Configure Zoho Books to automatically sync Repair Tickets as Estimates and Invoices.
+            </Text>
+            
+            <div className="flex flex-col gap-y-6 mt-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="font-semibold">Enable Zoho Books Sync</Label>
+                  <Text className="text-sm text-ui-fg-subtle">Replaces local PDF generation with official Zoho Books documents.</Text>
+                </div>
+                <Switch checked={settings.zoho_books_enabled} onCheckedChange={(v) => updateSettings("zoho_books_enabled", v)} />
+              </div>
+
+              {settings.zoho_books_enabled && (
+                <div className="flex flex-col gap-y-4 p-4 border border-ui-border-base rounded-lg bg-ui-bg-subtle">
+                  <div className="flex flex-col gap-y-2">
+                    <Label>Organization ID</Label>
+                    <Input 
+                      placeholder="e.g. 12345678" 
+                      value={settings.zoho_organization_id} 
+                      onChange={(e) => updateSettings("zoho_organization_id", e.target.value)} 
+                    />
+                  </div>
+                  <div className="flex flex-col gap-y-2">
+                    <Label>Client ID</Label>
+                    <Input 
+                      placeholder="1000.XXXXXXXXXXXXXXXXXXXXXXXX" 
+                      value={settings.zoho_client_id} 
+                      onChange={(e) => updateSettings("zoho_client_id", e.target.value)} 
+                    />
+                  </div>
+                  <div className="flex flex-col gap-y-2">
+                    <Label>Client Secret</Label>
+                    <Input 
+                      placeholder="Enter Client Secret" 
+                      type="password"
+                      value={settings.zoho_client_secret} 
+                      onChange={(e) => updateSettings("zoho_client_secret", e.target.value)} 
+                    />
+                  </div>
+                  <div className="flex flex-col gap-y-2">
+                    <Label>Refresh Token</Label>
+                    <Input 
+                      placeholder="1000.XXXXXXXXXXXXXXXXXXXXXXXX" 
+                      type="password"
+                      value={settings.zoho_refresh_token} 
+                      onChange={(e) => updateSettings("zoho_refresh_token", e.target.value)} 
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <hr className="my-8" />
+          
+          <div className="flex flex-col gap-y-6 max-w-2xl">
+            <Heading level="h2">Paystack Integration</Heading>
+            <Text className="text-ui-fg-subtle">
+              Configure Paystack to generate payment links for repairs.
+            </Text>
+            
+            <div className="flex flex-col gap-y-6 mt-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="font-semibold">Enable Paystack Checkout</Label>
+                  <Text className="text-sm text-ui-fg-subtle">Generate Paystack checkout links on approved tickets.</Text>
+                </div>
+                <Switch checked={settings.paystack_enabled} onCheckedChange={(v) => updateSettings("paystack_enabled", v)} />
+              </div>
+
+              {settings.paystack_enabled && (
+                <div className="flex flex-col gap-y-4 p-4 border border-ui-border-base rounded-lg bg-ui-bg-subtle">
+                  <div className="flex flex-col gap-y-2">
+                    <Label>Public Key</Label>
+                    <Input 
+                      placeholder="pk_test_..." 
+                      value={settings.paystack_public_key} 
+                      onChange={(e) => updateSettings("paystack_public_key", e.target.value)} 
+                    />
+                  </div>
+                  <div className="flex flex-col gap-y-2">
+                    <Label>Secret Key</Label>
+                    <Input 
+                      placeholder="sk_test_..." 
+                      type="password"
+                      value={settings.paystack_secret_key} 
+                      onChange={(e) => updateSettings("paystack_secret_key", e.target.value)} 
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </Container>
   );
 };

@@ -5,4 +5,16 @@ export const RepairSettings = model.define("repair_settings", {
   email_notifications_enabled: model.boolean().default(true),
   sms_notifications_enabled: model.boolean().default(true),
   whatsapp_notifications_enabled: model.boolean().default(true),
+  zoho_books_enabled: model.boolean().default(false),
+  zoho_client_id: model.text().nullable(),
+  zoho_client_secret: model.text().nullable(),
+  zoho_refresh_token: model.text().nullable(),
+  zoho_organization_id: model.text().nullable(),
+
+  paystack_enabled: model.boolean().default(false),
+  paystack_public_key: model.text().nullable(),
+  paystack_secret_key: model.text().nullable(),
+
+  company_name: model.text().default("Repair Shop"),
+  storefront_url: model.text().nullable(),
 });

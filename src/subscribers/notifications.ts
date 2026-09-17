@@ -83,8 +83,23 @@ export default async function globalNotificationHandler({
 
       const ticket = tickets[0];
       const deviceModel = ticket.device?.model_name || "Device";
+
+      let storeUrl = process.env.STORE_URL || "http://localhost:3000";
+      let companyName = "Repair Shop";
+      try {
+        const repairModule: any = container.resolve("repair");
+        const [settings] = await repairModule.listRepairSettings({});
+        if (settings) {
+          if (settings.storefront_url) storeUrl = settings.storefront_url;
+          if (settings.company_name) companyName = settings.company_name;
+        }
+      } catch (e) {}
+
+      // Strip trailing slash if present
+      storeUrl = storeUrl.replace(/\/$/, "");
+
       const approvalUrl = ticket.approval_token
-        ? `${process.env.STORE_URL || "http://localhost:3000"}/store/repairs/track?token=${ticket.approval_token}`
+        ? `${storeUrl}/repairs/track?token=${ticket.approval_token}`
         : "";
 
       // Attempt to load customer details
@@ -119,6 +134,13 @@ export default async function globalNotificationHandler({
         // Fallback
       }
 
+      let pdfUrl = "";
+      if (ticket.approval_token) {
+        if (ticket.status === "awaiting_approval") pdfUrl = `${storeUrl}/api/repairs/token/${ticket.approval_token}/document?type=quote`;
+        else if (ticket.payment_status === "captured" || ticket.payment_status === "paid") pdfUrl = `${storeUrl}/api/repairs/token/${ticket.approval_token}/document?type=receipt`;
+        else pdfUrl = `${storeUrl}/api/repairs/token/${ticket.approval_token}/document?type=invoice`;
+      }
+
       // Populate base data
       notificationData = {
         ...notificationData,
@@ -126,7 +148,9 @@ export default async function globalNotificationHandler({
         device: deviceModel,
         status: data.status || ticket.status,
         approval_url: approvalUrl,
+        pdf_url: pdfUrl,
         currency_code: currencyCode.toUpperCase(),
+        company_name: companyName,
         total_estimate:
           Number(
             (ticket.total_estimate as any)?.value ?? ticket.total_estimate,
