@@ -8,6 +8,7 @@ import { updateRepairTicketStatusStep } from "./steps/update-repair-ticket-statu
 import { REPAIR_MODULE } from "../modules/repair";
 import RepairModuleService from "../modules/repair/service";
 import { Modules } from "@medusajs/framework/utils";
+import { getRepairTemplate } from "../utils/templates/repair";
 
 type RejectRepairCostWorkflowInput = {
   repair_ticket_id: string;
@@ -34,18 +35,31 @@ export const notifyTechnicianRejectedStep = createStep(
       }
 
       if (technicianEmail) {
+        const [settings] = await repairService.listRepairSettings({});
+        if (!settings || settings.email_notifications_enabled) {
+          const templateData = {
+          ticket_number: ticket.ticket_number,
+          status: ticket.status,
+          repair_ticket_id: ticket.id,
+          technician_name: ticket.technician_name,
+        };
+        const template = getRepairTemplate("technician-job-rejected", templateData);
+        
         const notificationModuleService = container.resolve(Modules.NOTIFICATION);
         await notificationModuleService.createNotifications({
           to: technicianEmail,
           channel: "email",
           template: "technician-job-rejected",
+          content: {
+            subject: `Repair Job Cancelled: #${ticket.ticket_number}`,
+            html: template.html,
+          },
           data: {
-            ticket_number: ticket.ticket_number,
-            status: ticket.status,
-            repair_ticket_id: ticket.id,
-            technician_name: ticket.technician_name,
+            ...templateData,
+            body: template.text,
           },
         });
+        }
       }
     }
     return new StepResponse(null);

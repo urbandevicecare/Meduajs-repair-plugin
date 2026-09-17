@@ -2,6 +2,7 @@ import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import { REPAIR_MODULE } from "../../../../../modules/repair";
 import RepairModuleService from "../../../../../modules/repair/service";
 import { Modules } from "@medusajs/framework/utils";
+import { getRepairTemplate } from "../../../../../utils/templates/repair";
 
 export async function POST(
   req: MedusaRequest<{
@@ -43,18 +44,31 @@ export async function POST(
     }
 
     if (technicianEmail) {
+      const [settings] = await repairService.listRepairSettings({});
+      if (!settings || settings.email_notifications_enabled) {
+        const templateData = {
+        ticket_number: updatedTicket.ticket_number,
+        status: updatedTicket.status,
+        repair_ticket_id: updatedTicket.id,
+        technician_name: updatedTicket.technician_name,
+      };
+      const template = getRepairTemplate("technician-assigned", templateData);
+      
       const notificationModuleService = req.scope.resolve(Modules.NOTIFICATION);
       await notificationModuleService.createNotifications({
         to: technicianEmail,
         channel: "email",
         template: "technician-assigned",
+        content: {
+          subject: `New Repair Job Assigned: #${updatedTicket.ticket_number}`,
+          html: template.html,
+        },
         data: {
-          ticket_number: updatedTicket.ticket_number,
-          status: updatedTicket.status,
-          repair_ticket_id: updatedTicket.id,
-          technician_name: updatedTicket.technician_name,
+          ...templateData,
+          body: template.text,
         },
       });
+      }
     }
   }
 

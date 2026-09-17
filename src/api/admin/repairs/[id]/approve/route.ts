@@ -14,6 +14,6 @@ export async function POST(
 
   res.json({
     repair_ticket: result.repairTicket,
-    order: result.order,
+    payment_collection: result.paymentCollection,
   });
 }

@@ -63,6 +63,12 @@ const RepairTicket = model.define("repair_ticket", {
   completed_at: model.dateTime().nullable(),
   collected_at: model.dateTime().nullable(),
 
+  // Payment Tracking
+  payment_status: model
+    .enum(["pending", "authorized", "captured", "refunded"])
+    .default("pending"),
+  payment_collection_id: model.text().nullable(),
+
   // Relationships
   media: model.hasMany(() => RepairMedia, {
     mappedBy: "repair_ticket",

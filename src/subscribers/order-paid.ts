@@ -5,6 +5,7 @@ import {
 import { Modules } from "@medusajs/framework/utils";
 import { REPAIR_MODULE } from "../modules/repair";
 import RepairModuleService from "../modules/repair/service";
+import { getRepairTemplate } from "../utils/templates/repair";
 
 export default async function handleOrderPaid({
   event: { data },
@@ -48,19 +49,32 @@ export default async function handleOrderPaid({
     }
 
     if (technicianEmail) {
+      const [settings] = await repairService.listRepairSettings({});
+      if (!settings || settings.email_notifications_enabled) {
+        const templateData = {
+        ticket_number: ticket.ticket_number,
+        status: ticket.status,
+        repair_ticket_id: ticket.id,
+        technician_name: ticket.technician_name,
+      };
+      const template = getRepairTemplate("technician-job-paid", templateData);
+      
       // Dispatch notification
       const notificationModuleService = container.resolve(Modules.NOTIFICATION);
       await notificationModuleService.createNotifications({
         to: technicianEmail,
         channel: "email",
         template: "technician-job-paid",
+        content: {
+          subject: `Repair Job Paid: #${ticket.ticket_number}`,
+          html: template.html,
+        },
         data: {
-          ticket_number: ticket.ticket_number,
-          status: ticket.status,
-          repair_ticket_id: ticket.id,
-          technician_name: ticket.technician_name,
+          ...templateData,
+          body: template.text,
         },
       });
+      }
     }
   }
 

@@ -5,7 +5,7 @@ import {
 } from "@medusajs/framework/workflows-sdk";
 import { approveRepairCostStep } from "./steps/approve-repair-cost";
 import { updateRepairTicketStatusStep } from "./steps/update-repair-ticket-status";
-import { createRepairOrderStep } from "./steps/create-repair-order";
+import { createRepairPaymentCollectionStep } from "./steps/create-repair-payment-collection";
 
 type ApproveRepairCostWorkflowInput = {
   repair_ticket_id: string;
@@ -22,16 +22,16 @@ export const approveRepairCostWorkflow = createWorkflow(
       status: "repairing",
     });
 
-    const orderInput = transform({ approvedTicket, input }, ({ approvedTicket, input }) => ({
+    const paymentInput = transform({ approvedTicket, input }, ({ approvedTicket, input }) => ({
       repair_ticket_id: input.repair_ticket_id,
       customer_id: approvedTicket.customer_id,
     }));
 
-    const { order } = createRepairOrderStep(orderInput);
+    const { paymentCollection } = createRepairPaymentCollectionStep(paymentInput);
 
     return new WorkflowResponse({
       repairTicket: updatedTicket,
-      order,
+      paymentCollection,
     });
   },
 );

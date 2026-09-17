@@ -45,6 +45,8 @@ type RepairTicket = {
   total_actual: number;
   is_approved: boolean;
   approved_at?: string;
+  payment_status: string;
+  payment_collection_id?: string;
   warranty_months: number;
   warranty_expiry?: string;
   estimated_completion?: string;
@@ -570,10 +572,22 @@ const RepairDetailPage = () => {
                 <Text>{formatCurrency(ticket.total_estimate)}</Text>
               </div>
               {ticket.is_approved ? (
-                <Badge color="green" size="small" className="mt-2">
-                  Approved on{" "}
-                  {new Date(ticket.approved_at!).toLocaleDateString()}
-                </Badge>
+                <div className="flex flex-col gap-2 mt-2">
+                  <Badge color="green" size="small">
+                    Approved on {new Date(ticket.approved_at!).toLocaleDateString()}
+                  </Badge>
+                  <div className="flex justify-between items-center border-t pt-2 mt-2">
+                    <Text className="text-sm font-medium">Payment Status</Text>
+                    <Badge color={ticket.payment_status === "paid" || ticket.payment_status === "captured" ? "green" : "orange"} size="small">
+                      {ticket.payment_status.toUpperCase()}
+                    </Badge>
+                  </div>
+                  {ticket.payment_collection_id && (
+                    <Text className="text-xs text-ui-fg-muted">
+                      Collection ID: {ticket.payment_collection_id}
+                    </Text>
+                  )}
+                </div>
               ) : (
                 <div className="mt-4 pt-4 border-t">
                   <Button 
@@ -583,7 +597,7 @@ const RepairDetailPage = () => {
                     disabled={loading}
                     className="w-full"
                   >
-                    Manually Approve & Create Order
+                    Manually Approve & Create Payment
                   </Button>
                 </div>
               )}
@@ -600,13 +614,13 @@ const RepairDetailPage = () => {
               {ticket.parts && ticket.parts.length > 0 && (
                 <div className="space-y-2">
                   <Label>Inventory Parts Used</Label>
-                  {ticket.parts.map((p) => (
+                  {ticket.parts.map((p: any) => (
                     <div
                       key={p.id}
                       className="flex items-center justify-between p-2 bg-ui-bg-subtle rounded border text-sm"
                     >
                       <div className="flex flex-col">
-                        <Text>{p.title}</Text>
+                        <Text>{p.product?.title ? `${p.product.title} - ` : ""}{p.title}</Text>
                         <Text className="text-ui-fg-subtle text-xs">
                           {p.sku || "-"}
                         </Text>
@@ -630,12 +644,36 @@ const RepairDetailPage = () => {
                   {ticket.custom_parts.map((cp, idx) => (
                     <div
                       key={idx}
-                      className="flex justify-between p-2 bg-ui-bg-subtle rounded border text-sm"
+                      className="flex items-center justify-between p-2 bg-ui-bg-subtle rounded border text-sm"
                     >
-                      <Text>{cp.name}</Text>
-                      <Text className="font-medium">
-                        {formatCurrency(cp.price)}
-                      </Text>
+                      <div className="flex flex-col">
+                        <Text>{cp.name}</Text>
+                        <Text className="font-medium text-xs">
+                          {formatCurrency(cp.price)}
+                        </Text>
+                      </div>
+                      <Button
+                        variant="transparent"
+                        className="text-ui-fg-muted hover:text-ui-fg-base"
+                        onClick={async () => {
+                          try {
+                            setIsAddingPart(true);
+                            await fetch(`/admin/repairs/${id}/custom-parts/${idx}`, {
+                              method: "DELETE",
+                              credentials: "include",
+                            });
+                            toast.success("Custom part removed");
+                            loadTicket();
+                          } catch (e) {
+                            toast.error("Failed to remove custom part");
+                          } finally {
+                            setIsAddingPart(false);
+                          }
+                        }}
+                        disabled={isAddingPart}
+                      >
+                        <Trash />
+                      </Button>
                     </div>
                   ))}
                 </div>

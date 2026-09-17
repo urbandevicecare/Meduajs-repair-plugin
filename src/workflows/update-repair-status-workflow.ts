@@ -4,6 +4,7 @@ import {
 } from "@medusajs/framework/workflows-sdk";
 import { updateRepairTicketStatusStep } from "./steps/update-repair-ticket-status";
 import { emitRepairStatusChangedEventStep } from "./steps/emit-repair-status-changed-event";
+import { syncRepairInventoryStep } from "./steps/sync-repair-inventory";
 
 type UpdateRepairStatusWorkflowInput = {
   repair_ticket_id: string;
@@ -14,7 +15,8 @@ type UpdateRepairStatusWorkflowInput = {
     | "repairing"
     | "ready"
     | "completed"
-    | "cancelled";
+    | "cancelled"
+    | "refunded";
   estimated_completion?: Date;
   previous_status?: string;
 };
@@ -24,8 +26,13 @@ export const updateRepairStatusWorkflow = createWorkflow(
   function (input: UpdateRepairStatusWorkflowInput) {
     const updatedTicket = updateRepairTicketStatusStep({
       repair_ticket_id: input.repair_ticket_id,
-      status: input.status,
+      status: input.status as any,
       estimated_completion: input.estimated_completion,
+    });
+
+    syncRepairInventoryStep({
+      repair_ticket_id: input.repair_ticket_id,
+      status: input.status,
     });
 
     // Emit event for subscribers

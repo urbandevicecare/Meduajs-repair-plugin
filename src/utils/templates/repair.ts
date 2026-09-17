@@ -17,6 +17,12 @@ export function getRepairTemplate(
         return getRepairReminderTemplate(data);
       case "admin-repair-status":
         return getAdminRepairStatusTemplate(data);
+      case "technician-assigned":
+        return getTechnicianAssignedTemplate(data);
+      case "technician-job-rejected":
+        return getTechnicianJobRejectedTemplate(data);
+      case "technician-job-paid":
+        return getTechnicianJobPaidTemplate(data);
       default:
         console.warn(
           `[Template-Debug] ⚠️ Repair template '${templateName}' not found.`,
@@ -46,9 +52,10 @@ function getRepairStatusTemplate(data: any) {
     <p>The status of your repair ticket <strong>#${ticket_number}</strong> for your <strong>${device || "device"}</strong> has been updated to: <strong style="text-transform: capitalize;">${status.replace("_", " ")}</strong>.</p>`;
 
   if (total_estimate && Number(total_estimate) > 0) {
-    const formattedEstimate = new Intl.NumberFormat("en-KE", {
+    const currency = data.currency_code || "USD";
+    const formattedEstimate = new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "KES",
+      currency: currency,
     }).format(Number(total_estimate));
     text += `\nEstimated total cost: ${formattedEstimate}.`;
     html += `<div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #2563eb; margin: 20px 0;">
@@ -136,4 +143,71 @@ function getAdminRepairStatusTemplate(data: any) {
   </div>`;
 
   return { html, text };
+}
+
+function getTechnicianAssignedTemplate(data: any): TemplatePayload {
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
+      <div style="background-color: #3b82f6; color: white; padding: 20px; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px;">New Repair Job Assigned</h1>
+      </div>
+      <div style="padding: 20px;">
+        <p>Hello ${data.technician_name || "Technician"},</p>
+        <p>A new repair job <strong>#${data.ticket_number}</strong> has been assigned to you.</p>
+        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 6px; margin: 20px 0;">
+          <h3 style="margin-top: 0;">Job Details</h3>
+          <p><strong>Ticket ID:</strong> ${data.repair_ticket_id}</p>
+          <p><strong>Status:</strong> ${data.status}</p>
+        </div>
+        <p>Please log in to your dashboard to review the details and proceed with the diagnosis/repair.</p>
+      </div>
+    </div>
+  `
+
+  const text = `Hello ${data.technician_name || "Technician"},\n\nA new repair job #${data.ticket_number} has been assigned to you.\n\nTicket ID: ${data.repair_ticket_id}\nStatus: ${data.status}\n\nPlease log in to your dashboard to review the details.`
+
+  return { html, text }
+}
+
+function getTechnicianJobRejectedTemplate(data: any): TemplatePayload {
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
+      <div style="background-color: #ef4444; color: white; padding: 20px; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px;">Repair Job Cancelled</h1>
+      </div>
+      <div style="padding: 20px;">
+        <p>Hello ${data.technician_name || "Technician"},</p>
+        <p>The cost estimate for repair job <strong>#${data.ticket_number}</strong> was rejected by the customer.</p>
+        <p>This job has now been <strong>cancelled</strong> and requires no further action.</p>
+      </div>
+    </div>
+  `
+
+  const text = `Hello ${data.technician_name || "Technician"},\n\nThe cost estimate for repair job #${data.ticket_number} was rejected by the customer. This job has now been cancelled and requires no further action.`
+
+  return { html, text }
+}
+
+function getTechnicianJobPaidTemplate(data: any): TemplatePayload {
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 8px; overflow: hidden;">
+      <div style="background-color: #4CAF50; color: white; padding: 20px; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px;">Repair Job Paid</h1>
+      </div>
+      <div style="padding: 20px;">
+        <p>Hello ${data.technician_name || "Technician"},</p>
+        <p>The repair job <strong>#${data.ticket_number}</strong> has been successfully paid for by the customer.</p>
+        <p>You may now proceed to finalize the repair if it is not already completed.</p>
+        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 6px; margin: 20px 0;">
+          <h3 style="margin-top: 0;">Job Details</h3>
+          <p><strong>Ticket ID:</strong> ${data.repair_ticket_id}</p>
+          <p><strong>Status:</strong> ${data.status}</p>
+        </div>
+      </div>
+    </div>
+  `
+
+  const text = `Hello ${data.technician_name || "Technician"},\n\nThe repair job #${data.ticket_number} has been successfully paid for by the customer.\nYou may now proceed to finalize the repair.\n\nTicket ID: ${data.repair_ticket_id}\nStatus: ${data.status}`
+
+  return { html, text }
 }

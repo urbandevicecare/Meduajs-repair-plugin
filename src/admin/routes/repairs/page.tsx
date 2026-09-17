@@ -12,6 +12,8 @@ import {
   Textarea,
   Text,
   Checkbox,
+  Tabs,
+  Switch,
 } from "@medusajs/ui";
 import { useEffect, useState } from "react";
 import { Wrench } from "@medusajs/icons";
@@ -40,6 +42,35 @@ const RepairsPage = () => {
 
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [settings, setSettings] = useState({
+    email_notifications_enabled: true,
+    sms_notifications_enabled: true,
+    whatsapp_notifications_enabled: true,
+  });
+
+  const loadSettings = () => {
+    fetch("/admin/repairs/settings", { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settings) setSettings(data.settings);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const updateSettings = async (key: string, value: boolean) => {
+    const newSettings = { ...settings, [key]: value };
+    setSettings(newSettings);
+    try {
+      await fetch("/admin/repairs/settings", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newSettings),
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
   const [newDevice, setNewDevice] = useState({
     serial_number: "",
     model_name: "",
@@ -96,6 +127,7 @@ const RepairsPage = () => {
   useEffect(() => {
     loadTickets();
     loadCustomers();
+    loadSettings();
   }, []);
 
   const handleAccessoryKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -226,7 +258,13 @@ const RepairsPage = () => {
     });
 
   return (
-    <Container>
+    <Container className="p-0 overflow-hidden">
+      <Tabs defaultValue="tickets">
+        <Tabs.List className="px-6 pt-4 border-b border-ui-border-base">
+          <Tabs.Trigger value="tickets">Tickets</Tabs.Trigger>
+          <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content value="tickets" className="p-6">
       <div className="flex items-center justify-between mb-6">
         <Heading level="h1">Repair Tickets</Heading>
         <FocusModal open={createModalOpen} onOpenChange={setCreateModalOpen}>
@@ -539,6 +577,39 @@ const RepairsPage = () => {
           </Table.Body>
         </Table>
       )}
+        </Tabs.Content>
+        <Tabs.Content value="settings" className="p-6">
+          <div className="flex flex-col gap-y-6 max-w-2xl">
+            <Heading level="h2">Notification Settings</Heading>
+            <Text className="text-ui-fg-subtle">
+              Configure which channels are enabled for automated repair notifications. (Note: Medusa must have a provider configured for these channels to actually send them).
+            </Text>
+            <div className="flex flex-col gap-y-6 mt-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="font-semibold">Email Notifications</Label>
+                  <Text className="text-sm text-ui-fg-subtle">Send status updates and payment links to customers via Email.</Text>
+                </div>
+                <Switch checked={settings.email_notifications_enabled} onCheckedChange={(v) => updateSettings("email_notifications_enabled", v)} />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="font-semibold">SMS Notifications</Label>
+                  <Text className="text-sm text-ui-fg-subtle">Send status updates and payment links to customers via SMS.</Text>
+                </div>
+                <Switch checked={settings.sms_notifications_enabled} onCheckedChange={(v) => updateSettings("sms_notifications_enabled", v)} />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="font-semibold">WhatsApp Notifications</Label>
+                  <Text className="text-sm text-ui-fg-subtle">Send status updates and payment links to customers via WhatsApp.</Text>
+                </div>
+                <Switch checked={settings.whatsapp_notifications_enabled} onCheckedChange={(v) => updateSettings("whatsapp_notifications_enabled", v)} />
+              </div>
+            </div>
+          </div>
+        </Tabs.Content>
+      </Tabs>
     </Container>
   );
 };

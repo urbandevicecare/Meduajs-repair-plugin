@@ -5,8 +5,8 @@ import {
   Modules,
 } from "@medusajs/framework/utils";
 import { getRepairTemplate } from "../utils/templates/repair";
-
-const ACTIVE_CHANNELS = ["email", "sms", "whatsapp"];
+import { REPAIR_MODULE } from "../modules/repair";
+import RepairModuleService from "../modules/repair/service";
 
 export default async function globalNotificationHandler({
   event,
@@ -27,6 +27,19 @@ export default async function globalNotificationHandler({
       logger.warn(
         `[Omni-Notify] ⚠️ Notification module not installed. Aborting.`,
       );
+      return;
+    }
+
+    const repairService: RepairModuleService = container.resolve(REPAIR_MODULE);
+    const [settings] = await repairService.listRepairSettings({});
+    
+    const ACTIVE_CHANNELS: string[] = [];
+    if (!settings || settings.email_notifications_enabled) ACTIVE_CHANNELS.push("email");
+    if (!settings || settings.sms_notifications_enabled) ACTIVE_CHANNELS.push("sms");
+    if (!settings || settings.whatsapp_notifications_enabled) ACTIVE_CHANNELS.push("whatsapp");
+
+    if (ACTIVE_CHANNELS.length === 0) {
+      logger.info(`[Omni-Notify] All notification channels disabled in settings. Aborting.`);
       return;
     }
 
@@ -93,6 +106,19 @@ export default async function globalNotificationHandler({
         }
       }
 
+      let currencyCode = "usd";
+      try {
+        const regionModule = container.resolve(Modules.REGION, { allowUnregistered: true });
+        if (regionModule) {
+          const regions = await regionModule.listRegions({}, { take: 1 });
+          if (regions && regions.length > 0) {
+            currencyCode = regions[0].currency_code;
+          }
+        }
+      } catch (e) {
+        // Fallback
+      }
+
       // Populate base data
       notificationData = {
         ...notificationData,
@@ -100,6 +126,7 @@ export default async function globalNotificationHandler({
         device: deviceModel,
         status: data.status || ticket.status,
         approval_url: approvalUrl,
+        currency_code: currencyCode.toUpperCase(),
         total_estimate:
           Number(
             (ticket.total_estimate as any)?.value ?? ticket.total_estimate,

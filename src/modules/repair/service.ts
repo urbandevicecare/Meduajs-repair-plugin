@@ -4,6 +4,7 @@ import RepairTicket from "./models/repair-ticket";
 import RepairMedia from "./models/repair-media";
 import RepairNote from "./models/repair-note";
 import RepairUpdate from "./models/repair-update";
+import { RepairSettings } from "./models/repair-settings";
 
 class RepairModuleService extends MedusaService({
   Device,
@@ -11,6 +12,7 @@ class RepairModuleService extends MedusaService({
   RepairMedia,
   RepairNote,
   RepairUpdate,
+  RepairSettings,
 }) {}
 
 export default RepairModuleService;
