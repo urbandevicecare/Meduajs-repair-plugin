@@ -1,16 +1,26 @@
 import { Head, Partial } from "fresh/runtime";
 import BookRepairIsland from "./(_islands)/BookRepairIsland.tsx";
-import { STORE_NAME } from "../../lib/utils.ts";
+import { define, STORE_NAME } from "../../lib/utils.ts";
+import { page } from "fresh";
 
-export default function BookRepairRoute() {
-  const backendUrl =
-    Deno.env.get("MEDUSA_BACKEND_URL")!;
-  const publishableKey = Deno.env.get("MEDUSA_PUBLISHABLE_KEY") || "";
+export const handler = define.handlers({
+  GET(ctx) {
+    const isLoggedIn = Boolean((ctx.state as any).isLoggedIn);
+    if (!isLoggedIn) {
+      return new Response(null, {
+        status: 302,
+        headers: { Location: "/account/login?redirect=/repairs/book" },
+      });
+    }
+    return page({});
+  },
+});
 
+export default define.page(function BookRepairRoute(props) {
   return (
     <>
       <Head>
-        <title>Book a Repair | Urban Device Care</title>
+        <title>Book a Repair | {STORE_NAME}</title>
         <meta
           name="description"
           content="Initiate a device for repair and get a pickup."
@@ -23,11 +33,17 @@ export default function BookRepairRoute() {
         <meta name="view-transition" content="same-origin" />
       </Head>
       <Partial name="repair-content">
-        <div class="route-container max-w-4xl mx-auto px-4 py-8" f-client-nav>
-          <div class="mb-8">
-            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight mb-4">Book a Repair</h1>
-            <p class="text-slate-600">
-              Provide device details and book it in for a repair.
+        <div
+          class="route-container max-w-6xl mx-auto px-4 md:px-8 py-16 md:py-24"
+          f-client-nav={false}
+        >
+          <div class="mb-16 border-b border-black pb-8">
+            <h1 class="text-5xl md:text-7xl font-[Oswald] uppercase tracking-tighter leading-none text-slate-900 mb-6">
+              Book a<br />Repair
+            </h1>
+            <p class="text-xl font-serif italic text-slate-500 max-w-2xl">
+              Provide your device details and we'll get it fixed as soon as
+              possible.
             </p>
           </div>
           <div>
@@ -37,4 +53,4 @@ export default function BookRepairRoute() {
       </Partial>
     </>
   );
-}
+});
