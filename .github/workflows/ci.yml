@@ -49,9 +49,16 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # 6. Create GitHub Release
+      # 6. Package Storefront Examples for Release
+      - name: Package Storefront Examples
+        run: |
+          mkdir -p assets
+          zip -r assets/storefront-examples.zip storefront
+
+      # 7. Create GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ env.VERSION }}
           generate_release_notes: true
+          files: assets/storefront-examples.zip
