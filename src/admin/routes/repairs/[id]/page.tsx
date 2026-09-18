@@ -115,7 +115,6 @@ const RepairDetailPage = () => {
   const [partSearch, setPartSearch] = useState<string>("");
   const [isAddingPart, setIsAddingPart] = useState(false);
   const [customPartName, setCustomPartName] = useState("");
-  const [customPartTaxable, setCustomPartTaxable] = useState(true);
   const [customPartPrice, setCustomPartPrice] = useState("");
 
   const [technicianSearch, setTechnicianSearch] = useState("");
@@ -272,7 +271,6 @@ const RepairDetailPage = () => {
         body: JSON.stringify({
           name: customPartName,
           price: Number(customPartPrice),
-          is_taxable: customPartTaxable,
         }),
       });
       toast.success("Custom part added");
@@ -487,53 +485,6 @@ const RepairDetailPage = () => {
               </Text>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <a
-              href={`/admin/repairs/${id}/document?type=quote`}
-              target="_blank"
-            >
-              <Button variant="secondary" size="small">
-                Quote PDF
-              </Button>
-            </a>
-            <a
-              href={`/admin/repairs/${id}/document?type=invoice`}
-              target="_blank"
-            >
-              <Button variant="secondary" size="small">
-                Invoice PDF
-              </Button>
-            </a>
-            {(ticket.payment_status === "captured" || ticket.payment_status === "paid") && (
-              <a
-                href={`/admin/repairs/${id}/document?type=receipt`}
-                target="_blank"
-              >
-                <Button variant="primary" size="small">
-                  Download Receipt
-                </Button>
-              </a>
-            )}
-            <a
-              href={`/admin/repairs/${id}/document?type=job_card`}
-              target="_blank"
-            >
-              <Button variant="secondary" size="small">
-                Job Card
-              </Button>
-            </a>
-            <Button
-              variant="secondary"
-              size="small"
-              onClick={handleSendReminder}
-              disabled={isSendingReminder}
-            >
-              <BellAlert className="mr-1" /> Reminder
-            </Button>
-            <Button variant="secondary" size="small" onClick={() => navigate('/repairs')}>
-              Back
-            </Button>
-          </div>
         </div>
       </Container>
 
@@ -693,9 +644,6 @@ const RepairDetailPage = () => {
                       <div className="flex flex-col">
                         <Text>
                           {cp.name} 
-                          {cp.is_taxable === false && (
-                            <span className="ml-2 text-[10px] bg-ui-tag-neutral-bg text-ui-tag-neutral-text px-1.5 py-0.5 rounded-full border border-ui-border-base">No VAT</span>
-                          )}
                         </Text>
                         <Text className="font-medium text-xs">
                           {formatCurrency(cp.price)}
@@ -798,15 +746,6 @@ const RepairDetailPage = () => {
                   value={customPartPrice}
                   onChange={(e) => setCustomPartPrice(e.target.value)}
                 />
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="vat-toggle"
-                    checked={customPartTaxable}
-                    onChange={(e) => setCustomPartTaxable(e.target.checked)}
-                  />
-                  <Label htmlFor="vat-toggle" className="text-xs">VAT?</Label>
-                </div>
                 <Button
                   variant="secondary"
                   onClick={handleAddCustomPart}
@@ -892,10 +831,6 @@ const RepairDetailPage = () => {
                               }}
                             >
                               <Text>{opt.first_name} {opt.last_name}</Text>
-                              <div className="flex items-center gap-2">
-                                <Text size="small" className="text-ui-fg-muted">{opt.email}</Text>
-                                <Badge size="small" color={opt.type === 'Admin' ? 'purple' : 'blue'}>{opt.type}</Badge>
-                              </div>
                             </div>
                           ))}
                         </div>
