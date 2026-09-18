@@ -43,13 +43,7 @@ jobs:
       - name: Push changes
         run: git push --follow-tags
 
-      # 5. Publish to npm using your secret token
-      - name: Publish to npm
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      # 6. Package Plugin and Storefront Examples for Release
+      # 5. Package Plugin and Storefront Examples for Release
       - name: Package Release Assets
         run: |
           mkdir -p assets
@@ -57,7 +51,7 @@ jobs:
           yarn build
           yarn pack --filename assets/medusajs-repairshop-plugin-v${{ env.VERSION }}.tgz
 
-      # 7. Create GitHub Release
+      # 6. Create GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -66,3 +60,10 @@ jobs:
           files: |
             assets/storefront-examples.zip
             assets/medusajs-repairshop-plugin-v${{ env.VERSION }}.tgz
+
+      # 7. Publish to npm using your secret token
+      - name: Publish to npm
+        continue-on-error: true
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
