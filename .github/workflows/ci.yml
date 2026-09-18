@@ -49,11 +49,13 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # 6. Package Storefront Examples for Release
-      - name: Package Storefront Examples
+      # 6. Package Plugin and Storefront Examples for Release
+      - name: Package Release Assets
         run: |
           mkdir -p assets
           zip -r assets/storefront-examples.zip storefront
+          yarn build
+          yarn pack --filename assets/medusajs-repairshop-plugin-v${{ env.VERSION }}.tgz
 
       # 7. Create GitHub Release
       - name: Create GitHub Release
@@ -61,4 +63,6 @@ jobs:
         with:
           tag_name: v${{ env.VERSION }}
           generate_release_notes: true
-          files: assets/storefront-examples.zip
+          files: |
+            assets/storefront-examples.zip
+            assets/medusajs-repairshop-plugin-v${{ env.VERSION }}.tgz
