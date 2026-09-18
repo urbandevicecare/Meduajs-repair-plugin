@@ -51,12 +51,16 @@ jobs:
           yarn build
           yarn pack --filename assets/medusajs-repairshop-plugin-v${{ env.VERSION }}.tgz
 
-      # 6. Create GitHub Release
+      # 6. Extract Release Notes
+      - name: Extract Release Notes
+        run: awk '/^### v/ { if (p) { exit }; p=1; next } p' README.md > release_notes.md
+
+      # 7. Create GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ env.VERSION }}
-          generate_release_notes: true
+          body_path: release_notes.md
           files: |
             assets/storefront-examples.zip
             assets/medusajs-repairshop-plugin-v${{ env.VERSION }}.tgz

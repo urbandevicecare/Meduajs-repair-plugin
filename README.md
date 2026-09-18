@@ -107,7 +107,7 @@ To verify the system's integrations (such as price formatting, Zoho Books tax ha
 
 ## Changelog
 
-### v0.1.40 (Current)
+### v0.1.44 (Current)
 - **Global VAT Toggle**: Added a centralized "Add 16% VAT to Total" checkbox directly below the Cost Breakdown in the Admin UI. This replaces the old, per-item legacy checkboxes and calculates a seamless 16% markup on Parts + Labor.
 - **Zoho Books Native Tax Sync**: Perfected the Zoho synchronization. When VAT is checked, the plugin sets `is_inclusive_tax: false` and lets Zoho accurately add its default organizational tax rate. When unchecked, it aggressively sends `tax_id: ""` to bypass Zoho's default taxes, ensuring your totals remain flat.
 - **Medusa v2 BigNumber JSONB Fixes**: Introduced critical database migrations to add the implicit `raw_amount_paid` JSONB columns required by Medusa v2. This permanently stops silent backend rejection errors during partial updates.
