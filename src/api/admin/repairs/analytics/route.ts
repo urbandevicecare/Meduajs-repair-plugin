@@ -90,9 +90,9 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
         };
       }
 
-      acc[monthYear].partsRevenue += Number((partsAmount / 100).toFixed(2));
-      acc[monthYear].laborRevenue += Number((laborAmount / 100).toFixed(2));
-      acc[monthYear].totalRevenue += Number((tTotal / 100).toFixed(2));
+      acc[monthYear].partsRevenue += Number((partsAmount ).toFixed(2));
+      acc[monthYear].laborRevenue += Number((laborAmount ).toFixed(2));
+      acc[monthYear].totalRevenue += Number((tTotal ).toFixed(2));
     }
     return acc;
   }, {});

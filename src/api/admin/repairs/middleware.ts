@@ -75,6 +75,7 @@ const AddMessageSchema = z.object({
 const AddDetailsSchema = z.object({
   estimated_completion: z.string().nullable().optional(),
   technician_name: z.string().nullable().optional(),
+  technician_id: z.string().nullable().optional(),
 });
 
 export const repairMiddlewares: MiddlewareRoute[] = [

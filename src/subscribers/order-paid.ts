@@ -78,8 +78,10 @@ export default async function handleOrderPaid({
     }
   }
 
-  // Optionally auto-update ticket status to "ready" or "completed"
-  // await repairService.updateRepairTickets({ id: repairTicketId, status: "completed" });
+  // Push Payment to Zoho Books if enabled
+  const { syncPaymentToZoho } = await import("../utils/zoho-payment-sync.js");
+  const amount = order.total || ticket.total_actual || ticket.total_estimate;
+  await syncPaymentToZoho(container, ticket.id, amount as number, "PaymentCollection");
 }
 
 export const config: SubscriberConfig = {

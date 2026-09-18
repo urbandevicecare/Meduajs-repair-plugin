@@ -9,7 +9,7 @@ export async function POST(
   res: MedusaResponse,
 ) {
   const repairService: RepairModuleService = req.scope.resolve(REPAIR_MODULE);
-  const { name, price } = req.body as { name: string; price: number };
+  const { name, price, is_taxable } = req.body as { name: string; price: number; is_taxable?: boolean };
 
   if (!name || price === undefined) {
     res
@@ -25,8 +25,8 @@ export async function POST(
     ? [...ticket.custom_parts]
     : [];
 
-  const priceInCents = Math.round(Number(price) * 100);
-  customParts.push({ name, price: priceInCents });
+  const priceInCents = Number(price);
+  customParts.push({ name, price: priceInCents, is_taxable: is_taxable !== false });
 
   // also update parts estimate
   const currentPartsEstimate =

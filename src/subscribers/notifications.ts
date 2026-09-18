@@ -8,6 +8,20 @@ import { getRepairTemplate } from "../utils/templates/repair";
 import { REPAIR_MODULE } from "../modules/repair";
 import RepairModuleService from "../modules/repair/service";
 
+async function shortenUrl(url: string): Promise<string> {
+  if (!url) return url;
+  try {
+    const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
+    if (res.ok) {
+      const shortUrl = await res.text();
+      return shortUrl.trim();
+    }
+  } catch (e) {
+    // Silently fail and return original
+  }
+  return url;
+}
+
 export default async function globalNotificationHandler({
   event,
   container,
@@ -148,13 +162,15 @@ export default async function globalNotificationHandler({
         device: deviceModel,
         status: data.status || ticket.status,
         approval_url: approvalUrl,
+        short_approval_url: await shortenUrl(approvalUrl),
         pdf_url: pdfUrl,
+        short_pdf_url: await shortenUrl(pdfUrl),
         currency_code: currencyCode.toUpperCase(),
         company_name: companyName,
         total_estimate:
           Number(
             (ticket.total_estimate as any)?.value ?? ticket.total_estimate,
-          ) / 100,
+          ) ,
       };
 
       if (eventName === "repair.status_changed") {
@@ -253,6 +269,7 @@ export default async function globalNotificationHandler({
           data: {
             ...notificationData,
             body: textContent,
+            text: textContent,
           },
         }),
       );
@@ -269,6 +286,7 @@ export default async function globalNotificationHandler({
           data: {
             ...notificationData,
             body: textContent,
+            text: textContent,
           },
         }),
       );

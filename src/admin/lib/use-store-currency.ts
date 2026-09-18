@@ -31,7 +31,7 @@ export const useStoreCurrency = () => {
     return new Intl.NumberFormat(window.navigator.language || "en-US", {
       style: "currency",
       currency: currencyCode,
-    }).format(amount / 100);
+    }).format(amount);
   };
 
   return { currencyCode, formatCurrency };

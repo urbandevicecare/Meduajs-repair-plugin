@@ -15,7 +15,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     entity: "repair_ticket",
     fields: ["*", "device.*", "media.*", "notes.*", "updates.*"],
     filters: filters,
-    pagination: req.queryConfig?.pagination,
+    pagination: { ...req.queryConfig?.pagination, order: { created_at: "DESC" } },
   });
 
   res.json({

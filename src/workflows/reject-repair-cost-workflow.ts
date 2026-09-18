@@ -46,22 +46,54 @@ export const notifyTechnicianRejectedStep = createStep(
         const template = getRepairTemplate("technician-job-rejected", templateData);
         
         const notificationModuleService = container.resolve(Modules.NOTIFICATION);
-        await notificationModuleService.createNotifications({
-          to: technicianEmail,
-          channel: "email",
-          template: "technician-job-rejected",
-          content: {
-            subject: `Repair Job Cancelled: #${ticket.ticket_number}`,
-            html: template.html,
-          },
-          data: {
-            ...templateData,
-            body: template.text,
-          },
-        });
+        try {
+          await notificationModuleService.createNotifications({
+            to: technicianEmail,
+            channel: "email",
+            template: "technician-job-rejected",
+            content: {
+              subject: `Repair Job Cancelled: #${ticket.ticket_number}`,
+              html: template.html,
+            },
+            data: {
+              ...templateData,
+              body: template.text,
+            },
+          });
+        } catch (err: any) {
+          container.resolve("logger").warn(`Failed to send technician rejection notification: ${err.message}`);
+        }
         }
       }
     }
+      // 3. Delete Zoho Books Estimate if enabled
+      const [settings] = await repairService.listRepairSettings({});
+      if (settings?.zoho_books_enabled && settings.zoho_client_id) {
+        try {
+          const logger = container.resolve("logger");
+          const { ZohoBooksService } = await import("../services/zoho-books.js");
+          const zoho = new ZohoBooksService({
+            client_id: settings.zoho_client_id,
+            client_secret: settings.zoho_client_secret!,
+            refresh_token: settings.zoho_refresh_token!,
+            organization_id: settings.zoho_organization_id!,
+          }, logger);
+          
+          const metadata = ticket.metadata || {};
+          if (metadata.zoho_estimate_id) {
+            await zoho.deleteEstimate(metadata.zoho_estimate_id as string);
+            logger.info(`[Zoho Books] Deleted estimate ${metadata.zoho_estimate_id} for rejected ticket ${ticket.id}`);
+            
+            // clear from metadata
+            const newMeta = { ...metadata };
+            delete newMeta.zoho_estimate_id;
+            await repairService.updateRepairTickets({ id: ticket.id, metadata: newMeta });
+          }
+        } catch (e: any) {
+          container.resolve("logger").error(`[Zoho Books] Failed to delete estimate: ${e.message}`);
+        }
+      }
+
     return new StepResponse(null);
   }
 );

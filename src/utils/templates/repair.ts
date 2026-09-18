@@ -64,22 +64,28 @@ function getRepairStatusTemplate(data: any) {
   }
 
   if (data.pdf_url) {
-    text += ` Doc: ${data.pdf_url}`;
+    text += ` Doc: ${data.short_pdf_url || data.pdf_url}`;
     html += `<p style="margin-top: 15px;"><a href="${data.pdf_url}" style="color: #2563eb; font-weight: bold; text-decoration: underline;">📄 Download PDF Document</a></p>`;
   }
 
   if (approval_url && status === "awaiting_approval") {
-    const approveLink = approval_url.includes("?") ? `${approval_url}&action=approve` : `${approval_url}?action=approve`;
-    const rejectLink = approval_url.includes("?") ? `${approval_url}&action=reject` : `${approval_url}?action=reject`;
+    const textApprovalUrl = data.short_approval_url || approval_url;
+    const approveLink = textApprovalUrl.includes("?") ? `${textApprovalUrl}&action=approve` : `${textApprovalUrl}?action=approve`;
+    const rejectLink = textApprovalUrl.includes("?") ? `${textApprovalUrl}&action=reject` : `${textApprovalUrl}?action=reject`;
 
     text += ` Approve: ${approveLink} or Reject: ${rejectLink}`;
+    
+    // HTML uses original long links
+    const htmlApproveLink = approval_url.includes("?") ? `${approval_url}&action=approve` : `${approval_url}?action=approve`;
+    const htmlRejectLink = approval_url.includes("?") ? `${approval_url}&action=reject` : `${approval_url}?action=reject`;
+    
     html += `<p>Kindly review and approve or reject the repair costs so we can proceed:</p>
       <div style="margin-top: 25px; display: flex; gap: 10px;">
-        <a href="${approveLink}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Approve Repair</a>
-        <a href="${rejectLink}" style="background-color: #ef4444; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Reject</a>
+        <a href="${htmlApproveLink}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Approve Repair</a>
+        <a href="${htmlRejectLink}" style="background-color: #ef4444; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Reject</a>
       </div>`;
   } else if (approval_url) {
-    text += ` Track: ${approval_url}`;
+    text += ` Track: ${data.short_approval_url || approval_url}`;
     html += `<p style="margin-top: 25px;"><a href="${approval_url}" style="color: #2563eb; text-decoration: underline; font-weight: 500;">Track your repair progress here</a>.</p>`;
   }
 
@@ -94,7 +100,7 @@ function getRepairComplianceTemplate(data: any) {
   const { ticket_number, device, compliance_url } = data;
   const customerName = data.customer?.first_name || "Valued Customer";
   
-  const text = `[${data.company_name || "Repair Shop"}] Hi ${customerName}, please accept terms for repair #${ticket_number} (${device}) here: ${compliance_url}`;
+  const text = `[${data.company_name || "Repair Shop"}] Hi ${customerName}, please accept terms for repair #${ticket_number} (${device}) here: ${data.short_approval_url || compliance_url}`;
 
   const html = `<div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-w-lg: 600px; margin: 0 auto;">
     <h2 style="color: #d97706;">Action Required: Repair Ticket #${ticket_number}</h2>
@@ -113,7 +119,7 @@ function getRepairReminderTemplate(data: any) {
   const { ticket_number, status, device, nudge_message, approval_url } = data;
   const customerName = data.customer?.first_name || "Valued Customer";
 
-  const text = `[${data.company_name || "Repair Shop"}] Hi ${customerName}, Reminder for repair #${ticket_number} (${device}): ${nudge_message}. Track/Action: ${approval_url}`;
+  const text = `[${data.company_name || "Repair Shop"}] Hi ${customerName}, Reminder for repair #${ticket_number} (${device}): ${nudge_message}. Track/Action: ${data.short_approval_url || approval_url}`;
 
   const html = `<div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-w-lg: 600px; margin: 0 auto;">
     <h2 style="color: #2563eb;">Repair Reminder: Ticket #${ticket_number}</h2>

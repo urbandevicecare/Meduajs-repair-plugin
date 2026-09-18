@@ -24,6 +24,16 @@ export async function POST(
     email_notifications_enabled?: boolean;
     sms_notifications_enabled?: boolean;
     whatsapp_notifications_enabled?: boolean;
+    zoho_books_enabled?: boolean;
+    zoho_client_id?: string;
+    zoho_client_secret?: string;
+    zoho_refresh_token?: string;
+    zoho_organization_id?: string;
+    paystack_enabled?: boolean;
+    paystack_public_key?: string;
+    paystack_secret_key?: string;
+    company_name?: string;
+    storefront_url?: string;
   }>,
   res: MedusaResponse
 ) {

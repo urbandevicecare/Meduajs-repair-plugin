@@ -64,6 +64,7 @@ const RepairTicket = model.define("repair_ticket", {
   collected_at: model.dateTime().nullable(),
 
   // Payment Tracking
+  amount_paid: model.bigNumber().default(0),
   payment_status: model
     .enum(["pending", "authorized", "captured", "refunded"])
     .default("pending"),

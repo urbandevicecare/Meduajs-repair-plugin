@@ -21,8 +21,8 @@ export const removeRepairPartStep = createStep(
 
     // We dismiss the specific link
     const linkData = {
-      repair_ticket: { repair_ticket_id: input.repair_ticket_id },
-      product_variant: { product_variant_id: input.variant_id },
+      repair: { repair_ticket_id: input.repair_ticket_id },
+      product: { product_variant_id: input.variant_id },
     };
 
     await link.dismiss(linkData);

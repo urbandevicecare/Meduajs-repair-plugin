@@ -64,5 +64,5 @@ export async function GET(
     parts,
   };
 
-  await generateRepairDocument(type, payloadTicket, customerName, res);
+  await generateRepairDocument(type, payloadTicket, customerName, res, req);
 }

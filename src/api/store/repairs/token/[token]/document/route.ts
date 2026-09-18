@@ -55,5 +55,5 @@ export async function GET(
   }
 
   const payloadTicket = { ...ticket, parts };
-  await generateRepairDocument(type, payloadTicket, customerName, res);
+  await generateRepairDocument(type, payloadTicket, customerName, res, req);
 }

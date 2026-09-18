@@ -50,6 +50,34 @@ export const updateRepairTicketStatusStep = createStep(
       ...updateData,
     });
 
+    if (input.status === "cancelled") {
+      const [settings] = await repairService.listRepairSettings({});
+      if (settings?.zoho_books_enabled && settings.zoho_client_id) {
+        try {
+          const logger = container.resolve("logger");
+          const { ZohoBooksService } = await import("../../services/zoho-books.js");
+          const zoho = new ZohoBooksService({
+            client_id: settings.zoho_client_id,
+            client_secret: settings.zoho_client_secret!,
+            refresh_token: settings.zoho_refresh_token!,
+            organization_id: settings.zoho_organization_id!,
+          }, logger);
+          
+          const metadata = currentTicket.metadata || {};
+          if (metadata.zoho_estimate_id) await zoho.deleteEstimate(metadata.zoho_estimate_id as string);
+          if (metadata.zoho_invoice_id) await zoho.deleteInvoice(metadata.zoho_invoice_id as string);
+          
+          // clear from metadata
+          const newMeta = { ...metadata };
+          delete newMeta.zoho_estimate_id;
+          delete newMeta.zoho_invoice_id;
+          await repairService.updateRepairTickets({ id: input.repair_ticket_id, metadata: newMeta });
+        } catch (e: any) {
+          container.resolve("logger").error(`[Zoho Books] Failed to delete records: ${e.message}`);
+        }
+      }
+    }
+
     return new StepResponse(updatedTicket, {
       repair_ticket_id: currentTicket.id,
       previous_status: currentTicket.status,

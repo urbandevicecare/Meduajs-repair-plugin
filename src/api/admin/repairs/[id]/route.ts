@@ -32,7 +32,7 @@ export async function GET(
     // First try with plural name which is standard for isList: true
     const { data: ticketWithParts } = await linkQuery.graph({
       entity: "repair_ticket",
-      fields: ["id", "product_variants.*", "product_variants.product.*"],
+      fields: ["id", "product_variants.*", "product_variants.product.*", "product_variants.prices.*"],
       filters: { id: [req.params.id] },
     });
     parts = ticketWithParts?.[0]?.product_variants || [];
@@ -41,7 +41,7 @@ export async function GET(
       const linkQuery = req.scope.resolve(ContainerRegistrationKeys.QUERY);
       const { data: ticketWithParts } = await linkQuery.graph({
         entity: "repair_ticket",
-        fields: ["id", "product_variant.*", "product_variant.product.*"],
+        fields: ["id", "product_variant.*", "product_variant.product.*", "product_variant.prices.*"],
         filters: { id: [req.params.id] },
       });
       parts = ticketWithParts?.[0]?.product_variant || [];

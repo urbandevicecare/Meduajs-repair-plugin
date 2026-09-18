@@ -112,8 +112,10 @@ const RepairDetailPage = () => {
   const [inventoryParts, setInventoryParts] = useState<any[]>([]);
   const [selectedInventoryPart, setSelectedInventoryPart] =
     useState<string>("");
+  const [partSearch, setPartSearch] = useState<string>("");
   const [isAddingPart, setIsAddingPart] = useState(false);
   const [customPartName, setCustomPartName] = useState("");
+  const [customPartTaxable, setCustomPartTaxable] = useState(true);
   const [customPartPrice, setCustomPartPrice] = useState("");
 
   const [technicianSearch, setTechnicianSearch] = useState("");
@@ -174,7 +176,7 @@ const RepairDetailPage = () => {
       setTechnicianName(t.technician_name || "");
       setTechnicianId(t.technician_id || "");
 
-      setLaborCost((t.labor_estimate / 100).toFixed(2));
+      setLaborCost((t.labor_estimate || 0).toFixed(2));
 
       setEtc(
         t.estimated_completion ? t.estimated_completion.split("T")[0] : "",
@@ -234,6 +236,7 @@ const RepairDetailPage = () => {
       });
       toast.success("Inventory part added");
       setSelectedInventoryPart("");
+      setPartSearch("");
       loadTicket();
     } catch (err) {
       toast.error("Failed to add part");
@@ -269,11 +272,13 @@ const RepairDetailPage = () => {
         body: JSON.stringify({
           name: customPartName,
           price: Number(customPartPrice),
+          is_taxable: customPartTaxable,
         }),
       });
       toast.success("Custom part added");
       setCustomPartName("");
       setCustomPartPrice("");
+      setCustomPartTaxable(true);
       loadTicket();
     } catch (err) {
       toast.error("Failed to add custom part");
@@ -331,7 +336,7 @@ const RepairDetailPage = () => {
     try {
       const promises = [];
       if (laborCost !== "") {
-        const laborAmount = Math.round(parseFloat(laborCost) * 100);
+        const laborAmount = parseFloat(laborCost);
         if (!isNaN(laborAmount)) {
           promises.push(
             fetch(`/admin/repairs/${id}/costs`, {
@@ -482,6 +487,16 @@ const RepairDetailPage = () => {
                 Invoice PDF
               </Button>
             </a>
+            {(ticket.payment_status === "captured" || ticket.payment_status === "paid") && (
+              <a
+                href={`/admin/repairs/${id}/document?type=receipt`}
+                target="_blank"
+              >
+                <Button variant="primary" size="small">
+                  Download Receipt
+                </Button>
+              </a>
+            )}
             <a
               href={`/admin/repairs/${id}/document?type=job_card`}
               target="_blank"
@@ -622,7 +637,7 @@ const RepairDetailPage = () => {
                       <div className="flex flex-col">
                         <Text>{p.product?.title ? `${p.product.title} - ` : ""}{p.title}</Text>
                         <Text className="text-ui-fg-subtle text-xs">
-                          {p.sku || "-"}
+                          {p.sku || "-"} {p.prices?.[0]?.amount != null ? ` • ${formatCurrency(p.prices[0].amount)}` : ""}
                         </Text>
                       </div>
                       <Button
@@ -647,7 +662,12 @@ const RepairDetailPage = () => {
                       className="flex items-center justify-between p-2 bg-ui-bg-subtle rounded border text-sm"
                     >
                       <div className="flex flex-col">
-                        <Text>{cp.name}</Text>
+                        <Text>
+                          {cp.name} 
+                          {cp.is_taxable === false && (
+                            <span className="ml-2 text-[10px] bg-ui-tag-neutral-bg text-ui-tag-neutral-text px-1.5 py-0.5 rounded-full border border-ui-border-base">No VAT</span>
+                          )}
+                        </Text>
                         <Text className="font-medium text-xs">
                           {formatCurrency(cp.price)}
                         </Text>
@@ -685,21 +705,43 @@ const RepairDetailPage = () => {
                 Add Inventory Part
               </Heading>
               <div className="flex gap-2">
-                <Select
-                  value={selectedInventoryPart}
-                  onValueChange={setSelectedInventoryPart}
-                >
-                  <Select.Trigger className="flex-1">
-                    <Select.Value placeholder="Select variant..." />
-                  </Select.Trigger>
-                  <Select.Content>
-                    {inventoryParts.map((p) => (
-                      <Select.Item key={p.id} value={p.id}>
-                        {p.title} {p.sku ? `(${p.sku})` : ""}
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select>
+                <div className="relative flex-1">
+                  <Input
+                    placeholder="Search variant..."
+                    value={partSearch}
+                    onChange={(e) => {
+                      setPartSearch(e.target.value);
+                      setSelectedInventoryPart("");
+                    }}
+                  />
+                  {partSearch && !selectedInventoryPart && (
+                    <div className="absolute z-10 w-full mt-1 bg-ui-bg-base border border-ui-border-base rounded-md shadow-md max-h-48 overflow-y-auto">
+                      {inventoryParts
+                        .filter((p) =>
+                          p.title.toLowerCase().includes(partSearch.toLowerCase()) || 
+                          p.sku?.toLowerCase().includes(partSearch.toLowerCase())
+                        )
+                        .map((p) => (
+                          <div
+                            key={p.id}
+                            className="p-2 text-sm hover:bg-ui-bg-subtle-hover cursor-pointer"
+                            onClick={() => {
+                              setSelectedInventoryPart(p.id);
+                              setPartSearch(`${p.title} ${p.sku ? `(${p.sku})` : ""}`);
+                            }}
+                          >
+                            {p.title} {p.sku ? `(${p.sku})` : ""}
+                          </div>
+                        ))}
+                      {inventoryParts.filter((p) =>
+                          p.title.toLowerCase().includes(partSearch.toLowerCase()) || 
+                          p.sku?.toLowerCase().includes(partSearch.toLowerCase())
+                      ).length === 0 && (
+                        <div className="p-2 text-sm text-ui-fg-subtle">No parts found</div>
+                      )}
+                    </div>
+                  )}
+                </div>
                 <Button
                   variant="secondary"
                   onClick={handleAddInventoryPart}
@@ -727,6 +769,15 @@ const RepairDetailPage = () => {
                   value={customPartPrice}
                   onChange={(e) => setCustomPartPrice(e.target.value)}
                 />
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="vat-toggle"
+                    checked={customPartTaxable}
+                    onChange={(e) => setCustomPartTaxable(e.target.checked)}
+                  />
+                  <Label htmlFor="vat-toggle" className="text-xs">VAT?</Label>
+                </div>
                 <Button
                   variant="secondary"
                   onClick={handleAddCustomPart}

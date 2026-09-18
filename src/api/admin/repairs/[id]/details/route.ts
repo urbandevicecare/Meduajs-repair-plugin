@@ -55,19 +55,23 @@ export async function POST(
       const template = getRepairTemplate("technician-assigned", templateData);
       
       const notificationModuleService = req.scope.resolve(Modules.NOTIFICATION);
-      await notificationModuleService.createNotifications({
-        to: technicianEmail,
-        channel: "email",
-        template: "technician-assigned",
-        content: {
-          subject: `New Repair Job Assigned: #${updatedTicket.ticket_number}`,
-          html: template.html,
-        },
-        data: {
-          ...templateData,
-          body: template.text,
-        },
-      });
+      try {
+        await notificationModuleService.createNotifications({
+          to: technicianEmail,
+          channel: "email",
+          template: "technician-assigned",
+          content: {
+            subject: `New Repair Job Assigned: #${updatedTicket.ticket_number}`,
+            html: template.html,
+          },
+          data: {
+            ...templateData,
+            body: template.text,
+          },
+        });
+      } catch (err: any) {
+        req.scope.resolve("logger").error(`Failed to send technician notification: ${err.message}`);
+      }
       }
     }
   }

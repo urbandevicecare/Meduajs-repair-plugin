@@ -26,8 +26,8 @@ export const addRepairPartsStep = createStep(
 
     // Create links between repair ticket and product variants
     const linkData = input.variant_ids.map((variantId) => ({
-      repair_ticket: { repair_ticket_id: input.repair_ticket_id },
-      product_variant: { product_variant_id: variantId },
+      [REPAIR_MODULE]: { repair_ticket_id: input.repair_ticket_id },
+      [ModuleRegistrationName.PRODUCT]: { product_variant_id: variantId },
     }));
 
     await link.create(linkData);

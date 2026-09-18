@@ -1,6 +1,9 @@
-import { MedusaResponse } from "@medusajs/framework/http";
+import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import PDFDocument from "pdfkit";
 import QRCode from "qrcode";
+import { REPAIR_MODULE } from "../modules/repair";
+import RepairModuleService from "../modules/repair/service";
+import { ZohoBooksService } from "../services/zoho-books.js";
 
 // Helpers
 const formatCurrency = (amount: number) => {
@@ -21,11 +24,71 @@ export async function generateRepairDocument(
   ticket: any,
   customerName: string,
   res: MedusaResponse,
+  req: MedusaRequest,
 ) {
+  const repairService: RepairModuleService = req.scope.resolve(REPAIR_MODULE);
+  const [settings] = await repairService.listRepairSettings({});
+  
+  if (settings?.zoho_books_enabled && settings.zoho_client_id && settings.zoho_client_secret && settings.zoho_refresh_token && settings.zoho_organization_id) {
+    const logger = req.scope.resolve("logger");
+    const zoho = new ZohoBooksService({
+      client_id: settings.zoho_client_id,
+      client_secret: settings.zoho_client_secret,
+      refresh_token: settings.zoho_refresh_token,
+      organization_id: settings.zoho_organization_id,
+    }, logger);
+
+    try {
+      // 1. Sync Contact
+      let customerObj: any = { email: `guest-${ticket.id}@example.com`, first_name: customerName };
+      if (ticket.customer_id) {
+        const customerModule = req.scope.resolve("customer", { allowUnregistered: true });
+        if (customerModule) {
+          const c = await customerModule.retrieveCustomer(ticket.customer_id);
+          if (c) customerObj = c;
+        }
+      }
+      
+      const contactId = await zoho.syncContact(customerObj);
+      
+      // 2. Generate Estimate or Invoice or Receipt
+      const metadata = ticket.metadata || {};
+
+      if (docType === "quote") {
+        let estId = metadata.zoho_estimate_id as string;
+        if (!estId) {
+          estId = await zoho.createEstimate(contactId, ticket);
+          await repairService.updateRepairTickets({ id: ticket.id, metadata: { ...metadata, zoho_estimate_id: estId } });
+        }
+        const pdfBuffer = await zoho.getDocumentPdf(estId, "estimate");
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `inline; filename="Repair-Quote-${ticket.ticket_number}.pdf"`);
+        return res.send(Buffer.from(pdfBuffer));
+      } else if (docType === "receipt" && metadata.zoho_payment_id) {
+        const pdfBuffer = await zoho.getPaymentReceiptPdf(metadata.zoho_payment_id as string);
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `inline; filename="Repair-Receipt-${ticket.ticket_number}.pdf"`);
+        return res.send(Buffer.from(pdfBuffer));
+      } else if (docType !== "receipt") {
+        let invId = metadata.zoho_invoice_id as string;
+        if (!invId) {
+          invId = await zoho.createInvoice(contactId, ticket);
+          await repairService.updateRepairTickets({ id: ticket.id, metadata: { ...metadata, zoho_invoice_id: invId } });
+        }
+        const pdfBuffer = await zoho.getDocumentPdf(invId, "invoice");
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `inline; filename="Repair-${docType.charAt(0).toUpperCase() + docType.slice(1)}-${ticket.ticket_number}.pdf"`);
+        return res.send(Buffer.from(pdfBuffer));
+      }
+    } catch (e: any) {
+      logger.error(`Zoho Books Integration failed: ${e.message}. Falling back to local PDF generation.`);
+    }
+  }
+
   const parseNum = (val: any) => {
     if (!val) return 0;
-    if (typeof val === "object" && "value" in val) return Number(val.value) / 100;
-    return Number(val) / 100;
+    if (typeof val === "object" && "value" in val) return Number(val.value) ;
+    return Number(val) ;
   };
 
   const tTotal = parseNum(ticket.total_estimate);

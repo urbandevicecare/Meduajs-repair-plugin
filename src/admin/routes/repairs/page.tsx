@@ -79,24 +79,33 @@ const RepairsPage = () => {
       .catch((err) => console.error(err));
   };
 
-  const updateSettings = async (key: string, value: boolean | string) => {
-    const newSettings = { ...settings, [key]: value };
-    setSettings(newSettings);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const updateSettingState = (key: string, value: boolean | string) => {
+    setSettings({ ...settings, [key]: value });
+  };
+
+  const saveSettings = async () => {
+    setIsSaving(true);
     try {
       await fetch("/admin/repairs/settings", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newSettings),
+        body: JSON.stringify(settings),
       });
+      alert("Settings saved successfully!");
     } catch (e) {
       console.error(e);
+      alert("Failed to save settings.");
+    } finally {
+      setIsSaving(false);
     }
   };
   const [newDevice, setNewDevice] = useState({
     serial_number: "",
     model_name: "",
-    brand: "",
+    brand: "Apple",
     customer_id: "",
     imei: "",
     condition: "",
@@ -206,7 +215,7 @@ const RepairsPage = () => {
       setNewDevice({
         serial_number: "",
         model_name: "",
-        brand: "",
+        brand: "Apple",
         customer_id: "",
         imei: "",
         condition: "",
@@ -535,16 +544,11 @@ const RepairsPage = () => {
       </div>
 
       <div className="flex gap-4 mb-6">
-        <Input
-          placeholder="Search tickets..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1"
-        />
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <Select.Trigger>
-            <Select.Value placeholder="Filter by status" />
-          </Select.Trigger>
+        <div className="w-48">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select.Trigger>
+              <Select.Value placeholder="Filter by status" />
+            </Select.Trigger>
           <Select.Content>
             <Select.Item value="all">All Statuses</Select.Item>
             <Select.Item value="received">Received</Select.Item>
@@ -558,6 +562,13 @@ const RepairsPage = () => {
             <Select.Item value="cancelled">Cancelled</Select.Item>
           </Select.Content>
         </Select>
+        </div>
+        <Input
+          placeholder="Search tickets..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="flex-1"
+        />
       </div>
 
       {loading ? (
@@ -577,12 +588,15 @@ const RepairsPage = () => {
               <Table.HeaderCell>Issue</Table.HeaderCell>
               <Table.HeaderCell>Estimate</Table.HeaderCell>
               <Table.HeaderCell>Created</Table.HeaderCell>
-              <Table.HeaderCell></Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
             {filteredTickets.map((ticket) => (
-              <Table.Row key={ticket.id}>
+              <Table.Row 
+                key={ticket.id} 
+                onClick={() => navigate(`/repairs/${ticket.id}`)}
+                className="cursor-pointer hover:bg-ui-bg-subtle-hover transition-colors"
+              >
                 <Table.Cell>
                   <Text className="font-medium">{ticket.ticket_number}</Text>
                   <Text className="text-ui-fg-subtle text-xs">
@@ -600,7 +614,7 @@ const RepairsPage = () => {
                       {ticket.technician_name}
                     </Badge>
                   ) : (
-                    <span className="text-ui-fg-muted">Unassigned</span>
+                    <span className="text-ui-fg-muted text-xs">Unassigned</span>
                   )}
                 </Table.Cell>
                 <Table.Cell className="max-w-xs truncate">
@@ -609,11 +623,6 @@ const RepairsPage = () => {
                 <Table.Cell>{formatCurrency(ticket.total_estimate)}</Table.Cell>
                 <Table.Cell>
                   {new Date(ticket.created_at).toLocaleDateString()}
-                </Table.Cell>
-                <Table.Cell>
-                  <Button variant="secondary" size="small" onClick={() => navigate(`/repairs/${ticket.id}`)}>
-                    View
-                  </Button>
                 </Table.Cell>
               </Table.Row>
             ))}
@@ -634,7 +643,7 @@ const RepairsPage = () => {
                 <Input 
                   placeholder="e.g. Urban Device Care Ltd" 
                   value={settings.company_name} 
-                  onChange={(e) => updateSettings("company_name", e.target.value)} 
+                  onChange={(e) => updateSettingState("company_name", e.target.value)} 
                 />
               </div>
               <div className="flex flex-col gap-2 mt-2">
@@ -643,7 +652,7 @@ const RepairsPage = () => {
                 <Input 
                   placeholder="e.g. https://store.example.com" 
                   value={settings.storefront_url} 
-                  onChange={(e) => updateSettings("storefront_url", e.target.value)} 
+                  onChange={(e) => updateSettingState("storefront_url", e.target.value)} 
                 />
               </div>
             </div>
@@ -661,21 +670,21 @@ const RepairsPage = () => {
                   <Label className="font-semibold">Email Notifications</Label>
                   <Text className="text-sm text-ui-fg-subtle">Send status updates and payment links to customers via Email.</Text>
                 </div>
-                <Switch checked={settings.email_notifications_enabled} onCheckedChange={(v) => updateSettings("email_notifications_enabled", v)} />
+                <Switch checked={settings.email_notifications_enabled} onCheckedChange={(v) => updateSettingState("email_notifications_enabled", v)} />
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <Label className="font-semibold">SMS Notifications</Label>
                   <Text className="text-sm text-ui-fg-subtle">Send status updates and payment links to customers via SMS.</Text>
                 </div>
-                <Switch checked={settings.sms_notifications_enabled} onCheckedChange={(v) => updateSettings("sms_notifications_enabled", v)} />
+                <Switch checked={settings.sms_notifications_enabled} onCheckedChange={(v) => updateSettingState("sms_notifications_enabled", v)} />
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <Label className="font-semibold">WhatsApp Notifications</Label>
                   <Text className="text-sm text-ui-fg-subtle">Send status updates and payment links to customers via WhatsApp.</Text>
                 </div>
-                <Switch checked={settings.whatsapp_notifications_enabled} onCheckedChange={(v) => updateSettings("whatsapp_notifications_enabled", v)} />
+                <Switch checked={settings.whatsapp_notifications_enabled} onCheckedChange={(v) => updateSettingState("whatsapp_notifications_enabled", v)} />
               </div>
             </div>
           </div>
@@ -694,7 +703,7 @@ const RepairsPage = () => {
                   <Label className="font-semibold">Enable Zoho Books Sync</Label>
                   <Text className="text-sm text-ui-fg-subtle">Replaces local PDF generation with official Zoho Books documents.</Text>
                 </div>
-                <Switch checked={settings.zoho_books_enabled} onCheckedChange={(v) => updateSettings("zoho_books_enabled", v)} />
+                <Switch checked={settings.zoho_books_enabled} onCheckedChange={(v) => updateSettingState("zoho_books_enabled", v)} />
               </div>
 
               {settings.zoho_books_enabled && (
@@ -704,7 +713,7 @@ const RepairsPage = () => {
                     <Input 
                       placeholder="e.g. 12345678" 
                       value={settings.zoho_organization_id} 
-                      onChange={(e) => updateSettings("zoho_organization_id", e.target.value)} 
+                      onChange={(e) => updateSettingState("zoho_organization_id", e.target.value)} 
                     />
                   </div>
                   <div className="flex flex-col gap-y-2">
@@ -712,7 +721,7 @@ const RepairsPage = () => {
                     <Input 
                       placeholder="1000.XXXXXXXXXXXXXXXXXXXXXXXX" 
                       value={settings.zoho_client_id} 
-                      onChange={(e) => updateSettings("zoho_client_id", e.target.value)} 
+                      onChange={(e) => updateSettingState("zoho_client_id", e.target.value)} 
                     />
                   </div>
                   <div className="flex flex-col gap-y-2">
@@ -721,7 +730,7 @@ const RepairsPage = () => {
                       placeholder="Enter Client Secret" 
                       type="password"
                       value={settings.zoho_client_secret} 
-                      onChange={(e) => updateSettings("zoho_client_secret", e.target.value)} 
+                      onChange={(e) => updateSettingState("zoho_client_secret", e.target.value)} 
                     />
                   </div>
                   <div className="flex flex-col gap-y-2">
@@ -730,7 +739,7 @@ const RepairsPage = () => {
                       placeholder="1000.XXXXXXXXXXXXXXXXXXXXXXXX" 
                       type="password"
                       value={settings.zoho_refresh_token} 
-                      onChange={(e) => updateSettings("zoho_refresh_token", e.target.value)} 
+                      onChange={(e) => updateSettingState("zoho_refresh_token", e.target.value)} 
                     />
                   </div>
                 </div>
@@ -752,7 +761,7 @@ const RepairsPage = () => {
                   <Label className="font-semibold">Enable Paystack Checkout</Label>
                   <Text className="text-sm text-ui-fg-subtle">Generate Paystack checkout links on approved tickets.</Text>
                 </div>
-                <Switch checked={settings.paystack_enabled} onCheckedChange={(v) => updateSettings("paystack_enabled", v)} />
+                <Switch checked={settings.paystack_enabled} onCheckedChange={(v) => updateSettingState("paystack_enabled", v)} />
               </div>
 
               {settings.paystack_enabled && (
@@ -762,7 +771,7 @@ const RepairsPage = () => {
                     <Input 
                       placeholder="pk_test_..." 
                       value={settings.paystack_public_key} 
-                      onChange={(e) => updateSettings("paystack_public_key", e.target.value)} 
+                      onChange={(e) => updateSettingState("paystack_public_key", e.target.value)} 
                     />
                   </div>
                   <div className="flex flex-col gap-y-2">
@@ -771,12 +780,18 @@ const RepairsPage = () => {
                       placeholder="sk_test_..." 
                       type="password"
                       value={settings.paystack_secret_key} 
-                      onChange={(e) => updateSettings("paystack_secret_key", e.target.value)} 
+                      onChange={(e) => updateSettingState("paystack_secret_key", e.target.value)} 
                     />
                   </div>
                 </div>
               )}
             </div>
+          </div>
+
+          <div className="flex justify-end mt-4">
+            <Button variant="primary" onClick={saveSettings} isLoading={isSaving}>
+              Save Settings
+            </Button>
           </div>
         </div>
       )}
