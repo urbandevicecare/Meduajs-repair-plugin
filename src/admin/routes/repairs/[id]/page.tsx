@@ -606,7 +606,7 @@ const RepairDetailPage = () => {
                 <input
                   type="checkbox"
                   id="global-vat-toggle"
-                  checked={ticket.apply_tax ?? true}
+                  checked={ticket.apply_tax ?? false}
                   onChange={(e) => handleToggleTax(e.target.checked)}
                   disabled={loading}
                 />

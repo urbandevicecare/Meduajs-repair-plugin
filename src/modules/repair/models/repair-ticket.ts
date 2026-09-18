@@ -71,7 +71,7 @@ const RepairTicket = model.define("repair_ticket", {
   payment_collection_id: model.text().nullable(),
 
   // Tax handling
-  apply_tax: model.boolean().default(true),
+  apply_tax: model.boolean().default(false),
 
   // Relationships
   media: model.hasMany(() => RepairMedia, {
