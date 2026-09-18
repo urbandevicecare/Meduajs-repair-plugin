@@ -115,32 +115,49 @@ export class ZohoBooksService {
 
   private formatLineItems(ticket: any) {
     const items: any[] = [];
+    const applyGlobalTax = ticket.apply_tax !== false;
+
     if (ticket.device?.parts_used && ticket.device.parts_used.length > 0) {
       for (const part of ticket.device.parts_used) {
+        const exempt = !applyGlobalTax || part.is_taxable === false;
         items.push({
           name: part.name || "Part",
           description: part.sku ? `SKU: ${part.sku}` : "",
-          rate: (Number(part.price || 0) ).toFixed(2),
+          rate: (Number(part.price || 0)).toFixed(2),
           quantity: 1,
-          ...(part.is_taxable === false ? { tax_id: "" } : {})
+          ...(exempt ? { tax_id: "" } : {})
         });
       }
     }
+    
+    // Also push labor if present
+    if (ticket.labor_estimate > 0) {
+      items.push({
+        name: "Labor Charge",
+        rate: (Number(ticket.labor_estimate || 0)).toFixed(2),
+        quantity: 1,
+        ...(!applyGlobalTax ? { tax_id: "" } : {})
+      });
+    }
+
     if (ticket.custom_parts && ticket.custom_parts.length > 0) {
       for (const cp of ticket.custom_parts) {
+        const exempt = !applyGlobalTax || cp.is_taxable === false;
         items.push({
           name: cp.name || "Custom Part / Service",
-          rate: (Number(cp.price || 0) ).toFixed(2),
+          rate: (Number(cp.price || 0)).toFixed(2),
           quantity: 1,
-          ...(cp.is_taxable === false ? { tax_id: "" } : {})
+          ...(exempt ? { tax_id: "" } : {})
         });
       }
     }
+
     if (items.length === 0) {
       items.push({
         name: `Repair Ticket #${ticket.ticket_number}`,
-        rate: (Number(ticket.total_estimate || 0) ).toFixed(2),
+        rate: (Number(ticket.total_estimate || 0)).toFixed(2),
         quantity: 1,
+        ...(!applyGlobalTax ? { tax_id: "" } : {})
       });
     }
     return items;
@@ -152,7 +169,7 @@ export class ZohoBooksService {
       reference_number: `TKT-${ticket.ticket_number}`,
       line_items: this.formatLineItems(ticket),
       notes: "Generated from Medusa Repair Module",
-      is_inclusive_tax: true
+      is_inclusive_tax: false
     };
 
     const res = await this.request("POST", "/estimates", payload);
@@ -169,7 +186,7 @@ export class ZohoBooksService {
       reference_number: `TKT-${ticket.ticket_number}`,
       line_items: this.formatLineItems(ticket),
       notes: "Generated from Medusa Repair Module",
-      is_inclusive_tax: true
+      is_inclusive_tax: false
     };
 
     const res = await this.request("POST", "/invoices", payload);

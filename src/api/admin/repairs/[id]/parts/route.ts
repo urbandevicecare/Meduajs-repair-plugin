@@ -46,16 +46,23 @@ export async function POST(
           ? Number((ticket.parts_estimate as any).value)
           : Number(ticket.parts_estimate);
       const currentLaborEstimate =
-        typeof ticket.labor_estimate === "object" && ticket.labor_estimate !== null && "value" in ticket.labor_estimate
+        typeof ticket.labor_estimate === "object" &&
+        ticket.labor_estimate !== null &&
+        "value" in ticket.labor_estimate
           ? Number((ticket.labor_estimate as any).value)
           : Number(ticket.labor_estimate);
 
       const updatedPartsEstimate = currentPartsEstimate + additionalCost;
 
+      let newTotalEstimate = updatedPartsEstimate + currentLaborEstimate;
+      if ((ticket as any).apply_tax) {
+        newTotalEstimate = newTotalEstimate * 1.16;
+      }
+
       await repairService.updateRepairTickets({
         id: req.params.id,
         parts_estimate: updatedPartsEstimate,
-        total_estimate: updatedPartsEstimate + currentLaborEstimate,
+        total_estimate: newTotalEstimate,
       });
     }
   } catch (err) {

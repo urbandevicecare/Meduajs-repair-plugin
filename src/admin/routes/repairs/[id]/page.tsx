@@ -401,6 +401,23 @@ const RepairDetailPage = () => {
       setLoading(false);
     }
   };
+  const handleToggleTax = async (checked: boolean) => {
+    try {
+      setLoading(true);
+      await fetch(`/admin/repairs/${id}/tax`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apply_tax: checked }),
+      });
+      toast.success(checked ? "VAT applied to total" : "VAT removed from total");
+      await loadTicket();
+    } catch (err) {
+      toast.error("Failed to update tax setting");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleStatusChange = async (newStatusValue: string) => {
     const colors: Record<string, "grey" | "blue" | "orange" | "green" | "red"> =
@@ -581,6 +598,18 @@ const RepairDetailPage = () => {
                 <Text className="font-medium">
                   {formatCurrency(ticket.labor_estimate)}
                 </Text>
+              </div>
+              <div className="flex justify-between items-center py-2">
+                <Label htmlFor="global-vat-toggle" className="text-sm cursor-pointer text-ui-fg-subtle">
+                  + Add 16% VAT to Total
+                </Label>
+                <input
+                  type="checkbox"
+                  id="global-vat-toggle"
+                  checked={ticket.apply_tax ?? true}
+                  onChange={(e) => handleToggleTax(e.target.checked)}
+                  disabled={loading}
+                />
               </div>
               <div className="flex justify-between text-lg font-semibold border-t pt-2">
                 <Text>Total Estimate:</Text>

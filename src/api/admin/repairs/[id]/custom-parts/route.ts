@@ -45,11 +45,16 @@ export async function POST(
 
   const updatedPartsEstimate = currentPartsEstimate + priceInCents;
 
+  let newTotalEstimate = updatedPartsEstimate + currentLaborEstimate;
+  if ((ticket as any).apply_tax) {
+    newTotalEstimate = newTotalEstimate * 1.16;
+  }
+
   const updatedTicket = await repairService.updateRepairTickets({
     id: req.params.id,
     custom_parts: customParts as unknown as Record<string, unknown>,
     parts_estimate: updatedPartsEstimate,
-    total_estimate: updatedPartsEstimate + currentLaborEstimate,
+    total_estimate: newTotalEstimate,
   });
 
   res.json({ repair_ticket: updatedTicket });

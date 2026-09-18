@@ -45,11 +45,16 @@ export async function DELETE(req: MedusaRequest, res: MedusaResponse) {
           : Number(ticket.labor_estimate);
 
       const updatedPartsEstimate = Math.max(0, currentPartsEstimate - deductCost);
+      
+      let newTotalEstimate = updatedPartsEstimate + currentLaborEstimate;
+      if ((ticket as any).apply_tax) {
+        newTotalEstimate = newTotalEstimate * 1.16;
+      }
 
       await repairService.updateRepairTickets({
         id: req.params.id,
         parts_estimate: updatedPartsEstimate,
-        total_estimate: updatedPartsEstimate + currentLaborEstimate,
+        total_estimate: newTotalEstimate,
       });
     } catch (err) {
       console.error("Failed to update estimate from inventory part removal", err);

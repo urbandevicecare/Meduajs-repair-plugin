@@ -24,28 +24,38 @@ export const updateRepairCostsStep = createStep(
 
     if (input.parts_estimate !== undefined) {
       updateData.parts_estimate = input.parts_estimate;
-      updateData.total_estimate =
-        input.parts_estimate +
-        (input.labor_estimate ?? currentTicket.labor_estimate);
+      let newTotal = input.parts_estimate + (input.labor_estimate ?? currentTicket.labor_estimate);
+      if (currentTicket.apply_tax) {
+        newTotal = newTotal * 1.16;
+      }
+      updateData.total_estimate = newTotal;
     }
 
     if (input.labor_estimate !== undefined) {
       updateData.labor_estimate = input.labor_estimate;
-      updateData.total_estimate =
-        (input.parts_estimate ?? currentTicket.parts_estimate) +
-        input.labor_estimate;
+      let newTotal = (input.parts_estimate ?? currentTicket.parts_estimate) + input.labor_estimate;
+      if (currentTicket.apply_tax) {
+        newTotal = newTotal * 1.16;
+      }
+      updateData.total_estimate = newTotal;
     }
 
     if (input.parts_actual !== undefined) {
       updateData.parts_actual = input.parts_actual;
-      updateData.total_actual =
-        input.parts_actual + (input.labor_actual ?? currentTicket.labor_actual);
+      let newTotal = input.parts_actual + (input.labor_actual ?? currentTicket.labor_actual);
+      if (currentTicket.apply_tax) {
+        newTotal = newTotal * 1.16;
+      }
+      updateData.total_actual = newTotal;
     }
 
     if (input.labor_actual !== undefined) {
       updateData.labor_actual = input.labor_actual;
-      updateData.total_actual =
-        (input.parts_actual ?? currentTicket.parts_actual) + input.labor_actual;
+      let newTotal = (input.parts_actual ?? currentTicket.parts_actual) + input.labor_actual;
+      if (currentTicket.apply_tax) {
+        newTotal = newTotal * 1.16;
+      }
+      updateData.total_actual = newTotal;
     }
 
     const updatedTicket = await repairService.updateRepairTickets({

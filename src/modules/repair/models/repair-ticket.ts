@@ -70,6 +70,9 @@ const RepairTicket = model.define("repair_ticket", {
     .default("pending"),
   payment_collection_id: model.text().nullable(),
 
+  // Tax handling
+  apply_tax: model.boolean().default(true),
+
   // Relationships
   media: model.hasMany(() => RepairMedia, {
     mappedBy: "repair_ticket",
