@@ -143,7 +143,7 @@ const RepairDetailPage = () => {
 
   const loadTicket = async () => {
     try {
-      setLoading(true);
+      if (!ticket) setLoading(true);
       const res = await fetch(`/admin/repairs/${id}`, {
         credentials: "include",
       });
@@ -403,19 +403,19 @@ const RepairDetailPage = () => {
   };
   const handleToggleTax = async (checked: boolean) => {
     try {
-      setLoading(true);
-      await fetch(`/admin/repairs/${id}/tax`, {
+      const res = await fetch(`/admin/repairs/${id}/tax`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ apply_tax: checked }),
       });
+      if (!res.ok) {
+        throw new Error("Failed to update tax setting");
+      }
       toast.success(checked ? "VAT applied to total" : "VAT removed from total");
       await loadTicket();
-    } catch (err) {
-      toast.error("Failed to update tax setting");
-    } finally {
-      setLoading(false);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update tax setting");
     }
   };
 
