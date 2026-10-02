@@ -10,7 +10,7 @@ export const RepairSettings = model.define("repair_settings", {
   zoho_client_secret: model.text().nullable(),
   zoho_refresh_token: model.text().nullable(),
   zoho_organization_id: model.text().nullable(),
-
+  zoho_domain: model.text().default("com"),
   paystack_enabled: model.boolean().default(false),
   paystack_public_key: model.text().nullable(),
   paystack_secret_key: model.text().nullable(),

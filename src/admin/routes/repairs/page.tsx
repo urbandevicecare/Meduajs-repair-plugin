@@ -51,6 +51,7 @@ const RepairsPage = () => {
     zoho_client_secret: "",
     zoho_refresh_token: "",
     zoho_organization_id: "",
+    zoho_domain: "com",
     paystack_enabled: false,
     paystack_public_key: "",
     paystack_secret_key: "",
@@ -69,6 +70,7 @@ const RepairsPage = () => {
             zoho_client_secret: data.settings.zoho_client_secret || "",
             zoho_refresh_token: data.settings.zoho_refresh_token || "",
             zoho_organization_id: data.settings.zoho_organization_id || "",
+            zoho_domain: data.settings.zoho_domain || "com",
             paystack_public_key: data.settings.paystack_public_key || "",
             paystack_secret_key: data.settings.paystack_secret_key || "",
             company_name: data.settings.company_name || "Repair Shop",
@@ -718,6 +720,24 @@ const RepairsPage = () => {
 
               {settings.zoho_books_enabled && (
                 <div className="flex flex-col gap-y-4 p-4 border border-ui-border-base rounded-lg bg-ui-bg-subtle">
+                  <div className="flex flex-col gap-y-2">
+                    <Label>Zoho Data Center (Domain)</Label>
+                    <Select 
+                      value={settings.zoho_domain} 
+                      onValueChange={(v) => updateSettingState("zoho_domain", v)}
+                    >
+                      <Select.Trigger>
+                        <Select.Value placeholder="Select Data Center" />
+                      </Select.Trigger>
+                      <Select.Content>
+                        <Select.Item value="com">.com (Global)</Select.Item>
+                        <Select.Item value="eu">.eu (Europe)</Select.Item>
+                        <Select.Item value="in">.in (India)</Select.Item>
+                        <Select.Item value="com.au">.com.au (Australia)</Select.Item>
+                        <Select.Item value="jp">.jp (Japan)</Select.Item>
+                      </Select.Content>
+                    </Select>
+                  </div>
                   <div className="flex flex-col gap-y-2">
                     <Label>Organization ID</Label>
                     <Input 

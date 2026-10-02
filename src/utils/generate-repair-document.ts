@@ -39,6 +39,7 @@ export async function generateRepairDocument(
       client_secret: settings.zoho_client_secret,
       refresh_token: settings.zoho_refresh_token,
       organization_id: settings.zoho_organization_id,
+      domain: settings.zoho_domain || "com",
     }, logger);
 
     try {

@@ -29,6 +29,7 @@ export async function POST(
     zoho_client_secret?: string;
     zoho_refresh_token?: string;
     zoho_organization_id?: string;
+    zoho_domain?: string;
     paystack_enabled?: boolean;
     paystack_public_key?: string;
     paystack_secret_key?: string;

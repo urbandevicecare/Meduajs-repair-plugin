@@ -117,6 +117,7 @@ const RepairsPage = () => {
     zoho_client_secret: "",
     zoho_refresh_token: "",
     zoho_organization_id: "",
+    zoho_domain: "com",
     paystack_enabled: false,
     paystack_public_key: "",
     paystack_secret_key: "",
@@ -132,6 +133,7 @@ const RepairsPage = () => {
           zoho_client_secret: data.settings.zoho_client_secret || "",
           zoho_refresh_token: data.settings.zoho_refresh_token || "",
           zoho_organization_id: data.settings.zoho_organization_id || "",
+          zoho_domain: data.settings.zoho_domain || "com",
           paystack_public_key: data.settings.paystack_public_key || "",
           paystack_secret_key: data.settings.paystack_secret_key || "",
           company_name: data.settings.company_name || "Repair Shop",
@@ -285,6 +287,7 @@ const RepairsPage = () => {
       repairing: "blue",
       ready: "green",
       completed: "green",
+      collected: "green",
       cancelled: "red"
     };
     return colors[status] || "grey";
@@ -557,6 +560,7 @@ const RepairsPage = () => {
             /* @__PURE__ */ jsx(Select.Item, { value: "repairing", children: "Repairing" }),
             /* @__PURE__ */ jsx(Select.Item, { value: "ready", children: "Ready" }),
             /* @__PURE__ */ jsx(Select.Item, { value: "completed", children: "Completed" }),
+            /* @__PURE__ */ jsx(Select.Item, { value: "collected", children: "Collected" }),
             /* @__PURE__ */ jsx(Select.Item, { value: "cancelled", children: "Cancelled" })
           ] })
         ] }) }),
@@ -592,7 +596,10 @@ const RepairsPage = () => {
                 /* @__PURE__ */ jsx(Text, { className: "font-medium", children: ticket.ticket_number }),
                 /* @__PURE__ */ jsx(Text, { className: "text-ui-fg-subtle text-xs", children: getCustomerName(ticket.customer_id) })
               ] }),
-              /* @__PURE__ */ jsx(Table.Cell, { children: /* @__PURE__ */ jsx(Badge, { color: getStatusColor(ticket.status), size: "small", children: ticket.status.replace("_", " ") }) }),
+              /* @__PURE__ */ jsx(Table.Cell, { children: /* @__PURE__ */ jsxs("div", { className: "flex gap-2 items-center", children: [
+                /* @__PURE__ */ jsx(Badge, { color: getStatusColor(ticket.status), size: "small", children: ticket.status.replace("_", " ") }),
+                (ticket.status === "completed" || ticket.status === "collected") && ticket.payment_status !== "captured" && ticket.payment_status !== "paid" && /* @__PURE__ */ jsx(Badge, { color: "red", size: "small", children: "Unpaid" })
+              ] }) }),
               /* @__PURE__ */ jsx(Table.Cell, { children: ticket.technician_name ? /* @__PURE__ */ jsx(Badge, { color: "purple", size: "small", children: ticket.technician_name }) : /* @__PURE__ */ jsx("span", { className: "text-ui-fg-muted text-xs", children: "Unassigned" }) }),
               /* @__PURE__ */ jsx(Table.Cell, { className: "max-w-xs truncate", children: ticket.issue_description }),
               /* @__PURE__ */ jsx(Table.Cell, { children: formatCurrency(ticket.total_estimate) }),
@@ -674,6 +681,26 @@ const RepairsPage = () => {
             /* @__PURE__ */ jsx(Switch, { checked: settings.zoho_books_enabled, onCheckedChange: (v) => updateSettingState("zoho_books_enabled", v) })
           ] }),
           settings.zoho_books_enabled && /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-y-4 p-4 border border-ui-border-base rounded-lg bg-ui-bg-subtle", children: [
+            /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-y-2", children: [
+              /* @__PURE__ */ jsx(Label, { children: "Zoho Data Center (Domain)" }),
+              /* @__PURE__ */ jsxs(
+                Select,
+                {
+                  value: settings.zoho_domain,
+                  onValueChange: (v) => updateSettingState("zoho_domain", v),
+                  children: [
+                    /* @__PURE__ */ jsx(Select.Trigger, { children: /* @__PURE__ */ jsx(Select.Value, { placeholder: "Select Data Center" }) }),
+                    /* @__PURE__ */ jsxs(Select.Content, { children: [
+                      /* @__PURE__ */ jsx(Select.Item, { value: "com", children: ".com (Global)" }),
+                      /* @__PURE__ */ jsx(Select.Item, { value: "eu", children: ".eu (Europe)" }),
+                      /* @__PURE__ */ jsx(Select.Item, { value: "in", children: ".in (India)" }),
+                      /* @__PURE__ */ jsx(Select.Item, { value: "com.au", children: ".com.au (Australia)" }),
+                      /* @__PURE__ */ jsx(Select.Item, { value: "jp", children: ".jp (Japan)" })
+                    ] })
+                  ]
+                }
+              )
+            ] }),
             /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-y-2", children: [
               /* @__PURE__ */ jsx(Label, { children: "Organization ID" }),
               /* @__PURE__ */ jsx(
@@ -1052,6 +1079,7 @@ const RepairDetailPage = () => {
       repairing: "blue",
       ready: "green",
       completed: "green",
+      collected: "green",
       cancelled: "red"
     };
     return colors[status] || "grey";
@@ -1430,7 +1458,10 @@ const RepairDetailPage = () => {
               ] })
             ] }),
             /* @__PURE__ */ jsxs("div", { children: [
-              /* @__PURE__ */ jsx(Label, { children: "Status" }),
+              /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 mb-2", children: [
+                /* @__PURE__ */ jsx(Label, { children: "Status" }),
+                ((ticket == null ? void 0 : ticket.status) === "completed" || (ticket == null ? void 0 : ticket.status) === "collected") && (ticket == null ? void 0 : ticket.payment_status) !== "captured" && (ticket == null ? void 0 : ticket.payment_status) !== "paid" && /* @__PURE__ */ jsx(Badge, { color: "red", size: "small", children: "Unpaid" })
+              ] }),
               /* @__PURE__ */ jsxs(Select, { value: newStatus, onValueChange: setNewStatus, children: [
                 /* @__PURE__ */ jsx(Select.Trigger, { children: /* @__PURE__ */ jsx(Select.Value, {}) }),
                 /* @__PURE__ */ jsxs(Select.Content, { children: [
@@ -1448,6 +1479,10 @@ const RepairDetailPage = () => {
                   ] }),
                   /* @__PURE__ */ jsxs(Select.Item, { value: "completed", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
                     "Completed ",
+                    !(ticket == null ? void 0 : ticket.is_approved) && "(Requires Approval)"
+                  ] }),
+                  /* @__PURE__ */ jsxs(Select.Item, { value: "collected", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
+                    "Collected ",
                     !(ticket == null ? void 0 : ticket.is_approved) && "(Requires Approval)"
                   ] }),
                   /* @__PURE__ */ jsx(Select.Item, { value: "cancelled", children: "Cancelled" }),

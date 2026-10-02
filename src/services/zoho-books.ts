@@ -5,6 +5,7 @@ interface ZohoConfig {
   client_secret: string;
   refresh_token: string;
   organization_id: string;
+  domain?: string;
 }
 
 export class ZohoBooksService {
@@ -16,6 +17,14 @@ export class ZohoBooksService {
   constructor(config: ZohoConfig, logger: Logger) {
     this.config = config;
     this.logger = logger;
+  }
+
+  private get baseAccountsUrl() {
+    return `https://accounts.zoho.${this.config.domain || "com"}`;
+  }
+
+  private get baseApiUrl() {
+    return `https://www.zohoapis.${this.config.domain || "com"}/books/v3`;
   }
 
   private async getAccessToken(): Promise<string> {
@@ -30,7 +39,7 @@ export class ZohoBooksService {
     params.append("client_secret", this.config.client_secret);
     params.append("grant_type", "refresh_token");
 
-    const response = await fetch("https://accounts.zoho.com/oauth/v2/token", {
+    const response = await fetch(this.baseAccountsUrl + "/oauth/v2/token", {
       method: "POST",
       body: params,
     });
@@ -48,7 +57,7 @@ export class ZohoBooksService {
 
   private async request(method: string, endpoint: string, body?: any, isBlob: boolean = false) {
     const token = await this.getAccessToken();
-    const url = `https://www.zohoapis.com/books/v3${endpoint}${endpoint.includes("?") ? "&" : "?"}organization_id=${this.config.organization_id}`;
+    const url = `${this.baseApiUrl}${endpoint}${endpoint.includes("?") ? "&" : "?"}organization_id=${this.config.organization_id}`;
     
     const headers: Record<string, string> = {
       Authorization: `Zoho-oauthtoken ${token}`,
