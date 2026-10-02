@@ -20,15 +20,20 @@ const postProcessZohoPdf = async (pdfBuffer: Buffer, ticket: any, docType: strin
   try {
     const pdfDoc = await PDFLibDoc.load(pdfBuffer);
     
-    // 1. Generate & Embed QR Code
-    const qrUrl = `${process.env.STORE_URL || "http://localhost:3000"}/store/repairs/track?number=${ticket.ticket_number}`;
-    const qrBufferLib = await QRCode.toBuffer(qrUrl, {
-      errorCorrectionLevel: "H",
-      type: "png",
-      margin: 1,
-      width: 70,
-    });
-    const qrImage = await pdfDoc.embedPng(qrBufferLib);
+    // 1. Generate & Embed QR Code Safely
+    let qrImage: any = null;
+    try {
+      const qrUrl = `${process.env.STORE_URL || "http://localhost:3000"}/store/repairs/track?number=${ticket.ticket_number}`;
+      const qrBufferLib = await QRCode.toBuffer(qrUrl, {
+        errorCorrectionLevel: "H",
+        type: "png",
+        margin: 1,
+        width: 70,
+      });
+      qrImage = await pdfDoc.embedPng(qrBufferLib);
+    } catch (qrErr) {
+      console.error("[postProcessZohoPdf] QR Code generation skipped due to error:", qrErr);
+    }
     
     // 2. Determine Watermark
     let watermarkText = "";
@@ -56,12 +61,14 @@ const postProcessZohoPdf = async (pdfBuffer: Buffer, ticket: any, docType: strin
       const firstPage = pages[0];
       
       // Draw QR Code
-      firstPage.drawImage(qrImage, {
-        x: firstPage.getWidth() - 110,
-        y: 40,
-        width: 70,
-        height: 70,
-      });
+      if (qrImage) {
+        firstPage.drawImage(qrImage, {
+          x: firstPage.getWidth() - 110,
+          y: 40,
+          width: 70,
+          height: 70,
+        });
+      }
       
       // Draw Watermark
       if (watermarkText) {
@@ -90,8 +97,8 @@ const postProcessZohoPdf = async (pdfBuffer: Buffer, ticket: any, docType: strin
 
     const modifiedPdfBytes = await pdfDoc.save();
     return Buffer.from(modifiedPdfBytes);
-  } catch (e) {
-    console.error("[postProcessZohoPdf] Error processing PDF:", e);
+  } catch (e: any) {
+    console.error("[postProcessZohoPdf] CRITICAL Error processing PDF:", e?.message || e);
     return pdfBuffer; // fallback to original
   }
 };
