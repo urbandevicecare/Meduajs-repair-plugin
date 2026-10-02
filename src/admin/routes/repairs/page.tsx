@@ -246,6 +246,7 @@ const RepairsPage = () => {
         repairing: "blue",
         ready: "green",
         completed: "green",
+        collected: "green",
         cancelled: "red",
       };
     return colors[status] || "grey";
@@ -558,7 +559,8 @@ const RepairsPage = () => {
             </Select.Item>
             <Select.Item value="repairing">Repairing</Select.Item>
             <Select.Item value="ready">Ready</Select.Item>
-            <Select.Item value="completed">Completed</Select.Item>
+            <Select.Item value="completed">Paid</Select.Item>
+            <Select.Item value="collected">Collected</Select.Item>
             <Select.Item value="cancelled">Cancelled</Select.Item>
           </Select.Content>
         </Select>
@@ -605,7 +607,7 @@ const RepairsPage = () => {
                 </Table.Cell>
                 <Table.Cell>
                   <Badge color={getStatusColor(ticket.status)} size="small">
-                    {ticket.status.replace("_", " ")}
+                    {ticket.status === "completed" ? "Paid" : ticket.status.replace("_", " ")}
                   </Badge>
                 </Table.Cell>
                 <Table.Cell>

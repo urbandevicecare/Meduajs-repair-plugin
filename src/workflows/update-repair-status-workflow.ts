@@ -15,6 +15,7 @@ type UpdateRepairStatusWorkflowInput = {
     | "repairing"
     | "ready"
     | "completed"
+    | "collected"
     | "cancelled"
     | "refunded";
   estimated_completion?: Date;

@@ -36,6 +36,7 @@ const UpdateStatusSchema = z.object({
     "repairing",
     "ready",
     "completed",
+    "collected",
     "cancelled",
     "refunded",
   ]),

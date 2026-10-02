@@ -11,6 +11,7 @@ type UpdateRepairTicketStatusInput = {
     | "repairing"
     | "ready"
     | "completed"
+    | "collected"
     | "cancelled";
   estimated_completion?: Date;
 };

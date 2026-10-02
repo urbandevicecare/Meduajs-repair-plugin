@@ -174,13 +174,12 @@ export async function generateRepairDocument(
   // Company Info
   doc.fontSize(10).font("Helvetica-Bold").fillColor("#000").text("Urban Device Care Ltd", 50, 130);
   doc.font("Helvetica").fontSize(9).fillColor("#333");
-  doc.text("Bekim house", 50, 145);
+  doc.text("Bekim house,", 50, 145);
   doc.text("Westlands crossway Road");
-  doc.text("Nairobi 00800");
+  doc.text("00800, Nairobi");
   doc.text("Kenya");
-  doc.text("0115682959");
-  doc.text("7c8bczm6zk@privaterelay.appleid.com");
-  doc.text("KRA PIN P052534849N");
+  doc.text("0729436660 / 0794700241");
+  doc.text("urbandevice.care@gmail.com");
 
   // QR Code positioned near company info
   if (qrBuffer) {

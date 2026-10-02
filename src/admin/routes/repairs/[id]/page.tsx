@@ -427,6 +427,7 @@ const RepairDetailPage = () => {
         repairing: "blue",
         ready: "green",
         completed: "green",
+        collected: "green",
         cancelled: "red",
       };
     return colors[newStatusValue] || "grey";
@@ -442,6 +443,7 @@ const RepairDetailPage = () => {
         repairing: "blue",
         ready: "green",
         completed: "green",
+        collected: "green",
         cancelled: "red",
       };
     return colors[status] || "grey";
@@ -861,7 +863,10 @@ const RepairDetailPage = () => {
                       Ready {!ticket?.is_approved && "(Requires Approval)"}
                     </Select.Item>
                     <Select.Item value="completed" disabled={!ticket?.is_approved}>
-                      Completed {!ticket?.is_approved && "(Requires Approval)"}
+                      Paid {!ticket?.is_approved && "(Requires Approval)"}
+                    </Select.Item>
+                    <Select.Item value="collected" disabled={!ticket?.is_approved}>
+                      Collected {!ticket?.is_approved && "(Requires Approval)"}
                     </Select.Item>
                     <Select.Item value="cancelled">Cancelled</Select.Item>
                     <Select.Item value="refunded">Refunded</Select.Item>

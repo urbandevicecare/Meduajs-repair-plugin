@@ -30,6 +30,7 @@ const RepairTicket = model.define("repair_ticket", {
       "repairing",
       "ready",
       "completed",
+      "collected",
       "cancelled",
       "refunded",
     ])
