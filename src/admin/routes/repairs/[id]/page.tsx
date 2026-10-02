@@ -595,8 +595,23 @@ const RepairDetailPage = () => {
                 <Text>Total Estimate:</Text>
                 <Text>{formatCurrency(ticket.total_estimate)}</Text>
               </div>
+
+              {ticket.payment_status !== "paid" && ticket.payment_status !== "captured" && ticket.status !== "cancelled" && (
+                <div className="mt-2">
+                  <Button 
+                    variant="secondary" 
+                    size="small" 
+                    onClick={handleStkPush}
+                    disabled={loading || isPushingStk}
+                    className="w-full"
+                  >
+                    {isPushingStk ? "Pushing STK..." : "Push M-PESA STK to Customer"}
+                  </Button>
+                </div>
+              )}
+
               {ticket.is_approved ? (
-                <div className="flex flex-col gap-2 mt-2">
+                <div className="flex flex-col gap-2 mt-4 pt-4 border-t">
                   <Badge color="green" size="small">
                     Approved on {new Date(ticket.approved_at!).toLocaleDateString()}
                   </Badge>
@@ -610,17 +625,6 @@ const RepairDetailPage = () => {
                     <Text className="text-xs text-ui-fg-muted">
                       Collection ID: {ticket.payment_collection_id}
                     </Text>
-                  )}
-                  {ticket.payment_status !== "paid" && ticket.payment_status !== "captured" && (
-                    <Button 
-                      variant="secondary" 
-                      size="small" 
-                      onClick={handleStkPush}
-                      disabled={loading || isPushingStk}
-                      className="w-full mt-2"
-                    >
-                      {isPushingStk ? "Pushing STK..." : "Push M-PESA STK"}
-                    </Button>
                   )}
                 </div>
               ) : (
