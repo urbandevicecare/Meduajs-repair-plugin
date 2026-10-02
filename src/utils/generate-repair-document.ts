@@ -165,7 +165,7 @@ export async function generateRepairDocument(
 
   // QR Code positioned near company info
   if (qrBuffer) {
-      doc.image(qrBuffer, 50, 230, { width: 60 });
+      doc.image(qrBuffer, 220, 130, { width: 60 });
   }
 
   // Dates and Meta
@@ -218,8 +218,7 @@ export async function generateRepairDocument(
   let i = 1;
   const drawRow = (desc: string, qty: number, rate: number, amt: number) => {
       // Ensure we don't bleed off the page, if we do we'd normally add a new page
-      // but for repair tickets 1 page is usually enough
-      if (currentY > 700) {
+      if (currentY > 650) {
           doc.addPage();
           currentY = 50;
       }
@@ -290,7 +289,7 @@ export async function generateRepairDocument(
   // Signatures for job card
   if (docType === "job_card") {
       currentY += 50;
-      if (currentY > 700) { doc.addPage(); currentY = 50; }
+      if (currentY > 650) { doc.addPage(); currentY = 50; }
       
       doc.moveTo(50, currentY).lineTo(250, currentY).strokeColor("#000000").stroke();
       doc.fontSize(10).font("Helvetica").text("Technician Signature", 50, currentY + 5);
@@ -300,15 +299,17 @@ export async function generateRepairDocument(
   }
 
   const pageHeight = doc.page.height;
+  const footerY = pageHeight - 120; // 720
+  
   doc.fontSize(9).font("Helvetica").fillColor("#333");
-  doc.text("Thanks for your business.", 50, pageHeight - 120);
-  doc.text("Paybill: 880100 - Acc No: PAYURBANDEVICE", 50, pageHeight - 105);
+  doc.text("Thanks for your business.", 50, footerY, { lineBreak: false });
+  doc.text("Paybill: 880100 - Acc No: PAYURBANDEVICE", 50, footerY + 15, { lineBreak: false });
 
-  if (zohoError) { doc.fontSize(8).fillColor("red").text(zohoError, 50, pageHeight - 65); }
-  doc.moveTo(50, pageHeight - 50).lineTo(545, pageHeight - 50).lineWidth(0.5).strokeColor("#CCCCCC").stroke();
-  doc.fontSize(8).fillColor("#999").text("POWERED BY URBAN DEVICE CARE", 50, pageHeight - 40);
-  // page numbers (pdfkit automatically adds pages, but since it's typically 1 page, hardcoding 1 is ok)
-  doc.text("1", 530, pageHeight - 40, { align: "right" });
+  if (zohoError) { doc.fontSize(8).fillColor("red").text(zohoError, 50, footerY + 30, { lineBreak: false }); }
+  
+  doc.moveTo(50, footerY + 45).lineTo(545, footerY + 45).lineWidth(0.5).strokeColor("#CCCCCC").stroke();
+  doc.fontSize(8).fillColor("#999").text("POWERED BY URBAN DEVICE CARE", 50, footerY + 55, { lineBreak: false });
+  doc.text("1", 530, footerY + 55, { align: "right", lineBreak: false });
 
   doc.end();
 }
