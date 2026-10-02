@@ -844,7 +844,15 @@ const RepairDetailPage = () => {
                 </div>
               </div>
               <div>
-                <Label>Status</Label>
+                <div className="flex items-center gap-2 mb-2">
+                  <Label>Status</Label>
+                  {(ticket?.status === "completed" || ticket?.status === "collected") && 
+                   ticket?.payment_status !== "captured" && ticket?.payment_status !== "paid" && (
+                    <Badge color="red" size="small">
+                      Unpaid
+                    </Badge>
+                  )}
+                </div>
                 <Select value={newStatus} onValueChange={setNewStatus}>
                   <Select.Trigger>
                     <Select.Value />
@@ -863,7 +871,7 @@ const RepairDetailPage = () => {
                       Ready {!ticket?.is_approved && "(Requires Approval)"}
                     </Select.Item>
                     <Select.Item value="completed" disabled={!ticket?.is_approved}>
-                      Paid {!ticket?.is_approved && "(Requires Approval)"}
+                      Completed {!ticket?.is_approved && "(Requires Approval)"}
                     </Select.Item>
                     <Select.Item value="collected" disabled={!ticket?.is_approved}>
                       Collected {!ticket?.is_approved && "(Requires Approval)"}

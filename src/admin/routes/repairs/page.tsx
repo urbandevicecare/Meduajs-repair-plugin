@@ -559,7 +559,7 @@ const RepairsPage = () => {
             </Select.Item>
             <Select.Item value="repairing">Repairing</Select.Item>
             <Select.Item value="ready">Ready</Select.Item>
-            <Select.Item value="completed">Paid</Select.Item>
+            <Select.Item value="completed">Completed</Select.Item>
             <Select.Item value="collected">Collected</Select.Item>
             <Select.Item value="cancelled">Cancelled</Select.Item>
           </Select.Content>
@@ -606,9 +606,17 @@ const RepairsPage = () => {
                   </Text>
                 </Table.Cell>
                 <Table.Cell>
-                  <Badge color={getStatusColor(ticket.status)} size="small">
-                    {ticket.status === "completed" ? "Paid" : ticket.status.replace("_", " ")}
-                  </Badge>
+                  <div className="flex gap-2 items-center">
+                    <Badge color={getStatusColor(ticket.status)} size="small">
+                      {ticket.status.replace("_", " ")}
+                    </Badge>
+                    {(ticket.status === "completed" || ticket.status === "collected") && 
+                     ticket.payment_status !== "captured" && ticket.payment_status !== "paid" && (
+                      <Badge color="red" size="small">
+                        Unpaid
+                      </Badge>
+                    )}
+                  </div>
                 </Table.Cell>
                 <Table.Cell>
                   {ticket.technician_name ? (
