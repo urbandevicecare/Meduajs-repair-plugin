@@ -121,6 +121,7 @@ const RepairDetailPage = () => {
   const [technicianOptions, setTechnicianOptions] = useState<any[]>([]);
   const [showTechnicianDropdown, setShowTechnicianDropdown] = useState(false);
   const [isSendingReminder, setIsSendingReminder] = useState(false);
+  const [isPushingStk, setIsPushingStk] = useState(false);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -282,6 +283,30 @@ const RepairDetailPage = () => {
       toast.error("Failed to add custom part");
     } finally {
       setIsAddingPart(false);
+    }
+  };
+
+  const handleStkPush = async () => {
+    const phone = prompt("Enter customer M-PESA phone number:", ticket?.customer_phone || "");
+    if (!phone) return;
+    
+    let amount = prompt("Enter amount to charge (KES):", ticket?.total_estimate?.toString());
+    if (!amount) return;
+
+    setIsPushingStk(true);
+    try {
+      const response = await fetch(`/admin/repairs/${id}/stk-push`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, amount: Number(amount) })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "STK Push failed");
+      toast.success("STK Push successfully sent to customer's phone!");
+    } catch (e: any) {
+      toast.error("Error: " + e.message);
+    } finally {
+      setIsPushingStk(false);
     }
   };
 
@@ -585,6 +610,17 @@ const RepairDetailPage = () => {
                     <Text className="text-xs text-ui-fg-muted">
                       Collection ID: {ticket.payment_collection_id}
                     </Text>
+                  )}
+                  {ticket.payment_status !== "paid" && ticket.payment_status !== "captured" && (
+                    <Button 
+                      variant="secondary" 
+                      size="small" 
+                      onClick={handleStkPush}
+                      disabled={loading || isPushingStk}
+                      className="w-full mt-2"
+                    >
+                      {isPushingStk ? "Pushing STK..." : "Push M-PESA STK"}
+                    </Button>
                   )}
                 </div>
               ) : (
