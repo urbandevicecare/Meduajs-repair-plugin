@@ -23,6 +23,7 @@ const RepairTicket = model.define("repair_ticket", {
   // Status tracking
   status: model
     .enum([
+      "pending_dropoff",
       "received",
       "diagnosing",
       "awaiting_approval",
@@ -32,7 +33,7 @@ const RepairTicket = model.define("repair_ticket", {
       "cancelled",
       "refunded",
     ])
-    .default("received"),
+    .default("pending_dropoff"),
 
   // Repair details
   issue_description: model.text(),

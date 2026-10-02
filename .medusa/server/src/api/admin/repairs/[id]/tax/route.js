@@ -1,22 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.POST = POST;
-const repair_1 = require("../../../../../modules/repair");
+const toggle_repair_tax_workflow_1 = require("../../../../../workflows/toggle-repair-tax-workflow");
 async function POST(req, res) {
     const { apply_tax } = req.body;
-    const repairService = req.scope.resolve(repair_1.REPAIR_MODULE);
-    const ticket = await repairService.retrieveRepairTicket(req.params.id);
-    const partsEstimate = Number(ticket.parts_estimate || 0);
-    const laborEstimate = Number(ticket.labor_estimate || 0);
-    let newTotal = partsEstimate + laborEstimate;
-    if (apply_tax) {
-        newTotal = newTotal * 1.16;
-    }
-    const updatedTicket = await repairService.updateRepairTickets({
-        id: req.params.id,
-        apply_tax,
-        total_estimate: newTotal
+    const { result } = await (0, toggle_repair_tax_workflow_1.toggleRepairTaxWorkflow)(req.scope).run({
+        input: {
+            repair_ticket_id: req.params.id,
+            apply_tax,
+        },
     });
-    res.json({ repair_ticket: updatedTicket });
+    res.json({ repair_ticket: result });
 }
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicm91dGUuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi9zcmMvYXBpL2FkbWluL3JlcGFpcnMvW2lkXS90YXgvcm91dGUudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFJQSxvQkF3QkM7QUEzQkQsMERBQThEO0FBR3ZELEtBQUssVUFBVSxJQUFJLENBQ3hCLEdBQTBDLEVBQzFDLEdBQW1CO0lBRW5CLE1BQU0sRUFBRSxTQUFTLEVBQUUsR0FBRyxHQUFHLENBQUMsSUFBSSxDQUFDO0lBQy9CLE1BQU0sYUFBYSxHQUF3QixHQUFHLENBQUMsS0FBSyxDQUFDLE9BQU8sQ0FBQyxzQkFBYSxDQUFDLENBQUM7SUFFNUUsTUFBTSxNQUFNLEdBQUcsTUFBTSxhQUFhLENBQUMsb0JBQW9CLENBQUMsR0FBRyxDQUFDLE1BQU0sQ0FBQyxFQUFFLENBQUMsQ0FBQztJQUV2RSxNQUFNLGFBQWEsR0FBRyxNQUFNLENBQUMsTUFBTSxDQUFDLGNBQWMsSUFBSSxDQUFDLENBQUMsQ0FBQztJQUN6RCxNQUFNLGFBQWEsR0FBRyxNQUFNLENBQUMsTUFBTSxDQUFDLGNBQWMsSUFBSSxDQUFDLENBQUMsQ0FBQztJQUV6RCxJQUFJLFFBQVEsR0FBRyxhQUFhLEdBQUcsYUFBYSxDQUFDO0lBQzdDLElBQUksU0FBUyxFQUFFLENBQUM7UUFDZCxRQUFRLEdBQUcsUUFBUSxHQUFHLElBQUksQ0FBQztJQUM3QixDQUFDO0lBRUQsTUFBTSxhQUFhLEdBQUcsTUFBTSxhQUFhLENBQUMsbUJBQW1CLENBQUM7UUFDNUQsRUFBRSxFQUFFLEdBQUcsQ0FBQyxNQUFNLENBQUMsRUFBRTtRQUNqQixTQUFTO1FBQ1QsY0FBYyxFQUFFLFFBQVE7S0FDekIsQ0FBQyxDQUFDO0lBRUgsR0FBRyxDQUFDLElBQUksQ0FBQyxFQUFFLGFBQWEsRUFBRSxhQUFhLEVBQUUsQ0FBQyxDQUFDO0FBQzdDLENBQUMifQ==
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicm91dGUuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi9zcmMvYXBpL2FkbWluL3JlcGFpcnMvW2lkXS90YXgvcm91dGUudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFHQSxvQkFjQztBQWhCRCxvR0FBOEY7QUFFdkYsS0FBSyxVQUFVLElBQUksQ0FDeEIsR0FBMEMsRUFDMUMsR0FBbUI7SUFFbkIsTUFBTSxFQUFFLFNBQVMsRUFBRSxHQUFHLEdBQUcsQ0FBQyxJQUFJLENBQUM7SUFFL0IsTUFBTSxFQUFFLE1BQU0sRUFBRSxHQUFHLE1BQU0sSUFBQSxvREFBdUIsRUFBQyxHQUFHLENBQUMsS0FBSyxDQUFDLENBQUMsR0FBRyxDQUFDO1FBQzlELEtBQUssRUFBRTtZQUNMLGdCQUFnQixFQUFFLEdBQUcsQ0FBQyxNQUFNLENBQUMsRUFBRTtZQUMvQixTQUFTO1NBQ1Y7S0FDRixDQUFDLENBQUM7SUFFSCxHQUFHLENBQUMsSUFBSSxDQUFDLEVBQUUsYUFBYSxFQUFFLE1BQU0sRUFBRSxDQUFDLENBQUM7QUFDdEMsQ0FBQyJ9

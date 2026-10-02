@@ -420,6 +420,7 @@ const RepairDetailPage = () => {
   const handleStatusChange = async (newStatusValue: string) => {
     const colors: Record<string, "grey" | "blue" | "orange" | "green" | "red"> =
       {
+        pending_dropoff: "grey",
         received: "grey",
         diagnosing: "blue",
         awaiting_approval: "orange",
@@ -434,6 +435,7 @@ const RepairDetailPage = () => {
   const getStatusColor = (status: string) => {
     const colors: Record<string, "grey" | "blue" | "orange" | "green" | "red"> =
       {
+        pending_dropoff: "grey",
         received: "grey",
         diagnosing: "blue",
         awaiting_approval: "orange",
@@ -846,6 +848,7 @@ const RepairDetailPage = () => {
                     <Select.Value />
                   </Select.Trigger>
                   <Select.Content>
+                    <Select.Item value="pending_dropoff">Pending Dropoff</Select.Item>
                     <Select.Item value="received">Received</Select.Item>
                     <Select.Item value="diagnosing">Diagnosing</Select.Item>
                     <Select.Item value="awaiting_approval">
