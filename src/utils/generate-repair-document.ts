@@ -69,7 +69,7 @@ export async function generateRepairDocument(
         res.setHeader("Content-Type", "application/pdf");
         res.setHeader("Content-Disposition", `inline; filename="Repair-Receipt-${ticket.ticket_number}.pdf"`);
         return res.send(Buffer.from(pdfBuffer));
-      } else if (docType !== "receipt") {
+      } else if (docType === "invoice") {
         let invId = metadata.zoho_invoice_id as string;
         if (!invId) {
           invId = await zoho.createInvoice(contactId, ticket);
@@ -77,9 +77,10 @@ export async function generateRepairDocument(
         }
         const pdfBuffer = await zoho.getDocumentPdf(invId, "invoice");
         res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", `inline; filename="Repair-${docType.charAt(0).toUpperCase() + docType.slice(1)}-${ticket.ticket_number}.pdf"`);
+        res.setHeader("Content-Disposition", `inline; filename="Repair-Invoice-${ticket.ticket_number}.pdf"`);
         return res.send(Buffer.from(pdfBuffer));
       }
+      // If docType is "job_card" or anything else, it bypasses Zoho and generates locally using PDFKit
     } catch (e: any) {
       logger.error(`Zoho Books Integration failed: ${e.message}. Falling back to local PDF generation.`);
     }
