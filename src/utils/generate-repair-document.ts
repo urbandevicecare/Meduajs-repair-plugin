@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import PDFDocument from "pdfkit";
-import { PDFDocument as PDFLibDoc } from "pdf-lib";
+import { PDFDocument as PDFLibDoc, rgb, degrees, StandardFonts } from "pdf-lib";
 import QRCode from "qrcode";
 import { REPAIR_MODULE } from "../modules/repair";
 import RepairModuleService from "../modules/repair/service";
@@ -16,10 +16,12 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-const embedQRCodeInPdf = async (pdfBuffer: Buffer, ticketNumber: string): Promise<Buffer> => {
+const postProcessZohoPdf = async (pdfBuffer: Buffer, ticket: any, docType: string): Promise<Buffer> => {
   try {
     const pdfDoc = await PDFLibDoc.load(pdfBuffer);
-    const qrUrl = `${process.env.STORE_URL || "http://localhost:3000"}/store/repairs/track?number=${ticketNumber}`;
+    
+    // 1. Generate & Embed QR Code
+    const qrUrl = `${process.env.STORE_URL || "http://localhost:3000"}/store/repairs/track?number=${ticket.ticket_number}`;
     const qrBufferLib = await QRCode.toBuffer(qrUrl, {
       errorCorrectionLevel: "H",
       type: "png",
@@ -27,20 +29,69 @@ const embedQRCodeInPdf = async (pdfBuffer: Buffer, ticketNumber: string): Promis
       width: 70,
     });
     const qrImage = await pdfDoc.embedPng(qrBufferLib);
+    
+    // 2. Determine Watermark
+    let watermarkText = "";
+    let watermarkColor = rgb(0.8, 0.8, 0.8);
+    const isPaid = ticket.payment_status === "captured" || ticket.payment_status === "paid" || docType === "receipt";
+    
+    if (docType === "invoice" || docType === "receipt") {
+      watermarkText = isPaid ? "PAID" : "UNPAID";
+      watermarkColor = isPaid ? rgb(0.13, 0.77, 0.36) : rgb(0.93, 0.26, 0.26); // green vs red
+    } else if (docType === "quote") {
+      watermarkText = "QUOTATION";
+      watermarkColor = rgb(0.8, 0.8, 0.8);
+    }
+    
+    // Override if cancelled
+    if (ticket.status === "cancelled") {
+      watermarkText = "CANCELLED";
+      watermarkColor = rgb(0.93, 0.26, 0.26);
+    }
+    
+    const helveticaFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const pages = pdfDoc.getPages();
+    
     if (pages.length > 0) {
       const firstPage = pages[0];
+      
+      // Draw QR Code
       firstPage.drawImage(qrImage, {
         x: firstPage.getWidth() - 110,
         y: 40,
         width: 70,
         height: 70,
       });
+      
+      // Draw Watermark
+      if (watermarkText) {
+        firstPage.drawText(watermarkText, {
+          x: firstPage.getWidth() / 2 - 120,
+          y: firstPage.getHeight() / 2 - 120,
+          size: 80,
+          font: helveticaFont,
+          color: watermarkColor,
+          opacity: 0.15,
+          rotate: degrees(45),
+        });
+      }
     }
+    
+    // Obscure "Powered by Zoho Books" at the bottom of all pages
+    for (const page of pages) {
+      page.drawRectangle({
+        x: 0,
+        y: 0,
+        width: page.getWidth(),
+        height: 35,
+        color: rgb(1, 1, 1),
+      });
+    }
+
     const modifiedPdfBytes = await pdfDoc.save();
     return Buffer.from(modifiedPdfBytes);
   } catch (e) {
-    console.error("[embedQRCodeInPdf] Error embedding QR code:", e);
+    console.error("[postProcessZohoPdf] Error processing PDF:", e);
     return pdfBuffer; // fallback to original
   }
 };
@@ -95,13 +146,13 @@ export async function generateRepairDocument(
           await repairService.updateRepairTickets({ id: ticket.id, metadata: { ...metadata, zoho_estimate_id: estId } });
         }
         const pdfBuffer = await zoho.getDocumentPdf(estId, "estimate");
-        const modifiedBuffer = await embedQRCodeInPdf(Buffer.from(pdfBuffer), ticket.ticket_number);
+        const modifiedBuffer = await postProcessZohoPdf(Buffer.from(pdfBuffer), ticket, docType);
         res.setHeader("Content-Type", "application/pdf");
         res.setHeader("Content-Disposition", `inline; filename="Repair-Quote-${ticket.ticket_number}.pdf"`);
         return res.send(modifiedBuffer);
       } else if (docType === "receipt" && metadata.zoho_payment_id) {
         const pdfBuffer = await zoho.getPaymentReceiptPdf(metadata.zoho_payment_id as string);
-        const modifiedBuffer = await embedQRCodeInPdf(Buffer.from(pdfBuffer), ticket.ticket_number);
+        const modifiedBuffer = await postProcessZohoPdf(Buffer.from(pdfBuffer), ticket, docType);
         res.setHeader("Content-Type", "application/pdf");
         res.setHeader("Content-Disposition", `inline; filename="Repair-Receipt-${ticket.ticket_number}.pdf"`);
         return res.send(modifiedBuffer);
@@ -112,7 +163,7 @@ export async function generateRepairDocument(
           await repairService.updateRepairTickets({ id: ticket.id, metadata: { ...metadata, zoho_invoice_id: invId } });
         }
         const pdfBuffer = await zoho.getDocumentPdf(invId, "invoice");
-        const modifiedBuffer = await embedQRCodeInPdf(Buffer.from(pdfBuffer), ticket.ticket_number);
+        const modifiedBuffer = await postProcessZohoPdf(Buffer.from(pdfBuffer), ticket, docType);
         res.setHeader("Content-Type", "application/pdf");
         res.setHeader("Content-Disposition", `inline; filename="Repair-Invoice-${ticket.ticket_number}.pdf"`);
         return res.send(modifiedBuffer);
@@ -374,6 +425,34 @@ export async function generateRepairDocument(
   doc.moveTo(50, footerY + 45).lineTo(545, footerY + 45).lineWidth(0.5).strokeColor("#CCCCCC").stroke();
   doc.fontSize(8).fillColor("#999").text("POWERED BY URBAN DEVICE CARE", 50, footerY + 55, { lineBreak: false });
   doc.text("1", 530, footerY + 55, { align: "right", lineBreak: false });
+
+  let localWatermarkText = "";
+  let localWatermarkColor = "#cccccc";
+  const localIsPaid = ticket.payment_status === "captured" || ticket.payment_status === "paid" || docType === "receipt";
+  
+  if (docType === "invoice" || docType === "receipt") {
+    localWatermarkText = localIsPaid ? "PAID" : "UNPAID";
+    localWatermarkColor = localIsPaid ? "#22c55e" : "#ef4444"; 
+  } else if (docType === "quote") {
+    localWatermarkText = "QUOTATION";
+    localWatermarkColor = "#cccccc";
+  }
+  
+  if (ticket.status === "cancelled") {
+    localWatermarkText = "CANCELLED";
+    localWatermarkColor = "#ef4444";
+  }
+
+  if (localWatermarkText) {
+    doc.save()
+       .translate(doc.page.width / 2, doc.page.height / 2)
+       .rotate(-45, { origin: [0, 0] })
+       .fontSize(100)
+       .fillColor(localWatermarkColor)
+       .fillOpacity(0.15)
+       .text(localWatermarkText, -250, -50, { align: "center", width: 500 })
+       .restore();
+  }
 
   doc.end();
 }
