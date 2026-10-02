@@ -107,7 +107,9 @@ To verify the system's integrations (such as price formatting, Zoho Books tax ha
 
 ## Changelog
 
-### v0.1.44 (Current)
+### v0.1.46 (Current)
+- **Medusa Workflow Strict Architecture**: Converted the Paystack verification and VAT toggle logic into native Medusa Workflows, adding resilient transaction compensations and rollbacks for external Zoho Books network calls.
+- **Hybrid Document Generation Engine**: Intelligent document routing handles PDFs dynamically. Financial documents (Quotes, Invoices, Receipts) are pulled directly from the Zoho Books API on the fly to maintain perfect accounting parity, allowing you to edit invoices in Zoho before clients see them. Internal Job Cards securely bypass Zoho and generate locally via `pdfkit` for custom technician and customer signature layouts.
 - **Global VAT Toggle**: Added a centralized "Add 16% VAT to Total" checkbox directly below the Cost Breakdown in the Admin UI. This replaces the old, per-item legacy checkboxes and calculates a seamless 16% markup on Parts + Labor.
 - **Zoho Books Native Tax Sync**: Perfected the Zoho synchronization. When VAT is checked, the plugin sets `is_inclusive_tax: false` and lets Zoho accurately add its default organizational tax rate. When unchecked, it aggressively sends `tax_id: ""` to bypass Zoho's default taxes, ensuring your totals remain flat.
 - **Medusa v2 BigNumber JSONB Fixes**: Introduced critical database migrations to add the implicit `raw_amount_paid` JSONB columns required by Medusa v2. This permanently stops silent backend rejection errors during partial updates.
