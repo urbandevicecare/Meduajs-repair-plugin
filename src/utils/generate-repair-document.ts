@@ -28,8 +28,9 @@ export async function generateRepairDocument(
 ) {
   const repairService: RepairModuleService = req.scope.resolve(REPAIR_MODULE);
   const [settings] = await repairService.listRepairSettings({});
+  let zohoError = "";
   
-  if (settings?.zoho_books_enabled && settings.zoho_client_id && settings.zoho_client_secret && settings.zoho_refresh_token && settings.zoho_organization_id) {
+  if (!settings?.zoho_books_enabled) { zohoError = "Zoho Books Integration is disabled in Admin settings."; } else if (!settings.zoho_client_id || !settings.zoho_client_secret || !settings.zoho_refresh_token || !settings.zoho_organization_id) { zohoError = "Zoho Books enabled but missing API credentials."; } else {
     const logger = req.scope.resolve("logger");
     const zoho = new ZohoBooksService({
       client_id: settings.zoho_client_id,
@@ -82,7 +83,7 @@ export async function generateRepairDocument(
       }
       // If docType is "job_card" or anything else, it bypasses Zoho and generates locally using PDFKit
     } catch (e: any) {
-      logger.error(`Zoho Books Integration failed: ${e.message}. Falling back to local PDF generation.`);
+      zohoError = `Zoho Error: ${e.message}`; logger.error(`Zoho Books Integration failed: ${e.message}. Falling back to local PDF generation.`);
     }
   }
 
@@ -303,6 +304,7 @@ export async function generateRepairDocument(
   doc.text("Thanks for your business.", 50, pageHeight - 120);
   doc.text("Paybill: 880100 - Acc No: PAYURBANDEVICE", 50, pageHeight - 105);
 
+  if (zohoError) { doc.fontSize(8).fillColor("red").text(zohoError, 50, pageHeight - 65); }
   doc.moveTo(50, pageHeight - 50).lineTo(545, pageHeight - 50).lineWidth(0.5).strokeColor("#CCCCCC").stroke();
   doc.fontSize(8).fillColor("#999").text("POWERED BY URBAN DEVICE CARE", 50, pageHeight - 40);
   // page numbers (pdfkit automatically adds pages, but since it's typically 1 page, hardcoding 1 is ok)

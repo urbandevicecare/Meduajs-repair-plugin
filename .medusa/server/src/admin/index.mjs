@@ -1045,6 +1045,7 @@ const RepairDetailPage = () => {
   };
   const getStatusColor = (status) => {
     const colors = {
+      pending_dropoff: "grey",
       received: "grey",
       diagnosing: "blue",
       awaiting_approval: "orange",
@@ -1433,6 +1434,7 @@ const RepairDetailPage = () => {
               /* @__PURE__ */ jsxs(Select, { value: newStatus, onValueChange: setNewStatus, children: [
                 /* @__PURE__ */ jsx(Select.Trigger, { children: /* @__PURE__ */ jsx(Select.Value, {}) }),
                 /* @__PURE__ */ jsxs(Select.Content, { children: [
+                  /* @__PURE__ */ jsx(Select.Item, { value: "pending_dropoff", children: "Pending Dropoff" }),
                   /* @__PURE__ */ jsx(Select.Item, { value: "received", children: "Received" }),
                   /* @__PURE__ */ jsx(Select.Item, { value: "diagnosing", children: "Diagnosing" }),
                   /* @__PURE__ */ jsx(Select.Item, { value: "awaiting_approval", children: "Awaiting Approval" }),
