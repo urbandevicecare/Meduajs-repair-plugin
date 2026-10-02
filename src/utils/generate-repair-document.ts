@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import PDFDocument from "pdfkit";
+import { PDFDocument as PDFLibDoc } from "pdf-lib";
 import QRCode from "qrcode";
 import { REPAIR_MODULE } from "../modules/repair";
 import RepairModuleService from "../modules/repair/service";
@@ -13,6 +14,35 @@ const formatCurrency = (amount: number) => {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
+};
+
+const embedQRCodeInPdf = async (pdfBuffer: Buffer, ticketNumber: string): Promise<Buffer> => {
+  try {
+    const pdfDoc = await PDFLibDoc.load(pdfBuffer);
+    const qrUrl = `${process.env.STORE_URL || "http://localhost:3000"}/store/repairs/track?number=${ticketNumber}`;
+    const qrBufferLib = await QRCode.toBuffer(qrUrl, {
+      errorCorrectionLevel: "H",
+      type: "png",
+      margin: 1,
+      width: 70,
+    });
+    const qrImage = await pdfDoc.embedPng(qrBufferLib);
+    const pages = pdfDoc.getPages();
+    if (pages.length > 0) {
+      const firstPage = pages[0];
+      firstPage.drawImage(qrImage, {
+        x: 270,
+        y: firstPage.getHeight() - 110,
+        width: 70,
+        height: 70,
+      });
+    }
+    const modifiedPdfBytes = await pdfDoc.save();
+    return Buffer.from(modifiedPdfBytes);
+  } catch (e) {
+    console.error("[embedQRCodeInPdf] Error embedding QR code:", e);
+    return pdfBuffer; // fallback to original
+  }
 };
 
 const formatDate = (dateString: string | Date) => {
@@ -65,14 +95,16 @@ export async function generateRepairDocument(
           await repairService.updateRepairTickets({ id: ticket.id, metadata: { ...metadata, zoho_estimate_id: estId } });
         }
         const pdfBuffer = await zoho.getDocumentPdf(estId, "estimate");
+        const modifiedBuffer = await embedQRCodeInPdf(Buffer.from(pdfBuffer), ticket.ticket_number);
         res.setHeader("Content-Type", "application/pdf");
         res.setHeader("Content-Disposition", `inline; filename="Repair-Quote-${ticket.ticket_number}.pdf"`);
-        return res.send(Buffer.from(pdfBuffer));
+        return res.send(modifiedBuffer);
       } else if (docType === "receipt" && metadata.zoho_payment_id) {
         const pdfBuffer = await zoho.getPaymentReceiptPdf(metadata.zoho_payment_id as string);
+        const modifiedBuffer = await embedQRCodeInPdf(Buffer.from(pdfBuffer), ticket.ticket_number);
         res.setHeader("Content-Type", "application/pdf");
         res.setHeader("Content-Disposition", `inline; filename="Repair-Receipt-${ticket.ticket_number}.pdf"`);
-        return res.send(Buffer.from(pdfBuffer));
+        return res.send(modifiedBuffer);
       } else if (docType === "invoice") {
         let invId = metadata.zoho_invoice_id as string;
         if (!invId) {
@@ -80,9 +112,10 @@ export async function generateRepairDocument(
           await repairService.updateRepairTickets({ id: ticket.id, metadata: { ...metadata, zoho_invoice_id: invId } });
         }
         const pdfBuffer = await zoho.getDocumentPdf(invId, "invoice");
+        const modifiedBuffer = await embedQRCodeInPdf(Buffer.from(pdfBuffer), ticket.ticket_number);
         res.setHeader("Content-Type", "application/pdf");
         res.setHeader("Content-Disposition", `inline; filename="Repair-Invoice-${ticket.ticket_number}.pdf"`);
-        return res.send(Buffer.from(pdfBuffer));
+        return res.send(modifiedBuffer);
       }
       // If docType is "job_card" or anything else, it bypasses Zoho and generates locally using PDFKit
     } catch (e: any) {
