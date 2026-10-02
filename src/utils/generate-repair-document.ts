@@ -31,8 +31,8 @@ const embedQRCodeInPdf = async (pdfBuffer: Buffer, ticketNumber: string): Promis
     if (pages.length > 0) {
       const firstPage = pages[0];
       firstPage.drawImage(qrImage, {
-        x: 270,
-        y: firstPage.getHeight() - 110,
+        x: firstPage.getWidth() - 110,
+        y: 40,
         width: 70,
         height: 70,
       });
