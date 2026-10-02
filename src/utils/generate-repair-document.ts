@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import PDFDocument from "pdfkit";
 import QRCode from "qrcode";
@@ -118,9 +120,19 @@ export async function generateRepairDocument(
 
   doc.pipe(res);
 
-  // 1. Logo (Text placeholder since no image is provided)
-  doc.fontSize(28).font("Helvetica-Bold").fillColor("#333").text("URBAN", 50, 50, { continued: true }).fillColor("#666").text(" DEVICE CARE");
-  doc.fontSize(10).fillColor("#999").text("SINCE 2025", 50, 80);
+  // 1. Logo
+  try {
+      const logoPath = path.resolve(process.cwd(), "src/utils/assets/logo.png");
+      if (fs.existsSync(logoPath)) {
+          doc.image(logoPath, 50, 40, { width: 140 });
+      } else {
+          doc.fontSize(28).font("Helvetica-Bold").fillColor("#333").text("URBAN", 50, 50, { continued: true }).fillColor("#666").text(" DEVICE CARE");
+          doc.fontSize(10).fillColor("#999").text("SINCE 2025", 50, 80);
+      }
+  } catch (e) {
+      doc.fontSize(28).font("Helvetica-Bold").fillColor("#333").text("URBAN", 50, 50, { continued: true }).fillColor("#666").text(" DEVICE CARE");
+      doc.fontSize(10).fillColor("#999").text("SINCE 2025", 50, 80);
+  }
 
   // 2. Document Title & Number
   let title = "INVOICE";
@@ -135,6 +147,13 @@ export async function generateRepairDocument(
   const numericTicket = ticket.ticket_number ? ticket.ticket_number.replace(/\D/g, "").padStart(6, "0") : "000000";
   const docNumber = `# ${prefix}${numericTicket}`;
   doc.fontSize(10).font("Helvetica-Bold").text(docNumber, 350, 80, { align: "right" });
+
+  if (docType === "invoice") {
+      const isPaid = ticket.payment_status === "captured" || ticket.payment_status === "paid" || ticket.status === "completed";
+      const statusText = isPaid ? "PAID" : "UNPAID";
+      const statusColor = isPaid ? "#008000" : "#CC0000";
+      doc.fontSize(10).font("Helvetica-Bold").fillColor(statusColor).text(statusText, 350, 95, { align: "right" });
+  }
 
   // 3. Balance Due
   let balanceDue = 0;
@@ -194,11 +213,13 @@ export async function generateRepairDocument(
 
   // Bill To / Customer Data
   doc.font("Helvetica-Bold").fontSize(10).fillColor("#000").text(customerName || "Customer", 50, metaY + 30);
+  doc.font("Helvetica").fontSize(9).fillColor("#333");
+  if (ticket.device) {
+      doc.text(`Device: ${ticket.device.brand || ""} ${ticket.device.model_name || ""}`.trim());
+      doc.text(`S/N: ${ticket.device.serial_number || "N/A"}`);
+  }
   if (docType === "job_card") {
-     doc.font("Helvetica").fontSize(9).fillColor("#333");
-     doc.text(`Device: ${ticket.device?.brand || ""} ${ticket.device?.model_name || ""}`);
-     doc.text(`S/N: ${ticket.device?.serial_number || "N/A"}`);
-     doc.text(`Reported Issue: ${ticket.issue_description || "No description provided."}`);
+      doc.text(`Reported Issue: ${ticket.issue_description || "No description provided."}`);
   }
 
   // Table
@@ -208,9 +229,14 @@ export async function generateRepairDocument(
   doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(9);
   doc.text("#", 60, tableTop + 6);
   doc.text("Description", 90, tableTop + 6);
-  doc.text("Qty", 350, tableTop + 6, { width: 30, align: "center" });
-  doc.text("Rate", 390, tableTop + 6, { width: 60, align: "right" });
-  doc.text("Amount", 460, tableTop + 6, { width: 75, align: "right" });
+  
+  if (docType === "job_card") {
+      doc.text("Qty", 460, tableTop + 6, { width: 30, align: "center" });
+  } else {
+      doc.text("Qty", 350, tableTop + 6, { width: 30, align: "center" });
+      doc.text("Rate", 390, tableTop + 6, { width: 60, align: "right" });
+      doc.text("Amount", 460, tableTop + 6, { width: 75, align: "right" });
+  }
 
   let currentY = tableTop + 30;
   doc.fillColor("#333333").font("Helvetica").fontSize(9);
@@ -224,12 +250,18 @@ export async function generateRepairDocument(
       }
       
       doc.text(i.toString(), 60, currentY);
-      doc.text(desc, 90, currentY, { width: 250 });
-      doc.text(qty.toFixed(2), 350, currentY, { width: 30, align: "center" });
-      doc.text(formatCurrency(rate), 390, currentY, { width: 60, align: "right" });
-      doc.text(formatCurrency(amt), 460, currentY, { width: 75, align: "right" });
       
-      const height = doc.heightOfString(desc, { width: 250 }) || 10;
+      if (docType === "job_card") {
+          doc.text(desc, 90, currentY, { width: 350 });
+          doc.text(qty.toFixed(2), 460, currentY, { width: 30, align: "center" });
+      } else {
+          doc.text(desc, 90, currentY, { width: 250 });
+          doc.text(qty.toFixed(2), 350, currentY, { width: 30, align: "center" });
+          doc.text(formatCurrency(rate), 390, currentY, { width: 60, align: "right" });
+          doc.text(formatCurrency(amt), 460, currentY, { width: 75, align: "right" });
+      }
+      
+      const height = doc.heightOfString(desc, { width: docType === "job_card" ? 350 : 250 }) || 10;
       currentY += height + 10;
       
       doc.moveTo(50, currentY - 5).lineTo(545, currentY - 5).lineWidth(0.5).strokeColor("#EEEEEE").stroke();
