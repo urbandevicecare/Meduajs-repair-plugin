@@ -48,6 +48,44 @@ npx medusa db:migrate
 
 4. **Access the Interface:**
 - Backend: Navigate to `/app/repairs` in your admin panel.
+
+---
+
+## 📘 Zoho Books Configuration Guide
+
+This plugin seamlessly integrates with Zoho Books to generate Estimates, Tax Invoices, and log payments. To set it up, you need a **permanent Refresh Token**. 
+
+Follow these steps exactly to avoid the `invalid_code` or `invalid_client` errors:
+
+1. **Create a Zoho Self Client**
+   - Go to the Zoho API Console ([api-console.zoho.com](https://api-console.zoho.com) or [api-console.zoho.eu](https://api-console.zoho.eu) if you are in Europe).
+   - Click **Add Client** -> **Self Client**.
+   - *Note: You must use a Self Client because it does not require a Redirect URI.*
+
+2. **Generate a Temporary Grant Code**
+   - In your newly created Self Client, go to the **Generate Code** tab.
+   - Enter the scope: `ZohoBooks.fullaccess.all`
+   - Select your portal/organization and click **Create**.
+   - Copy the generated code. *Warning: This code expires in 3 minutes and can only be used once!*
+
+3. **Exchange for a Permanent Refresh Token**
+   - Immediately open your terminal and run the following `curl` command (Replace the `YOUR_` values with your actual Client ID, Client Secret, and the temporary Grant Code). 
+   - *Important: If your account is in Europe, change `.com` to `.eu` in the URL below!*
+
+   ```bash
+   curl -X POST "https://accounts.zoho.com/oauth/v2/token" \
+   -d "client_id=YOUR_CLIENT_ID" \
+   -d "client_secret=YOUR_CLIENT_SECRET" \
+   -d "code=YOUR_TEMPORARY_GRANT_CODE" \
+   -d "grant_type=authorization_code"
+   ```
+
+4. **Save in Medusa Settings**
+   - Zoho will return a JSON response containing a `refresh_token` (e.g., `1000.35cc05...`).
+   - Go to your **Medusa Admin -> Repair Settings**.
+   - Ensure you select the correct **Data Center (Domain)** that matches your account (`.com`, `.eu`, etc.).
+   - Paste the `refresh_token` into the **Zoho Refresh Token** field and click Save. 
+   - *Your plugin is now permanently authenticated!*
 - Storefront: Link to `/repairs/dashboard` and `/repairs/book` in your frontend application (e.g. Next.js or Fresh.js).
 
 ### 📓 Zoho Books Integration
