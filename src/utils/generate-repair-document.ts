@@ -144,9 +144,8 @@ export async function generateRepairDocument(
 
   doc.fontSize(26).font("Helvetica").fillColor("#000").text(title, 350, 50, { align: "right" });
   
-  // Clean ticket number for prefix (e.g. REPAIR-1234 -> 1234)
-  const numericTicket = ticket.ticket_number ? ticket.ticket_number.replace(/\D/g, "").padStart(6, "0") : "000000";
-  const docNumber = `# ${prefix}${numericTicket}`;
+  // Format doc number as RT-ticketnumber
+  const docNumber = `RT-${ticket.ticket_number}`;
   doc.fontSize(10).font("Helvetica-Bold").text(docNumber, 350, 80, { align: "right" });
 
   if (docType === "invoice") {

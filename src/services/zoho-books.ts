@@ -175,7 +175,8 @@ export class ZohoBooksService {
   async createEstimate(contactId: string, ticket: any): Promise<string> {
     const payload = {
       customer_id: contactId,
-      reference_number: `TKT-${ticket.ticket_number}`,
+      estimate_number: `RT-${ticket.ticket_number}`,
+      reference_number: "",
       line_items: this.formatLineItems(ticket),
       notes: "Generated from Medusa Repair Module",
       is_inclusive_tax: false
@@ -192,7 +193,8 @@ export class ZohoBooksService {
   async createInvoice(contactId: string, ticket: any): Promise<string> {
     const payload = {
       customer_id: contactId,
-      reference_number: `TKT-${ticket.ticket_number}`,
+      invoice_number: `RT-${ticket.ticket_number}`,
+      reference_number: "",
       line_items: this.formatLineItems(ticket),
       notes: "Generated from Medusa Repair Module",
       is_inclusive_tax: false
