@@ -615,24 +615,24 @@ const RepairDetailPage = () => {
               </div>
 
               {ticket.payment_status !== "paid" && ticket.payment_status !== "captured" && ticket.status !== "cancelled" && (
-                <div className="mt-2 flex flex-col gap-2">
+                <div className="mt-3 flex items-center gap-2">
                   <Button 
                     variant="secondary" 
                     size="small" 
                     onClick={handleStkPush}
                     disabled={loading || isPushingStk}
-                    className="w-full"
+                    className="flex-1"
                   >
-                    {isPushingStk ? "Pushing STK..." : "Push M-PESA STK to Customer"}
+                    {isPushingStk ? "Pushing..." : "Push STK (M-PESA)"}
                   </Button>
                   <Button 
                     variant="secondary" 
                     size="small" 
                     onClick={handleMarkPaid}
                     disabled={loading}
-                    className="w-full"
+                    className="flex-1"
                   >
-                    Mark as Paid (In-Store / Cash)
+                    Mark Paid (Cash)
                   </Button>
                 </div>
               )}

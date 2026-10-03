@@ -13,12 +13,14 @@ export async function POST(
     return res.status(400).json({ message: "Phone and amount are required" });
   }
 
-  // Format the phone number to 254XXXXXXXXX (Paystack MPESA format)
+  // Format the phone number to +254XXXXXXXXX (Paystack MPESA format)
   let formattedPhone = phone.replace(/\D/g, "");
   if (formattedPhone.startsWith("0")) {
-    formattedPhone = "254" + formattedPhone.substring(1);
+    formattedPhone = "+254" + formattedPhone.substring(1);
   } else if (formattedPhone.length === 9 && (formattedPhone.startsWith("7") || formattedPhone.startsWith("1"))) {
-    formattedPhone = "254" + formattedPhone;
+    formattedPhone = "+254" + formattedPhone;
+  } else if (formattedPhone.startsWith("254")) {
+    formattedPhone = "+" + formattedPhone;
   }
 
   const repairService: RepairModuleService = req.scope.resolve(REPAIR_MODULE);

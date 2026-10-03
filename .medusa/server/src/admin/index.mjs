@@ -1221,7 +1221,7 @@ const RepairDetailPage = () => {
               /* @__PURE__ */ jsx(Text, { children: "Total Estimate:" }),
               /* @__PURE__ */ jsx(Text, { children: formatCurrency(ticket.total_estimate) })
             ] }),
-            ticket.payment_status !== "paid" && ticket.payment_status !== "captured" && ticket.status !== "cancelled" && /* @__PURE__ */ jsxs("div", { className: "mt-2 flex flex-col gap-2", children: [
+            ticket.payment_status !== "paid" && ticket.payment_status !== "captured" && ticket.status !== "cancelled" && /* @__PURE__ */ jsxs("div", { className: "mt-3 flex items-center gap-2", children: [
               /* @__PURE__ */ jsx(
                 Button,
                 {
@@ -1229,8 +1229,8 @@ const RepairDetailPage = () => {
                   size: "small",
                   onClick: handleStkPush,
                   disabled: loading || isPushingStk,
-                  className: "w-full",
-                  children: isPushingStk ? "Pushing STK..." : "Push M-PESA STK to Customer"
+                  className: "flex-1",
+                  children: isPushingStk ? "Pushing..." : "Push STK (M-PESA)"
                 }
               ),
               /* @__PURE__ */ jsx(
@@ -1240,8 +1240,8 @@ const RepairDetailPage = () => {
                   size: "small",
                   onClick: handleMarkPaid,
                   disabled: loading,
-                  className: "w-full",
-                  children: "Mark as Paid (In-Store / Cash)"
+                  className: "flex-1",
+                  children: "Mark Paid (Cash)"
                 }
               )
             ] }),
