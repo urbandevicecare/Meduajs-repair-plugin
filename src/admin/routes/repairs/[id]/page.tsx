@@ -999,7 +999,7 @@ const RepairDetailPage = () => {
                   <button 
                     onClick={handleManualApprove}
                     disabled={loading}
-                    className="w-full py-2 text-[11px] uppercase tracking-wider font-semibold text-ui-fg-on-inverted bg-ui-button-inverted hover:bg-ui-button-inverted-hover rounded-md transition-colors disabled:opacity-50"
+                    className="w-full py-1.5 text-[11px] uppercase tracking-wider font-semibold text-ui-fg-base bg-ui-bg-subtle hover:bg-ui-bg-subtle-hover border border-ui-border-base rounded-md transition-colors disabled:opacity-50"
                   >
                     Manually Approve & Create Payment
                   </button>
