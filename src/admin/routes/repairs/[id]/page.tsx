@@ -207,6 +207,12 @@ const RepairDetailPage = () => {
   useEffect(() => {
     if (id) {
       loadTicket();
+      
+      // Mark messages as read in the background
+      fetch(`/admin/repairs/${id}/messages/read`, {
+        method: "POST",
+        credentials: "include",
+      }).catch(err => console.error("Failed to mark messages as read", err));
     }
   }, [id]);
 

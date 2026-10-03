@@ -30,6 +30,7 @@ type RepairTicket = {
   total_estimate: number;
   created_at: string;
   estimated_completion?: string;
+  updates?: any[];
 };
 
 const RepairsPage = () => {
@@ -595,14 +596,27 @@ const RepairsPage = () => {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {filteredTickets.map((ticket) => (
+            {filteredTickets.map((ticket) => {
+              const hasUnreadUpdate = ticket.updates?.some((u: any) => u.author_type === "customer" && !u.is_read);
+              const isPendingDropoff = ticket.status === "pending_dropoff";
+              const needsAttention = hasUnreadUpdate || isPendingDropoff;
+              
+              return (
               <Table.Row 
                 key={ticket.id} 
                 onClick={() => navigate(`/repairs/${ticket.id}`)}
-                className="cursor-pointer hover:bg-ui-bg-subtle-hover transition-colors"
+                className="cursor-pointer hover:bg-ui-bg-subtle-hover transition-colors relative"
               >
                 <Table.Cell>
-                  <Text className="font-medium">{ticket.ticket_number}</Text>
+                  <div className="flex items-center gap-2">
+                    <Text className="font-medium">{ticket.ticket_number}</Text>
+                    {needsAttention && (
+                      <div 
+                        className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_0_2px_rgba(239,68,68,0.2)]" 
+                        title={hasUnreadUpdate ? "Unread customer message" : "Pending drop-off"} 
+                      />
+                    )}
+                  </div>
                   <Text className="text-ui-fg-subtle text-xs">
                     {getCustomerName(ticket.customer_id)}
                   </Text>
@@ -637,7 +651,8 @@ const RepairsPage = () => {
                   {new Date(ticket.created_at).toLocaleDateString()}
                 </Table.Cell>
               </Table.Row>
-            ))}
+              );
+            })}
           </Table.Body>
         </Table>
       )}

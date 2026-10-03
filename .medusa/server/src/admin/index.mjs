@@ -586,28 +586,43 @@ const RepairsPage = () => {
           /* @__PURE__ */ jsx(Table.HeaderCell, { children: "Estimate" }),
           /* @__PURE__ */ jsx(Table.HeaderCell, { children: "Created" })
         ] }) }),
-        /* @__PURE__ */ jsx(Table.Body, { children: filteredTickets.map((ticket) => /* @__PURE__ */ jsxs(
-          Table.Row,
-          {
-            onClick: () => navigate(`/repairs/${ticket.id}`),
-            className: "cursor-pointer hover:bg-ui-bg-subtle-hover transition-colors",
-            children: [
-              /* @__PURE__ */ jsxs(Table.Cell, { children: [
-                /* @__PURE__ */ jsx(Text, { className: "font-medium", children: ticket.ticket_number }),
-                /* @__PURE__ */ jsx(Text, { className: "text-ui-fg-subtle text-xs", children: getCustomerName(ticket.customer_id) })
-              ] }),
-              /* @__PURE__ */ jsx(Table.Cell, { children: /* @__PURE__ */ jsxs("div", { className: "flex gap-2 items-center", children: [
-                /* @__PURE__ */ jsx(Badge, { color: getStatusColor(ticket.status), size: "small", children: ticket.status.replace("_", " ") }),
-                (ticket.status === "completed" || ticket.status === "collected") && ticket.payment_status !== "captured" && ticket.payment_status !== "paid" && /* @__PURE__ */ jsx(Badge, { color: "red", size: "small", children: "Unpaid" })
-              ] }) }),
-              /* @__PURE__ */ jsx(Table.Cell, { children: ticket.technician_name ? /* @__PURE__ */ jsx(Badge, { color: "purple", size: "small", children: ticket.technician_name }) : /* @__PURE__ */ jsx("span", { className: "text-ui-fg-muted text-xs", children: "Unassigned" }) }),
-              /* @__PURE__ */ jsx(Table.Cell, { className: "max-w-xs truncate", children: ticket.issue_description }),
-              /* @__PURE__ */ jsx(Table.Cell, { children: formatCurrency(ticket.total_estimate) }),
-              /* @__PURE__ */ jsx(Table.Cell, { children: new Date(ticket.created_at).toLocaleDateString() })
-            ]
-          },
-          ticket.id
-        )) })
+        /* @__PURE__ */ jsx(Table.Body, { children: filteredTickets.map((ticket) => {
+          var _a;
+          const hasUnreadUpdate = (_a = ticket.updates) == null ? void 0 : _a.some((u) => u.author_type === "customer" && !u.is_read);
+          const isPendingDropoff = ticket.status === "pending_dropoff";
+          const needsAttention = hasUnreadUpdate || isPendingDropoff;
+          return /* @__PURE__ */ jsxs(
+            Table.Row,
+            {
+              onClick: () => navigate(`/repairs/${ticket.id}`),
+              className: "cursor-pointer hover:bg-ui-bg-subtle-hover transition-colors relative",
+              children: [
+                /* @__PURE__ */ jsxs(Table.Cell, { children: [
+                  /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
+                    /* @__PURE__ */ jsx(Text, { className: "font-medium", children: ticket.ticket_number }),
+                    needsAttention && /* @__PURE__ */ jsx(
+                      "div",
+                      {
+                        className: "w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_0_2px_rgba(239,68,68,0.2)]",
+                        title: hasUnreadUpdate ? "Unread customer message" : "Pending drop-off"
+                      }
+                    )
+                  ] }),
+                  /* @__PURE__ */ jsx(Text, { className: "text-ui-fg-subtle text-xs", children: getCustomerName(ticket.customer_id) })
+                ] }),
+                /* @__PURE__ */ jsx(Table.Cell, { children: /* @__PURE__ */ jsxs("div", { className: "flex gap-2 items-center", children: [
+                  /* @__PURE__ */ jsx(Badge, { color: getStatusColor(ticket.status), size: "small", children: ticket.status.replace("_", " ") }),
+                  (ticket.status === "completed" || ticket.status === "collected") && ticket.payment_status !== "captured" && ticket.payment_status !== "paid" && /* @__PURE__ */ jsx(Badge, { color: "red", size: "small", children: "Unpaid" })
+                ] }) }),
+                /* @__PURE__ */ jsx(Table.Cell, { children: ticket.technician_name ? /* @__PURE__ */ jsx(Badge, { color: "purple", size: "small", children: ticket.technician_name }) : /* @__PURE__ */ jsx("span", { className: "text-ui-fg-muted text-xs", children: "Unassigned" }) }),
+                /* @__PURE__ */ jsx(Table.Cell, { className: "max-w-xs truncate", children: ticket.issue_description }),
+                /* @__PURE__ */ jsx(Table.Cell, { children: formatCurrency(ticket.total_estimate) }),
+                /* @__PURE__ */ jsx(Table.Cell, { children: new Date(ticket.created_at).toLocaleDateString() })
+              ]
+            },
+            ticket.id
+          );
+        }) })
       ] })
     ] }),
     activeTab === "settings" && /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-6 w-full max-w-2xl p-6", children: [
@@ -990,6 +1005,10 @@ const RepairDetailPage = () => {
   useEffect(() => {
     if (id) {
       loadTicket();
+      fetch(`/admin/repairs/${id}/messages/read`, {
+        method: "POST",
+        credentials: "include"
+      }).catch((err) => console.error("Failed to mark messages as read", err));
     }
   }, [id]);
   const handleAddInventoryPart = async () => {
