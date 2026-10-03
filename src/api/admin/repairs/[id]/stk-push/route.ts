@@ -13,6 +13,12 @@ export async function POST(
     return res.status(400).json({ message: "Phone and amount are required" });
   }
 
+  // Format the phone number to 07XXXXXXXX or 01XXXXXXXX (Paystack MPESA format)
+  let formattedPhone = phone.replace(/\D/g, "");
+  if (formattedPhone.startsWith("254")) {
+    formattedPhone = "0" + formattedPhone.substring(3);
+  }
+
   const repairService: RepairModuleService = req.scope.resolve(REPAIR_MODULE);
   
   const [settings] = await repairService.listRepairSettings({});
@@ -49,7 +55,7 @@ export async function POST(
       currency: "KES",
       reference: reference,
       mobile_money: {
-        phone: phone,
+        phone: formattedPhone,
         provider: "mpesa"
       },
       metadata: {
