@@ -683,6 +683,41 @@ const RepairsPage = () => {
                   onChange={(e) => updateSettingState("pdf_logo_url", e.target.value)} 
                 />
               </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <Text size="small" className="font-medium text-ui-fg-base">Address</Text>
+                  <Textarea 
+                    placeholder="e.g. Nairobi, Kenya" 
+                    value={settings.pdf_address || ""} 
+                    onChange={(e) => updateSettingState("pdf_address", e.target.value)} 
+                    rows={2}
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Text size="small" className="font-medium text-ui-fg-base">Phone Numbers</Text>
+                  <Input 
+                    placeholder="e.g. 0729436660 / 0794700241" 
+                    value={settings.pdf_phone || ""} 
+                    onChange={(e) => updateSettingState("pdf_phone", e.target.value)} 
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Text size="small" className="font-medium text-ui-fg-base">Email</Text>
+                  <Input 
+                    placeholder="e.g. info@company.com" 
+                    value={settings.pdf_email || ""} 
+                    onChange={(e) => updateSettingState("pdf_email", e.target.value)} 
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Text size="small" className="font-medium text-ui-fg-base">Website</Text>
+                  <Input 
+                    placeholder="e.g. www.company.com" 
+                    value={settings.pdf_website || ""} 
+                    onChange={(e) => updateSettingState("pdf_website", e.target.value)} 
+                  />
+                </div>
+              </div>
               <div className="flex flex-col gap-2 mt-2">
                 <Text size="small" className="font-medium text-ui-fg-base">Payment Details</Text>
                 <Text size="small" className="text-ui-fg-subtle">Bank account info, MPESA till number, or instructions to print on invoices.</Text>

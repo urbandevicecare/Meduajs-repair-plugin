@@ -268,14 +268,27 @@ export async function generateRepairDocument(
   }
 
   // Company Info
-  doc.fontSize(10).font("Helvetica-Bold").fillColor("#000").text("Urban Device Care Ltd", 50, 130);
+  doc.fontSize(10).font("Helvetica-Bold").fillColor("#000").text(settings?.company_name || "Urban Device Care Ltd", 50, 130);
   doc.font("Helvetica").fontSize(9).fillColor("#333");
-  doc.text("Bekim house,", 50, 145);
-  doc.text("Westlands crossway Road");
-  doc.text("00800, Nairobi");
-  doc.text("Kenya");
-  doc.text("0729436660 / 0794700241");
-  doc.text("urbandevice.care@gmail.com");
+  
+  if (settings?.pdf_address) {
+      const addressLines = settings.pdf_address.split(/\r?\n/);
+      let addressY = 145;
+      addressLines.forEach(line => {
+          doc.text(line, 50, addressY);
+          addressY += 12;
+      });
+      if (settings?.pdf_phone) { doc.text(settings.pdf_phone, 50, addressY); addressY += 12; }
+      if (settings?.pdf_email) { doc.text(settings.pdf_email, 50, addressY); addressY += 12; }
+      if (settings?.pdf_website) { doc.text(settings.pdf_website, 50, addressY); }
+  } else {
+      doc.text("Bekim house,", 50, 145);
+      doc.text("Westlands crossway Road");
+      doc.text("00800, Nairobi");
+      doc.text("Kenya");
+      doc.text("0729436660 / 0794700241");
+      doc.text("urbandevice.care@gmail.com");
+  }
 
   // Dates and Meta
   const metaY = 250;

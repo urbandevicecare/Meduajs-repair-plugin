@@ -657,6 +657,53 @@ const RepairsPage = () => {
               }
             )
           ] }),
+          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-2", children: [
+              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: "small", className: "font-medium text-ui-fg-base", children: "Address" }),
+              /* @__PURE__ */ jsxRuntime.jsx(
+                ui.Textarea,
+                {
+                  placeholder: "e.g. Nairobi, Kenya",
+                  value: settings.pdf_address || "",
+                  onChange: (e) => updateSettingState("pdf_address", e.target.value),
+                  rows: 2
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-2", children: [
+              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: "small", className: "font-medium text-ui-fg-base", children: "Phone Numbers" }),
+              /* @__PURE__ */ jsxRuntime.jsx(
+                ui.Input,
+                {
+                  placeholder: "e.g. 0729436660 / 0794700241",
+                  value: settings.pdf_phone || "",
+                  onChange: (e) => updateSettingState("pdf_phone", e.target.value)
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-2", children: [
+              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: "small", className: "font-medium text-ui-fg-base", children: "Email" }),
+              /* @__PURE__ */ jsxRuntime.jsx(
+                ui.Input,
+                {
+                  placeholder: "e.g. info@company.com",
+                  value: settings.pdf_email || "",
+                  onChange: (e) => updateSettingState("pdf_email", e.target.value)
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-2", children: [
+              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: "small", className: "font-medium text-ui-fg-base", children: "Website" }),
+              /* @__PURE__ */ jsxRuntime.jsx(
+                ui.Input,
+                {
+                  placeholder: "e.g. www.company.com",
+                  value: settings.pdf_website || "",
+                  onChange: (e) => updateSettingState("pdf_website", e.target.value)
+                }
+              )
+            ] })
+          ] }),
           /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-2 mt-2", children: [
             /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: "small", className: "font-medium text-ui-fg-base", children: "Payment Details" }),
             /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: "small", className: "text-ui-fg-subtle", children: "Bank account info, MPESA till number, or instructions to print on invoices." }),

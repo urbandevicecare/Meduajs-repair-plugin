@@ -22,4 +22,8 @@ export const RepairSettings = model.define("repair_settings", {
   pdf_logo_url: model.text().nullable(),
   pdf_payment_details: model.text().nullable(),
   pdf_terms: model.text().nullable(),
+  pdf_address: model.text().nullable(),
+  pdf_phone: model.text().nullable(),
+  pdf_email: model.text().nullable(),
+  pdf_website: model.text().nullable(),
 });
