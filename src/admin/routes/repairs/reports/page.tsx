@@ -1,7 +1,7 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk";
 import { Container, Heading, Text, Select } from "@medusajs/ui";
 import { ChartBar, ArrowDownTray } from "@medusajs/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useStoreCurrency } from "../../../lib/use-store-currency";
 import {
   AreaChart,
@@ -20,7 +20,7 @@ const ReportsPage = () => {
   const [rawTickets, setRawTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeframe, setTimeframe] = useState("all");
-  const { formatCurrency } = useStoreCurrency();
+  const { formatCurrency, currencyCode } = useStoreCurrency();
 
   useEffect(() => {
     setLoading(true);
@@ -94,6 +94,21 @@ const ReportsPage = () => {
     name: key.charAt(0).toUpperCase() + key.slice(1).replace("_", " "),
     count: data.status_counts[key],
   })) : [];
+
+  const technicianDistribution = useMemo(() => {
+    if (!rawTickets || rawTickets.length === 0) return [];
+    
+    const countMap: Record<string, number> = {};
+    rawTickets.forEach((t: any) => {
+      const techName = t.technician_name || "Unassigned";
+      countMap[techName] = (countMap[techName] || 0) + 1;
+    });
+
+    return Object.entries(countMap).map(([name, count]) => ({
+      name,
+      count
+    })).sort((a, b) => b.count - a.count);
+  }, [rawTickets]);
 
   return (
     <Container className="p-8 bg-transparent border-none shadow-none">
@@ -200,7 +215,7 @@ const ReportsPage = () => {
                       axisLine={false} 
                       tickLine={false} 
                       tick={{fontSize: 10, fill: '#6b7280'}}
-                      tickFormatter={(val) => `$${val}`}
+                      tickFormatter={(val) => new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short", style: "currency", currency: currencyCode }).format(val)}
                     />
                     <Tooltip 
                       contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
@@ -233,6 +248,25 @@ const ReportsPage = () => {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+            </div>
+          </div>
+
+          <div className="bg-ui-bg-base border border-ui-border-base rounded-xl p-6 shadow-sm mb-8">
+            <Text className="text-sm font-medium text-ui-fg-base mb-6">Technician Performance (Repairs Assigned)</Text>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={technicianDistribution} layout="vertical" margin={{ top: 0, right: 0, left: 10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e5e7eb" />
+                  <XAxis type="number" hide />
+                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#374151'}} width={90} />
+                  <Tooltip 
+                    cursor={{fill: '#f3f4f6'}}
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    itemStyle={{ fontSize: '12px' }}
+                  />
+                  <Bar dataKey="count" fill="#10b981" radius={[0, 4, 4, 0]} barSize={20} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </>

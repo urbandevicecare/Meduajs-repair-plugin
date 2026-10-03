@@ -1,7 +1,7 @@
 import { jsx, jsxs, Fragment } from "react/jsx-runtime";
 import { defineWidgetConfig, defineRouteConfig } from "@medusajs/admin-sdk";
 import { Container, Text, Heading, Badge, FocusModal, Button, Label, Input, Textarea, Select, Checkbox, Table, Switch, Toaster, toast } from "@medusajs/ui";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Wrench, BellAlert, Trash, ArrowUpRightOnBox, ChatBubbleLeftRight, ChartBar, ArrowDownTray } from "@medusajs/icons";
 import { useNavigate } from "react-router-dom";
 import { ResponsiveContainer, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, Area, BarChart, Bar } from "recharts";
@@ -1854,7 +1854,7 @@ const ReportsPage = () => {
   const [rawTickets, setRawTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [timeframe, setTimeframe] = useState("all");
-  const { formatCurrency } = useStoreCurrency();
+  const { formatCurrency, currencyCode } = useStoreCurrency();
   useEffect(() => {
     setLoading(true);
     fetch(`/admin/repairs/analytics?timeframe=${timeframe}`, {
@@ -1915,6 +1915,18 @@ const ReportsPage = () => {
     name: key.charAt(0).toUpperCase() + key.slice(1).replace("_", " "),
     count: data.status_counts[key]
   })) : [];
+  const technicianDistribution = useMemo(() => {
+    if (!rawTickets || rawTickets.length === 0) return [];
+    const countMap = {};
+    rawTickets.forEach((t) => {
+      const techName = t.technician_name || "Unassigned";
+      countMap[techName] = (countMap[techName] || 0) + 1;
+    });
+    return Object.entries(countMap).map(([name, count]) => ({
+      name,
+      count
+    })).sort((a, b) => b.count - a.count);
+  }, [rawTickets]);
   return /* @__PURE__ */ jsxs(Container, { className: "p-8 bg-transparent border-none shadow-none", children: [
     /* @__PURE__ */ jsxs("div", { className: "flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10", children: [
       /* @__PURE__ */ jsxs("div", { children: [
@@ -2008,7 +2020,7 @@ const ReportsPage = () => {
                 axisLine: false,
                 tickLine: false,
                 tick: { fontSize: 10, fill: "#6b7280" },
-                tickFormatter: (val) => `$${val}`
+                tickFormatter: (val) => new Intl.NumberFormat("en-US", { notation: "compact", compactDisplay: "short", style: "currency", currency: currencyCode }).format(val)
               }
             ),
             /* @__PURE__ */ jsx(
@@ -2041,6 +2053,23 @@ const ReportsPage = () => {
             /* @__PURE__ */ jsx(Bar, { dataKey: "count", fill: "#6366f1", radius: [0, 4, 4, 0], barSize: 20 })
           ] }) }) })
         ] })
+      ] }),
+      /* @__PURE__ */ jsxs("div", { className: "bg-ui-bg-base border border-ui-border-base rounded-xl p-6 shadow-sm mb-8", children: [
+        /* @__PURE__ */ jsx(Text, { className: "text-sm font-medium text-ui-fg-base mb-6", children: "Technician Performance (Repairs Assigned)" }),
+        /* @__PURE__ */ jsx("div", { className: "h-[300px]", children: /* @__PURE__ */ jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxs(BarChart, { data: technicianDistribution, layout: "vertical", margin: { top: 0, right: 0, left: 10, bottom: 0 }, children: [
+          /* @__PURE__ */ jsx(CartesianGrid, { strokeDasharray: "3 3", horizontal: true, vertical: false, stroke: "#e5e7eb" }),
+          /* @__PURE__ */ jsx(XAxis, { type: "number", hide: true }),
+          /* @__PURE__ */ jsx(YAxis, { dataKey: "name", type: "category", axisLine: false, tickLine: false, tick: { fontSize: 10, fill: "#374151" }, width: 90 }),
+          /* @__PURE__ */ jsx(
+            Tooltip,
+            {
+              cursor: { fill: "#f3f4f6" },
+              contentStyle: { borderRadius: "8px", border: "none", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" },
+              itemStyle: { fontSize: "12px" }
+            }
+          ),
+          /* @__PURE__ */ jsx(Bar, { dataKey: "count", fill: "#10b981", radius: [0, 4, 4, 0], barSize: 20 })
+        ] }) }) })
       ] })
     ] })
   ] });
