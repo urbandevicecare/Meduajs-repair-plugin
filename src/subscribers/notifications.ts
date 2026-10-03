@@ -9,16 +9,6 @@ import { REPAIR_MODULE } from "../modules/repair";
 import RepairModuleService from "../modules/repair/service";
 
 async function shortenUrl(url: string): Promise<string> {
-  if (!url) return url;
-  try {
-    const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
-    if (res.ok) {
-      const shortUrl = await res.text();
-      return shortUrl.trim();
-    }
-  } catch (e) {
-    // Silently fail and return original
-  }
   return url;
 }
 
