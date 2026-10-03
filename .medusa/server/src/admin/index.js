@@ -823,6 +823,7 @@ const RepairDetailPage = () => {
   const [isAddingPart, setIsAddingPart] = react.useState(false);
   const [customPartName, setCustomPartName] = react.useState("");
   const [customPartPrice, setCustomPartPrice] = react.useState("");
+  const [partInputMode, setPartInputMode] = react.useState("inventory");
   const [technicianSearch, setTechnicianSearch] = react.useState("");
   const [technicianOptions, setTechnicianOptions] = react.useState([]);
   const [showTechnicianDropdown, setShowTechnicianDropdown] = react.useState(false);
@@ -1333,94 +1334,102 @@ const RepairDetailPage = () => {
               ))
             ] })
           ] }),
-          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-4 pt-4 border-t", children: [
-            /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h3", className: "text-sm", children: "Add Inventory Part" }),
-            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex gap-2", children: [
-              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative flex-1", children: [
-                /* @__PURE__ */ jsxRuntime.jsx(
-                  ui.Input,
-                  {
-                    placeholder: "Search variant...",
-                    value: partSearch,
-                    onChange: (e) => {
-                      setPartSearch(e.target.value);
-                      setSelectedInventoryPart("");
-                    }
+          /* @__PURE__ */ jsxRuntime.jsx("div", { className: "pt-4 border-t", children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center border border-ui-border-base rounded-md overflow-visible bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all", children: [
+            /* @__PURE__ */ jsxRuntime.jsx("div", { className: "border-r border-ui-border-base px-2 py-[7px] bg-ui-bg-subtle h-full", children: /* @__PURE__ */ jsxRuntime.jsxs(
+              "select",
+              {
+                className: "bg-transparent text-xs font-medium text-ui-fg-subtle outline-none cursor-pointer appearance-none pr-1",
+                value: partInputMode,
+                onChange: (e) => {
+                  setPartInputMode(e.target.value);
+                  setPartSearch("");
+                  setSelectedInventoryPart("");
+                  setCustomPartName("");
+                  setCustomPartPrice("");
+                },
+                children: [
+                  /* @__PURE__ */ jsxRuntime.jsx("option", { value: "inventory", children: "Inventory ▾" }),
+                  /* @__PURE__ */ jsxRuntime.jsx("option", { value: "custom", children: "Custom ▾" })
+                ]
+              }
+            ) }),
+            /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex-1 px-3 relative", children: partInputMode === "inventory" ? /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+              /* @__PURE__ */ jsxRuntime.jsx(
+                "input",
+                {
+                  placeholder: "Search variant...",
+                  className: "w-full bg-transparent text-sm outline-none text-ui-fg-base placeholder-ui-fg-muted",
+                  value: partSearch,
+                  onChange: (e) => {
+                    setPartSearch(e.target.value);
+                    setSelectedInventoryPart("");
                   }
-                ),
-                partSearch && !selectedInventoryPart && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "absolute z-10 w-full mt-1 bg-ui-bg-base border border-ui-border-base rounded-md shadow-md max-h-48 overflow-y-auto", children: [
-                  inventoryParts.filter(
-                    (p) => {
-                      var _a;
-                      return p.title.toLowerCase().includes(partSearch.toLowerCase()) || ((_a = p.sku) == null ? void 0 : _a.toLowerCase().includes(partSearch.toLowerCase()));
-                    }
-                  ).map((p) => /* @__PURE__ */ jsxRuntime.jsxs(
-                    "div",
-                    {
-                      className: "p-2 text-sm hover:bg-ui-bg-subtle-hover cursor-pointer",
-                      onClick: () => {
-                        setSelectedInventoryPart(p.id);
-                        setPartSearch(`${p.title} ${p.sku ? `(${p.sku})` : ""}`);
-                      },
-                      children: [
-                        p.title,
-                        " ",
-                        p.sku ? `(${p.sku})` : ""
-                      ]
+                }
+              ),
+              partSearch && !selectedInventoryPart && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "absolute left-0 z-50 w-full mt-2 bg-ui-bg-base border border-ui-border-base rounded-md shadow-md max-h-48 overflow-y-auto", children: [
+                inventoryParts.filter(
+                  (p) => {
+                    var _a;
+                    return p.title.toLowerCase().includes(partSearch.toLowerCase()) || ((_a = p.sku) == null ? void 0 : _a.toLowerCase().includes(partSearch.toLowerCase()));
+                  }
+                ).map((p) => /* @__PURE__ */ jsxRuntime.jsxs(
+                  "div",
+                  {
+                    className: "p-2 text-sm hover:bg-ui-bg-subtle-hover cursor-pointer",
+                    onClick: () => {
+                      setSelectedInventoryPart(p.id);
+                      setPartSearch(`${p.title} ${p.sku ? `(${p.sku})` : ""}`);
                     },
-                    p.id
-                  )),
-                  inventoryParts.filter(
-                    (p) => {
-                      var _a;
-                      return p.title.toLowerCase().includes(partSearch.toLowerCase()) || ((_a = p.sku) == null ? void 0 : _a.toLowerCase().includes(partSearch.toLowerCase()));
-                    }
-                  ).length === 0 && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "p-2 text-sm text-ui-fg-subtle", children: "No parts found" })
-                ] })
+                    children: [
+                      p.title,
+                      " ",
+                      p.sku ? `(${p.sku})` : ""
+                    ]
+                  },
+                  p.id
+                )),
+                inventoryParts.filter(
+                  (p) => {
+                    var _a;
+                    return p.title.toLowerCase().includes(partSearch.toLowerCase()) || ((_a = p.sku) == null ? void 0 : _a.toLowerCase().includes(partSearch.toLowerCase()));
+                  }
+                ).length === 0 && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "p-2 text-sm text-ui-fg-subtle", children: "No parts found" })
+              ] })
+            ] }) : /* @__PURE__ */ jsxRuntime.jsx(
+              "input",
+              {
+                placeholder: "Part description...",
+                className: "w-full bg-transparent text-sm outline-none text-ui-fg-base placeholder-ui-fg-muted",
+                value: customPartName,
+                onChange: (e) => setCustomPartName(e.target.value)
+              }
+            ) }),
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center border-l border-ui-border-base bg-ui-bg-subtle pl-2", children: [
+              partInputMode === "custom" && /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+                /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-ui-fg-subtle text-xs mr-1", children: "KES" }),
+                /* @__PURE__ */ jsxRuntime.jsx(
+                  "input",
+                  {
+                    type: "number",
+                    step: "0.01",
+                    placeholder: "0.00",
+                    className: "w-16 bg-transparent text-sm text-right outline-none text-ui-fg-base placeholder-ui-fg-muted py-[7px]",
+                    value: customPartPrice,
+                    onChange: (e) => setCustomPartPrice(e.target.value)
+                  }
+                )
               ] }),
               /* @__PURE__ */ jsxRuntime.jsx(
-                ui.Button,
+                "button",
                 {
-                  variant: "secondary",
-                  onClick: handleAddInventoryPart,
-                  disabled: isAddingPart || !selectedInventoryPart,
-                  children: "Add"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h3", className: "text-sm mt-4", children: "Add Custom Part" }),
-            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex gap-2", children: [
-              /* @__PURE__ */ jsxRuntime.jsx(
-                ui.Input,
-                {
-                  className: "flex-1",
-                  placeholder: "Part description",
-                  value: customPartName,
-                  onChange: (e) => setCustomPartName(e.target.value)
-                }
-              ),
-              /* @__PURE__ */ jsxRuntime.jsx(
-                ui.Input,
-                {
-                  type: "number",
-                  step: "0.01",
-                  className: "w-24",
-                  placeholder: "Cost",
-                  value: customPartPrice,
-                  onChange: (e) => setCustomPartPrice(e.target.value)
-                }
-              ),
-              /* @__PURE__ */ jsxRuntime.jsx(
-                ui.Button,
-                {
-                  variant: "secondary",
-                  onClick: handleAddCustomPart,
-                  disabled: isAddingPart || !customPartName || !customPartPrice,
+                  className: `ml-2 px-3 py-[7px] text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${partInputMode === "custom" ? "border-l border-ui-border-base" : ""} text-ui-fg-base hover:bg-ui-bg-base-hover`,
+                  onClick: partInputMode === "inventory" ? handleAddInventoryPart : handleAddCustomPart,
+                  disabled: isAddingPart || partInputMode === "inventory" && !selectedInventoryPart || partInputMode === "custom" && (!customPartName || !customPartPrice),
                   children: "Add"
                 }
               )
             ] })
-          ] })
+          ] }) })
         ] }),
         ticket.media && ticket.media.length > 0 && /* @__PURE__ */ jsxRuntime.jsxs(ui.Container, { children: [
           /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h2", className: "mb-4", children: "Media" }),
