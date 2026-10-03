@@ -555,10 +555,14 @@ const RepairDetailPage = () => {
             <a href={`/admin/repairs/${id}/document?type=invoice`} target="_blank" className="text-[11px] uppercase tracking-wider font-semibold text-ui-fg-subtle hover:text-ui-fg-base transition-colors">
               Invoice
             </a>
-            {(ticket.payment_status === "captured" || ticket.payment_status === "paid") && (
+            {ticket.payment_status === "captured" || ticket.payment_status === "paid" || ticket.status === "completed" ? (
               <a href={`/admin/repairs/${id}/document?type=receipt`} target="_blank" className="text-[11px] uppercase tracking-wider font-semibold text-ui-fg-subtle hover:text-ui-fg-base transition-colors">
                 Receipt
               </a>
+            ) : (
+              <span className="text-[11px] uppercase tracking-wider font-semibold text-ui-fg-muted cursor-not-allowed opacity-50" title="Available once payment is captured">
+                Receipt
+              </span>
             )}
             <button 
               onClick={handleSendReminder}
