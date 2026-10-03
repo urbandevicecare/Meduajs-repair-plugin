@@ -277,11 +277,6 @@ export async function generateRepairDocument(
   doc.text("0729436660 / 0794700241");
   doc.text("urbandevice.care@gmail.com");
 
-  // QR Code positioned near company info
-  if (qrBuffer) {
-      doc.image(qrBuffer, 220, 130, { width: 60 });
-  }
-
   // Dates and Meta
   const metaY = 250;
   const addMetaRow = (label: string, value: string, yPos: number) => {
@@ -444,6 +439,10 @@ export async function generateRepairDocument(
   }
 
   if (zohoError) { doc.fontSize(8).fillColor("red").text(zohoError, 50, footerY + 15, { lineBreak: false }); }
+
+  if (qrBuffer) {
+      doc.image(qrBuffer, 485, footerY - 20, { width: 60 });
+  }
   
   doc.moveTo(50, footerY + 30).lineTo(545, footerY + 30).lineWidth(0.5).strokeColor("#CCCCCC").stroke();
   doc.fontSize(8).font("Helvetica").fillColor("#999").text(`POWERED BY ${settings?.company_name?.toUpperCase() || "URBAN DEVICE CARE"}`, 50, footerY + 40, { lineBreak: false });
