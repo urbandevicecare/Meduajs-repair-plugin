@@ -214,16 +214,21 @@ export async function generateRepairDocument(
 
   // 1. Logo
   try {
-      const logoPath = path.resolve(process.cwd(), "src/utils/assets/logo.png");
-      if (fs.existsSync(logoPath)) {
-          doc.image(logoPath, 50, 40, { width: 140 });
+      if (settings?.pdf_logo_url) {
+          const response = await fetch(settings.pdf_logo_url);
+          const arrayBuffer = await response.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          doc.image(buffer, 50, 40, { width: 140 });
       } else {
-          doc.fontSize(28).font("Helvetica-Bold").fillColor("#333").text("URBAN", 50, 50, { continued: true }).fillColor("#666").text(" DEVICE CARE");
-          doc.fontSize(10).fillColor("#999").text("SINCE 2025", 50, 80);
+          const logoPath = path.resolve(process.cwd(), "src/utils/assets/logo.png");
+          if (fs.existsSync(logoPath)) {
+              doc.image(logoPath, 50, 40, { width: 140 });
+          } else {
+              doc.fontSize(24).font("Helvetica-Bold").fillColor("#333").text(settings?.company_name || "URBAN DEVICE CARE", 50, 50);
+          }
       }
   } catch (e) {
-      doc.fontSize(28).font("Helvetica-Bold").fillColor("#333").text("URBAN", 50, 50, { continued: true }).fillColor("#666").text(" DEVICE CARE");
-      doc.fontSize(10).fillColor("#999").text("SINCE 2025", 50, 80);
+      doc.fontSize(24).font("Helvetica-Bold").fillColor("#333").text(settings?.company_name || "URBAN DEVICE CARE", 50, 50);
   }
 
   // 2. Document Title & Number
@@ -420,18 +425,29 @@ export async function generateRepairDocument(
       doc.text("Customer Signature", 350, currentY + 5);
   }
 
-  const pageHeight = doc.page.height;
-  const footerY = pageHeight - 120; // 720
-  
-  doc.fontSize(9).font("Helvetica").fillColor("#333");
-  doc.text("Thanks for your business.", 50, footerY, { lineBreak: false });
-  doc.text("Paybill: 880100 - Acc No: PAYURBANDEVICE", 50, footerY + 15, { lineBreak: false });
+  // Terms and conditions
+  if (settings?.pdf_terms) {
+      currentY += 40;
+      if (currentY > 650) { doc.addPage(); currentY = 50; }
+      doc.fontSize(9).font("Helvetica-Bold").fillColor("#333").text("Terms & Conditions", 50, currentY);
+      doc.fontSize(8).font("Helvetica").fillColor("#666").text(settings.pdf_terms, 50, currentY + 15, { width: 495 });
+  }
 
-  if (zohoError) { doc.fontSize(8).fillColor("red").text(zohoError, 50, footerY + 30, { lineBreak: false }); }
+  const pageHeight = doc.page.height;
+  const footerY = pageHeight - 90;
   
-  doc.moveTo(50, footerY + 45).lineTo(545, footerY + 45).lineWidth(0.5).strokeColor("#CCCCCC").stroke();
-  doc.fontSize(8).fillColor("#999").text("POWERED BY URBAN DEVICE CARE", 50, footerY + 55, { lineBreak: false });
-  doc.text("1", 530, footerY + 55, { align: "right", lineBreak: false });
+  doc.fontSize(9).font("Helvetica-Bold").fillColor("#333");
+  if (settings?.pdf_payment_details) {
+      doc.text(settings.pdf_payment_details.replace(/\n/g, ' | '), 50, footerY, { width: 495 });
+  } else {
+      doc.text("Thanks for your business. | Paybill: 880100 - Acc No: PAYURBANDEVICE", 50, footerY);
+  }
+
+  if (zohoError) { doc.fontSize(8).fillColor("red").text(zohoError, 50, footerY + 15, { lineBreak: false }); }
+  
+  doc.moveTo(50, footerY + 30).lineTo(545, footerY + 30).lineWidth(0.5).strokeColor("#CCCCCC").stroke();
+  doc.fontSize(8).font("Helvetica").fillColor("#999").text(`POWERED BY ${settings?.company_name?.toUpperCase() || "URBAN DEVICE CARE"}`, 50, footerY + 40, { lineBreak: false });
+  doc.text("1", 530, footerY + 40, { align: "right", lineBreak: false });
 
   let localWatermarkText = "";
   let localWatermarkColor = "#cccccc";

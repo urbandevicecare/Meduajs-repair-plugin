@@ -672,6 +672,42 @@ const RepairsPage = () => {
           </div>
 
           <div>
+            <Heading level="h2">PDF Document Settings</Heading>
+            <div className="flex flex-col gap-4 mt-4">
+              <div className="flex flex-col gap-2">
+                <Text size="small" className="font-medium text-ui-fg-base">Logo URL</Text>
+                <Text size="small" className="text-ui-fg-subtle">Enter an image URL for your company logo (e.g. https://example.com/logo.png).</Text>
+                <Input 
+                  placeholder="https://..." 
+                  value={settings.pdf_logo_url || ""} 
+                  onChange={(e) => updateSettingState("pdf_logo_url", e.target.value)} 
+                />
+              </div>
+              <div className="flex flex-col gap-2 mt-2">
+                <Text size="small" className="font-medium text-ui-fg-base">Payment Details</Text>
+                <Text size="small" className="text-ui-fg-subtle">Bank account info, MPESA till number, or instructions to print on invoices.</Text>
+                <Textarea 
+                  placeholder="Account Name: Urban Device Care..." 
+                  value={settings.pdf_payment_details || ""} 
+                  onChange={(e) => updateSettingState("pdf_payment_details", e.target.value)} 
+                  rows={3}
+                />
+              </div>
+              <div className="flex flex-col gap-2 mt-2">
+                <Text size="small" className="font-medium text-ui-fg-base">Terms & Conditions</Text>
+                <Text size="small" className="text-ui-fg-subtle">Legal text, warranty disclaimers, or terms to print at the bottom of Job Cards and Quotes.</Text>
+                <Textarea 
+                  placeholder="1. All repairs come with a 90-day warranty..." 
+                  value={settings.pdf_terms || ""} 
+                  onChange={(e) => updateSettingState("pdf_terms", e.target.value)} 
+                  rows={4}
+                />
+              </div>
+            </div>
+            <div className="border-b border-ui-border-base my-6" />
+          </div>
+
+          <div>
             <Heading level="h2">Notification Settings</Heading>
             <Text className="text-ui-fg-subtle">
               Configure which channels are enabled for automated repair notifications. (Note: Medusa must have a provider configured for these channels to actually send them).

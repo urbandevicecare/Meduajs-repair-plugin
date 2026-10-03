@@ -642,6 +642,50 @@ const RepairsPage = () => {
         /* @__PURE__ */ jsx("div", { className: "border-b border-ui-border-base my-6" })
       ] }),
       /* @__PURE__ */ jsxs("div", { children: [
+        /* @__PURE__ */ jsx(Heading, { level: "h2", children: "PDF Document Settings" }),
+        /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-4 mt-4", children: [
+          /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2", children: [
+            /* @__PURE__ */ jsx(Text, { size: "small", className: "font-medium text-ui-fg-base", children: "Logo URL" }),
+            /* @__PURE__ */ jsx(Text, { size: "small", className: "text-ui-fg-subtle", children: "Enter an image URL for your company logo (e.g. https://example.com/logo.png)." }),
+            /* @__PURE__ */ jsx(
+              Input,
+              {
+                placeholder: "https://...",
+                value: settings.pdf_logo_url || "",
+                onChange: (e) => updateSettingState("pdf_logo_url", e.target.value)
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2 mt-2", children: [
+            /* @__PURE__ */ jsx(Text, { size: "small", className: "font-medium text-ui-fg-base", children: "Payment Details" }),
+            /* @__PURE__ */ jsx(Text, { size: "small", className: "text-ui-fg-subtle", children: "Bank account info, MPESA till number, or instructions to print on invoices." }),
+            /* @__PURE__ */ jsx(
+              Textarea,
+              {
+                placeholder: "Account Name: Urban Device Care...",
+                value: settings.pdf_payment_details || "",
+                onChange: (e) => updateSettingState("pdf_payment_details", e.target.value),
+                rows: 3
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2 mt-2", children: [
+            /* @__PURE__ */ jsx(Text, { size: "small", className: "font-medium text-ui-fg-base", children: "Terms & Conditions" }),
+            /* @__PURE__ */ jsx(Text, { size: "small", className: "text-ui-fg-subtle", children: "Legal text, warranty disclaimers, or terms to print at the bottom of Job Cards and Quotes." }),
+            /* @__PURE__ */ jsx(
+              Textarea,
+              {
+                placeholder: "1. All repairs come with a 90-day warranty...",
+                value: settings.pdf_terms || "",
+                onChange: (e) => updateSettingState("pdf_terms", e.target.value),
+                rows: 4
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsx("div", { className: "border-b border-ui-border-base my-6" })
+      ] }),
+      /* @__PURE__ */ jsxs("div", { children: [
         /* @__PURE__ */ jsx(Heading, { level: "h2", children: "Notification Settings" }),
         /* @__PURE__ */ jsx(Text, { className: "text-ui-fg-subtle", children: "Configure which channels are enabled for automated repair notifications. (Note: Medusa must have a provider configured for these channels to actually send them)." }),
         /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-y-6 mt-4", children: [

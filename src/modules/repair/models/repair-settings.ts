@@ -17,4 +17,9 @@ export const RepairSettings = model.define("repair_settings", {
 
   company_name: model.text().default("Repair Shop"),
   storefront_url: model.text().nullable(),
+
+  // PDF Generation Details
+  pdf_logo_url: model.text().nullable(),
+  pdf_payment_details: model.text().nullable(),
+  pdf_terms: model.text().nullable(),
 });
