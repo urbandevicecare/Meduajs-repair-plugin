@@ -574,9 +574,18 @@ const RepairDetailPage = () => {
             {/* Issue Details */}
             <div className="p-6 border-b border-ui-border-base">
 
-            <Heading level="h2" className="mb-4">
-              Issue Details
-            </Heading>
+            <div className="flex items-baseline gap-2 mb-4">
+              <Heading level="h2">
+                Issue Details
+              </Heading>
+              <span className="text-ui-fg-muted text-xs">•</span>
+              <span className="text-ui-fg-muted text-xs">
+                {new Date(ticket.created_at).toLocaleString(undefined, {
+                  month: 'short', day: 'numeric', year: 'numeric', 
+                  hour: 'numeric', minute: '2-digit'
+                })}
+              </span>
+            </div>
             <div className="space-y-3">
               <div>
                 <Label>Description</Label>
@@ -588,10 +597,6 @@ const RepairDetailPage = () => {
                   <Text>{ticket.accessories}</Text>
                 </div>
               )}
-              <div>
-                <Label>Created</Label>
-                <Text>{new Date(ticket.created_at).toLocaleString()}</Text>
-              </div>
               <div className="pt-3 border-t">
                 <Label>Compliance</Label>
                 <div className="flex gap-2 mt-1.5">

@@ -1192,7 +1192,17 @@ const RepairDetailPage = () => {
       /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "lg:col-span-7 space-y-6", children: [
         /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "bg-ui-bg-base border border-ui-border-base rounded-lg shadow-sm", children: [
           /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "p-6 border-b border-ui-border-base", children: [
-            /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h2", className: "mb-4", children: "Issue Details" }),
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-baseline gap-2 mb-4", children: [
+              /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h2", children: "Issue Details" }),
+              /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-ui-fg-muted text-xs", children: "•" }),
+              /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-ui-fg-muted text-xs", children: new Date(ticket.created_at).toLocaleString(void 0, {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+                hour: "numeric",
+                minute: "2-digit"
+              }) })
+            ] }),
             /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-3", children: [
               /* @__PURE__ */ jsxRuntime.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { children: "Description" }),
@@ -1201,10 +1211,6 @@ const RepairDetailPage = () => {
               ticket.accessories && /* @__PURE__ */ jsxRuntime.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { children: "Accessories" }),
                 /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: ticket.accessories })
-              ] }),
-              /* @__PURE__ */ jsxRuntime.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { children: "Created" }),
-                /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: new Date(ticket.created_at).toLocaleString() })
               ] }),
               /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "pt-3 border-t", children: [
                 /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { children: "Compliance" }),
