@@ -1027,11 +1027,16 @@ const RepairDetailPage = () => {
       toast.error("Failed to add entry");
     }
   };
-  const handleUpdateCosts = async () => {
+  const handleUpdateCosts = async (overrides) => {
     try {
       const promises = [];
-      if (laborCost !== "") {
-        const laborAmount = parseFloat(laborCost);
+      const currentLaborCost = (overrides == null ? void 0 : overrides.laborCost) ?? laborCost;
+      const currentEtc = (overrides == null ? void 0 : overrides.etc) !== void 0 ? overrides.etc : etc;
+      const currentTechName = (overrides == null ? void 0 : overrides.technicianName) !== void 0 ? overrides.technicianName : technicianName;
+      const currentTechId = (overrides == null ? void 0 : overrides.technicianId) !== void 0 ? overrides.technicianId : technicianId;
+      const currentStatus = (overrides == null ? void 0 : overrides.newStatus) ?? newStatus;
+      if (currentLaborCost !== "") {
+        const laborAmount = parseFloat(currentLaborCost);
         if (!isNaN(laborAmount)) {
           promises.push(
             fetch(`/admin/repairs/${id}/costs`, {
@@ -1051,24 +1056,24 @@ const RepairDetailPage = () => {
           credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            estimated_completion: etc ? new Date(etc).toISOString() : null,
-            technician_name: technicianName || null,
-            technician_id: technicianId || null
+            estimated_completion: currentEtc ? new Date(currentEtc).toISOString() : null,
+            technician_name: currentTechName || null,
+            technician_id: currentTechId || null
           })
         })
       );
-      if (ticket && newStatus !== ticket.status) {
+      if (ticket && currentStatus !== ticket.status) {
         promises.push(
           fetch(`/admin/repairs/${id}/status`, {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: newStatus })
+            body: JSON.stringify({ status: currentStatus })
           })
         );
       }
       await Promise.all(promises);
-      toast.success("Details updated");
+      toast.success("Details saved successfully");
       loadTicket();
     } catch (err) {
       toast.error("Failed to update details");
@@ -1191,6 +1196,7 @@ const RepairDetailPage = () => {
                     /* @__PURE__ */ jsx("button", { className: "px-3 text-ui-fg-muted hover:text-ui-fg-base", onClick: () => {
                       setTechnicianName("");
                       setTechnicianId("");
+                      handleUpdateCosts({ technicianName: "", technicianId: "" });
                     }, children: "×" })
                   ] }) : /* @__PURE__ */ jsxs(Fragment, { children: [
                     /* @__PURE__ */ jsx(
@@ -1212,10 +1218,12 @@ const RepairDetailPage = () => {
                       {
                         className: "p-2 text-sm cursor-pointer hover:bg-ui-bg-subtle-hover flex justify-between items-center",
                         onClick: () => {
-                          setTechnicianName(`${opt.first_name} ${opt.last_name}`);
+                          const name = `${opt.first_name} ${opt.last_name}`;
+                          setTechnicianName(name);
                           setTechnicianId(opt.id);
                           setTechnicianSearch("");
                           setShowTechnicianDropdown(false);
+                          handleUpdateCosts({ technicianName: name, technicianId: opt.id });
                         },
                         children: [
                           opt.first_name,
@@ -1237,7 +1245,11 @@ const RepairDetailPage = () => {
                     {
                       className: "w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base appearance-none cursor-pointer",
                       value: newStatus,
-                      onChange: (e) => setNewStatus(e.target.value),
+                      onChange: (e) => {
+                        const val = e.target.value;
+                        setNewStatus(val);
+                        handleUpdateCosts({ newStatus: val });
+                      },
                       children: [
                         /* @__PURE__ */ jsx("option", { value: "pending_dropoff", children: "Pending Dropoff" }),
                         /* @__PURE__ */ jsx("option", { value: "received", children: "Received" }),
@@ -1279,7 +1291,13 @@ const RepairDetailPage = () => {
                         placeholder: "0.00",
                         className: "w-full bg-transparent text-sm px-2 py-[9px] outline-none text-ui-fg-base placeholder-ui-fg-muted",
                         value: laborCost,
-                        onChange: (e) => setLaborCost(e.target.value)
+                        onChange: (e) => setLaborCost(e.target.value),
+                        onBlur: (e) => handleUpdateCosts({ laborCost: e.target.value }),
+                        onKeyDown: (e) => {
+                          if (e.key === "Enter") {
+                            e.currentTarget.blur();
+                          }
+                        }
                       }
                     )
                   ] })
@@ -1293,21 +1311,15 @@ const RepairDetailPage = () => {
                       className: "w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base text-ui-fg-muted",
                       value: etc,
                       min: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
-                      onChange: (e) => setEtc(e.target.value)
+                      onChange: (e) => {
+                        setEtc(e.target.value);
+                        handleUpdateCosts({ etc: e.target.value });
+                      }
                     }
                   ) })
                 ] })
               ] }),
-              !(ticket == null ? void 0 : ticket.is_approved) && /* @__PURE__ */ jsx("div", { className: "text-xs text-ui-fg-error -mt-1", children: "Customer must approve estimate before starting work." }),
-              /* @__PURE__ */ jsx(
-                Button,
-                {
-                  onClick: handleUpdateCosts,
-                  variant: "primary",
-                  className: "w-full mt-2",
-                  children: "Save Details"
-                }
-              )
+              !(ticket == null ? void 0 : ticket.is_approved) && /* @__PURE__ */ jsx("div", { className: "text-xs text-ui-fg-error -mt-1", children: "Customer must approve estimate before starting work." })
             ] })
           ] }),
           /* @__PURE__ */ jsxs("div", { className: "p-6 border-b border-ui-border-base", children: [
@@ -1644,7 +1656,13 @@ const RepairDetailPage = () => {
               {
                 value: unifiedMessage,
                 onChange: (e) => setUnifiedMessage(e.target.value),
-                placeholder: "Type a message or note...",
+                onKeyDown: (e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendUnified();
+                  }
+                },
+                placeholder: "Type a message or note... (Press Enter to send)",
                 rows: 3,
                 className: "bg-ui-bg-base"
               }
@@ -1665,15 +1683,11 @@ const RepairDetailPage = () => {
                   ]
                 }
               ),
-              /* @__PURE__ */ jsx(
-                Button,
-                {
-                  onClick: handleSendUnified,
-                  variant: "primary",
-                  className: "flex-1",
-                  children: "Send / Add"
-                }
-              )
+              /* @__PURE__ */ jsxs("div", { className: "flex-1 text-xs text-ui-fg-muted flex justify-end", children: [
+                "Press ",
+                /* @__PURE__ */ jsx("kbd", { className: "mx-1 px-1.5 py-0.5 bg-ui-bg-subtle border border-ui-border-base rounded text-[10px] font-mono", children: "Enter" }),
+                " to submit"
+              ] })
             ] })
           ] })
         ] })

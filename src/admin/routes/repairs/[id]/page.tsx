@@ -374,11 +374,17 @@ const RepairDetailPage = () => {
     }
   };
 
-  const handleUpdateCosts = async () => {
+  const handleUpdateCosts = async (overrides?: { newStatus?: string; technicianName?: string; technicianId?: string; laborCost?: string; etc?: string }) => {
     try {
       const promises = [];
-      if (laborCost !== "") {
-        const laborAmount = parseFloat(laborCost);
+      const currentLaborCost = overrides?.laborCost ?? laborCost;
+      const currentEtc = overrides?.etc !== undefined ? overrides.etc : etc;
+      const currentTechName = overrides?.technicianName !== undefined ? overrides.technicianName : technicianName;
+      const currentTechId = overrides?.technicianId !== undefined ? overrides.technicianId : technicianId;
+      const currentStatus = overrides?.newStatus ?? newStatus;
+
+      if (currentLaborCost !== "") {
+        const laborAmount = parseFloat(currentLaborCost);
         if (!isNaN(laborAmount)) {
           promises.push(
             fetch(`/admin/repairs/${id}/costs`, {
@@ -398,24 +404,24 @@ const RepairDetailPage = () => {
           credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            estimated_completion: etc ? new Date(etc).toISOString() : null,
-            technician_name: technicianName || null,
-            technician_id: technicianId || null,
+            estimated_completion: currentEtc ? new Date(currentEtc).toISOString() : null,
+            technician_name: currentTechName || null,
+            technician_id: currentTechId || null,
           }),
         }),
       );
-      if (ticket && newStatus !== ticket.status) {
+      if (ticket && currentStatus !== ticket.status) {
         promises.push(
           fetch(`/admin/repairs/${id}/status`, {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: newStatus }),
+            body: JSON.stringify({ status: currentStatus }),
           }),
         );
       }
       await Promise.all(promises);
-      toast.success("Details updated");
+      toast.success("Details saved successfully");
       loadTicket();
     } catch (err) {
       toast.error("Failed to update details");
@@ -589,7 +595,7 @@ const RepairDetailPage = () => {
                     {technicianName ? (
                       <>
                         <div className="flex-1 px-3 py-[9px] text-sm text-ui-fg-base truncate">{technicianName}</div>
-                        <button className="px-3 text-ui-fg-muted hover:text-ui-fg-base" onClick={() => { setTechnicianName(""); setTechnicianId(""); }}>×</button>
+                        <button className="px-3 text-ui-fg-muted hover:text-ui-fg-base" onClick={() => { setTechnicianName(""); setTechnicianId(""); handleUpdateCosts({ technicianName: "", technicianId: "" }) }}>×</button>
                       </>
                     ) : (
                       <>
@@ -611,10 +617,12 @@ const RepairDetailPage = () => {
                                 key={opt.id}
                                 className="p-2 text-sm cursor-pointer hover:bg-ui-bg-subtle-hover flex justify-between items-center"
                                 onClick={() => {
-                                  setTechnicianName(`${opt.first_name} ${opt.last_name}`);
+                                  const name = `${opt.first_name} ${opt.last_name}`;
+                                  setTechnicianName(name);
                                   setTechnicianId(opt.id);
                                   setTechnicianSearch("");
                                   setShowTechnicianDropdown(false);
+                                  handleUpdateCosts({ technicianName: name, technicianId: opt.id });
                                 }}
                               >
                                 {opt.first_name} {opt.last_name}
@@ -640,7 +648,11 @@ const RepairDetailPage = () => {
                     <select 
                       className="w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base appearance-none cursor-pointer"
                       value={newStatus}
-                      onChange={(e) => setNewStatus(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setNewStatus(val);
+                        handleUpdateCosts({ newStatus: val });
+                      }}
                     >
                       <option value="pending_dropoff">Pending Dropoff</option>
                       <option value="received">Received</option>
@@ -670,6 +682,12 @@ const RepairDetailPage = () => {
                       className="w-full bg-transparent text-sm px-2 py-[9px] outline-none text-ui-fg-base placeholder-ui-fg-muted"
                       value={laborCost}
                       onChange={(e) => setLaborCost(e.target.value)}
+                      onBlur={(e) => handleUpdateCosts({ laborCost: e.target.value })}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.currentTarget.blur();
+                        }
+                      }}
                     />
                   </div>
                 </div>
@@ -683,7 +701,10 @@ const RepairDetailPage = () => {
                       className="w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base text-ui-fg-muted"
                       value={etc}
                       min={new Date().toISOString().split("T")[0]}
-                      onChange={(e) => setEtc(e.target.value)}
+                      onChange={(e) => {
+                        setEtc(e.target.value);
+                        handleUpdateCosts({ etc: e.target.value });
+                      }}
                     />
                   </div>
                 </div>
@@ -694,14 +715,6 @@ const RepairDetailPage = () => {
                   Customer must approve estimate before starting work.
                 </div>
               )}
-
-              <Button
-                onClick={handleUpdateCosts}
-                variant="primary"
-                className="w-full mt-2"
-              >
-                Save Details
-              </Button>
             </div>
           
             </div>
@@ -1088,7 +1101,13 @@ const RepairDetailPage = () => {
                 <Textarea
                   value={unifiedMessage}
                   onChange={(e) => setUnifiedMessage(e.target.value)}
-                  placeholder="Type a message or note..."
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendUnified();
+                    }
+                  }}
+                  placeholder="Type a message or note... (Press Enter to send)"
                   rows={3}
                   className="bg-ui-bg-base"
                 />
@@ -1108,13 +1127,9 @@ const RepairDetailPage = () => {
                       <Select.Item value="public_note">Public Note</Select.Item>
                     </Select.Content>
                   </Select>
-                  <Button
-                    onClick={handleSendUnified}
-                    variant="primary"
-                    className="flex-1"
-                  >
-                    Send / Add
-                  </Button>
+                  <div className="flex-1 text-xs text-ui-fg-muted flex justify-end">
+                    Press <kbd className="mx-1 px-1.5 py-0.5 bg-ui-bg-subtle border border-ui-border-base rounded text-[10px] font-mono">Enter</kbd> to submit
+                  </div>
                 </div>
               </div>
             </div>
