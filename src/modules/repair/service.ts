@@ -5,6 +5,7 @@ import RepairMedia from "./models/repair-media";
 import RepairNote from "./models/repair-note";
 import RepairUpdate from "./models/repair-update";
 import { RepairSettings } from "./models/repair-settings";
+import { RepairLink } from "./models/repair-link";
 
 class RepairModuleService extends MedusaService({
   Device,
@@ -13,6 +14,7 @@ class RepairModuleService extends MedusaService({
   RepairNote,
   RepairUpdate,
   RepairSettings,
+  RepairLink,
 }) {}
 
 export default RepairModuleService;

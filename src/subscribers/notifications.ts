@@ -8,8 +8,24 @@ import { getRepairTemplate } from "../utils/templates/repair";
 import { REPAIR_MODULE } from "../modules/repair";
 import RepairModuleService from "../modules/repair/service";
 
-async function shortenUrl(url: string): Promise<string> {
-  return url;
+async function shortenUrl(url: string, container: any): Promise<string> {
+  if (!url) return url;
+  try {
+    const repairModule: any = container.resolve("repair");
+    let backendUrl = process.env.MEDUSA_BACKEND_URL || "http://localhost:9000";
+    backendUrl = backendUrl.replace(/\/$/, "");
+
+    const shortcode = Math.random().toString(36).substring(2, 8);
+    await repairModule.createRepairLinks({
+      shortcode,
+      url,
+    });
+    
+    return `${backendUrl}/api/store/repairs/r/${shortcode}`;
+  } catch (e) {
+    // Silently fail and return original
+    return url;
+  }
 }
 
 export default async function globalNotificationHandler({
@@ -152,9 +168,9 @@ export default async function globalNotificationHandler({
         device: deviceModel,
         status: data.status || ticket.status,
         approval_url: approvalUrl,
-        short_approval_url: await shortenUrl(approvalUrl),
+        short_approval_url: await shortenUrl(approvalUrl, container),
         pdf_url: pdfUrl,
-        short_pdf_url: await shortenUrl(pdfUrl),
+        short_pdf_url: await shortenUrl(pdfUrl, container),
         currency_code: currencyCode.toUpperCase(),
         company_name: companyName,
         total_estimate:
