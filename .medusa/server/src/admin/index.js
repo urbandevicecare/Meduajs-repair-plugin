@@ -827,6 +827,7 @@ const RepairDetailPage = () => {
   const [technicianOptions, setTechnicianOptions] = react.useState([]);
   const [showTechnicianDropdown, setShowTechnicianDropdown] = react.useState(false);
   const [isSendingReminder, setIsSendingReminder] = react.useState(false);
+  const [isPushingStk, setIsPushingStk] = react.useState(false);
   react.useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (!technicianSearch) {
@@ -957,6 +958,44 @@ const RepairDetailPage = () => {
       ui.toast.error("Failed to add custom part");
     } finally {
       setIsAddingPart(false);
+    }
+  };
+  const handleStkPush = async () => {
+    var _a;
+    const phone = prompt("Enter customer M-PESA phone number:", (ticket == null ? void 0 : ticket.customer_phone) || "");
+    if (!phone) return;
+    let amount = prompt("Enter amount to charge (KES):", (_a = ticket == null ? void 0 : ticket.total_estimate) == null ? void 0 : _a.toString());
+    if (!amount) return;
+    setIsPushingStk(true);
+    try {
+      const response = await fetch(`/admin/repairs/${id}/stk-push`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, amount: Number(amount) })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "STK Push failed");
+      ui.toast.success("STK Push successfully sent to customer's phone!");
+    } catch (e) {
+      ui.toast.error("Error: " + e.message);
+    } finally {
+      setIsPushingStk(false);
+    }
+  };
+  const handleMarkPaid = async () => {
+    if (!confirm("Are you sure you want to mark this ticket as Paid manually (e.g. Cash in store)? This will sync the payment to Zoho Books.")) return;
+    try {
+      const response = await fetch(`/admin/repairs/${id}/mark-paid`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ method: "Cash" })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Failed to mark paid");
+      ui.toast.success("Successfully marked as paid and synced to Zoho Books!");
+      loadTicket();
+    } catch (e) {
+      ui.toast.error("Error: " + e.message);
     }
   };
   const handleSendUnified = async () => {
@@ -1183,7 +1222,31 @@ const RepairDetailPage = () => {
               /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: "Total Estimate:" }),
               /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: formatCurrency(ticket.total_estimate) })
             ] }),
-            ticket.is_approved ? /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-2 mt-2", children: [
+            ticket.payment_status !== "paid" && ticket.payment_status !== "captured" && ticket.status !== "cancelled" && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "mt-2 flex flex-col gap-2", children: [
+              /* @__PURE__ */ jsxRuntime.jsx(
+                ui.Button,
+                {
+                  variant: "secondary",
+                  size: "small",
+                  onClick: handleStkPush,
+                  disabled: loading || isPushingStk,
+                  className: "w-full",
+                  children: isPushingStk ? "Pushing STK..." : "Push M-PESA STK to Customer"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntime.jsx(
+                ui.Button,
+                {
+                  variant: "secondary",
+                  size: "small",
+                  onClick: handleMarkPaid,
+                  disabled: loading,
+                  className: "w-full",
+                  children: "Mark as Paid (In-Store / Cash)"
+                }
+              )
+            ] }),
+            ticket.is_approved ? /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-2 mt-4 pt-4 border-t", children: [
               /* @__PURE__ */ jsxRuntime.jsxs(ui.Badge, { color: "green", size: "small", children: [
                 "Approved on ",
                 new Date(ticket.approved_at).toLocaleDateString()
