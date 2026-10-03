@@ -310,6 +310,24 @@ const RepairDetailPage = () => {
     }
   };
 
+  const handleMarkPaid = async () => {
+    if (!confirm("Are you sure you want to mark this ticket as Paid manually (e.g. Cash in store)? This will sync the payment to Zoho Books.")) return;
+
+    try {
+      const response = await fetch(`/admin/repairs/${id}/mark-paid`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ method: "Cash" })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Failed to mark paid");
+      toast.success("Successfully marked as paid and synced to Zoho Books!");
+      loadTicket();
+    } catch (e: any) {
+      toast.error("Error: " + e.message);
+    }
+  };
+
   const handleSendUnified = async () => {
     if (!unifiedMessage.trim()) return;
     try {
@@ -597,7 +615,7 @@ const RepairDetailPage = () => {
               </div>
 
               {ticket.payment_status !== "paid" && ticket.payment_status !== "captured" && ticket.status !== "cancelled" && (
-                <div className="mt-2">
+                <div className="mt-2 flex flex-col gap-2">
                   <Button 
                     variant="secondary" 
                     size="small" 
@@ -606,6 +624,15 @@ const RepairDetailPage = () => {
                     className="w-full"
                   >
                     {isPushingStk ? "Pushing STK..." : "Push M-PESA STK to Customer"}
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    size="small" 
+                    onClick={handleMarkPaid}
+                    disabled={loading}
+                    className="w-full"
+                  >
+                    Mark as Paid (In-Store / Cash)
                   </Button>
                 </div>
               )}
