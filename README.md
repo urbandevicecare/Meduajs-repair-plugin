@@ -145,7 +145,13 @@ To verify the system's integrations (such as price formatting, Zoho Books tax ha
 
 ## Changelog
 
-### v0.1.46 (Current)
+### v0.1.68 (Current)
+- **Unified Minimalist Admin Dashboard**: Completely overhauled the Repair Ticket admin layout. Consolidated 'Issue Details', 'Update Details', 'Parts & Inventory', and 'Cost Breakdown' into a single, seamless, physical-ticket-style document. Restyled the Timeline & Communication feed into an open, borderless list for high legibility.
+- **Unified Parts Input**: Merged the "Add Custom Part" and "Add Inventory Part" components into a single, multifunctional, compact input field with a dropdown mode toggle.
+- **Paystack M-PESA Validation Fix**: Implemented an automated backend formatter in the `POST /admin/repairs/[id]/stk-push` route to strictly enforce Paystack's required `+254XXXXXXXXX` formatting, resolving `Invalid phone number format` failures during STK pushes.
+- **Manual "Mark Paid" (Cash)**: Added a "Mark Paid (Cash)" button that bypasses STK push, setting ticket payment status to `captured`, transitioning status to `ready`, and flawlessly logging the cash payment against the remote Zoho Books invoice.
+
+### v0.1.46
 - **Medusa Workflow Strict Architecture**: Converted the Paystack verification and VAT toggle logic into native Medusa Workflows, adding resilient transaction compensations and rollbacks for external Zoho Books network calls.
 - **Hybrid Document Generation Engine**: Intelligent document routing handles PDFs dynamically. Financial documents (Quotes, Invoices, Receipts) are pulled directly from the Zoho Books API on the fly to maintain perfect accounting parity, allowing you to edit invoices in Zoho before clients see them. Internal Job Cards securely bypass Zoho and generate locally via `pdfkit` for custom technician and customer signature layouts.
 - **Global VAT Toggle**: Added a centralized "Add 16% VAT to Total" checkbox directly below the Cost Breakdown in the Admin UI. This replaces the old, per-item legacy checkboxes and calculates a seamless 16% markup on Parts + Labor.
