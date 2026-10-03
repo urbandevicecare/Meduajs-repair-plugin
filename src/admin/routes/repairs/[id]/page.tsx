@@ -1110,8 +1110,10 @@ const RepairDetailPage = () => {
                             size="small"
                           >
                             {item.author_type === "customer"
-                              ? "Customer Msg"
-                              : "Technician Msg"}
+                              ? ((ticket as any).customer?.first_name 
+                                  ? `${(ticket as any).customer.first_name} ${(ticket as any).customer.last_name || ''}`.trim()
+                                  : "Customer")
+                              : (ticket.technician_name || "Technician")}
                           </Badge>
                         )}
                         <Text size="xsmall" className="text-ui-fg-muted">

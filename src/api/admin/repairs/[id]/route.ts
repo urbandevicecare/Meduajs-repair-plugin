@@ -50,9 +50,27 @@ export async function GET(
     }
   }
 
+  let customerInfo: any = null;
+  if (data[0].customer_id) {
+    try {
+      const { data: customers } = await query.graph({
+        entity: "customer",
+        fields: ["first_name", "last_name", "phone"],
+        filters: { id: [data[0].customer_id] },
+      });
+      if (customers && customers.length > 0) {
+        customerInfo = customers[0];
+      }
+    } catch (err) {
+      // ignore
+    }
+  }
+
   res.json({
     repair_ticket: {
       ...data[0],
+      customer: customerInfo,
+      customer_phone: customerInfo?.phone || "",
       parts,
     },
   });

@@ -1663,34 +1663,37 @@ const RepairDetailPage = () => {
             if (items.length === 0) {
               return /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "text-ui-fg-muted p-2 text-center text-sm", children: "No activity yet." });
             }
-            return items.map((item) => /* @__PURE__ */ jsxRuntime.jsxs(
-              "div",
-              {
-                className: `p-3 rounded border bg-ui-bg-base ${item.entryType === "update" && item.author_type !== "customer" ? "ml-8" : item.entryType === "update" && item.author_type === "customer" ? "mr-8" : ""}`,
-                children: [
-                  /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
-                    item.entryType === "note" ? /* @__PURE__ */ jsxRuntime.jsx(
-                      ui.Badge,
-                      {
-                        color: item.is_internal ? "orange" : "blue",
-                        size: "small",
-                        children: item.is_internal ? "Internal Note" : "Public Note"
-                      }
-                    ) : /* @__PURE__ */ jsxRuntime.jsx(
-                      ui.Badge,
-                      {
-                        color: item.author_type === "customer" ? "green" : "purple",
-                        size: "small",
-                        children: item.author_type === "customer" ? "Customer Msg" : "Technician Msg"
-                      }
-                    ),
-                    /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: "xsmall", className: "text-ui-fg-muted", children: new Date(item.created_at).toLocaleString() })
-                  ] }),
-                  /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: "small", className: "whitespace-pre-wrap", children: item.entryType === "note" ? item.content : item.message })
-                ]
-              },
-              `${item.entryType}_${item.id}`
-            ));
+            return items.map((item) => {
+              var _a;
+              return /* @__PURE__ */ jsxRuntime.jsxs(
+                "div",
+                {
+                  className: `p-3 rounded border bg-ui-bg-base ${item.entryType === "update" && item.author_type !== "customer" ? "ml-8" : item.entryType === "update" && item.author_type === "customer" ? "mr-8" : ""}`,
+                  children: [
+                    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
+                      item.entryType === "note" ? /* @__PURE__ */ jsxRuntime.jsx(
+                        ui.Badge,
+                        {
+                          color: item.is_internal ? "orange" : "blue",
+                          size: "small",
+                          children: item.is_internal ? "Internal Note" : "Public Note"
+                        }
+                      ) : /* @__PURE__ */ jsxRuntime.jsx(
+                        ui.Badge,
+                        {
+                          color: item.author_type === "customer" ? "green" : "purple",
+                          size: "small",
+                          children: item.author_type === "customer" ? ((_a = ticket.customer) == null ? void 0 : _a.first_name) ? `${ticket.customer.first_name} ${ticket.customer.last_name || ""}`.trim() : "Customer" : ticket.technician_name || "Technician"
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: "xsmall", className: "text-ui-fg-muted", children: new Date(item.created_at).toLocaleString() })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: "small", className: "whitespace-pre-wrap", children: item.entryType === "note" ? item.content : item.message })
+                  ]
+                },
+                `${item.entryType}_${item.id}`
+              );
+            });
           })() }),
           /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-2 p-3", children: [
             /* @__PURE__ */ jsxRuntime.jsx(
