@@ -61,7 +61,8 @@ export default async function repairCustomerReminderHandler({
             total_estimate:
               Number((ticket.total_estimate as any)?.value ?? ticket.total_estimate) ,
             approval_url: approvalUrl,
-            nudge_message: nudgeMessage
+            nudge_message: nudgeMessage,
+            text: `Hi ${customer.first_name || 'Customer'}, ${nudgeMessage} Ticket: #${ticket.ticket_number}. ${approvalUrl ? 'Check here: ' + approvalUrl : ''}`
           };
 
           // 1. Email Notification
