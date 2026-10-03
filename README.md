@@ -145,7 +145,7 @@ To verify the system's integrations (such as price formatting, Zoho Books tax ha
 
 ## Changelog
 
-### v0.1.68 (Current)
+### v0.1.70 (Current)
 - **Unified Minimalist Admin Dashboard**: Completely overhauled the Repair Ticket admin layout. Consolidated 'Issue Details', 'Update Details', 'Parts & Inventory', and 'Cost Breakdown' into a single, seamless, physical-ticket-style document. Restyled the Timeline & Communication feed into an open, borderless list for high legibility.
 - **Unified Parts Input**: Merged the "Add Custom Part" and "Add Inventory Part" components into a single, multifunctional, compact input field with a dropdown mode toggle.
 - **Paystack M-PESA Validation Fix**: Implemented an automated backend formatter in the `POST /admin/repairs/[id]/stk-push` route to strictly enforce Paystack's required `+254XXXXXXXXX` formatting, resolving `Invalid phone number format` failures during STK pushes.
