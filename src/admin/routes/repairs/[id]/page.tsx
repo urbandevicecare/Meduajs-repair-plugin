@@ -593,14 +593,14 @@ const RepairDetailPage = () => {
                 <Text>{new Date(ticket.created_at).toLocaleString()}</Text>
               </div>
               <div className="pt-3 border-t">
-                <Text className="text-xs text-ui-fg-muted mb-1">Compliance</Text>
-                <div className="flex gap-2">
-                  <Badge color={ticket.terms_accepted ? "green" : "red"} size="small">
-                    Terms: {ticket.terms_accepted ? "Yes" : "No"}
-                  </Badge>
-                  <Badge color={ticket.data_wiped_consent ? "green" : "grey"} size="small">
-                    Wipe: {ticket.data_wiped_consent ? "Yes" : "No"}
-                  </Badge>
+                <Label>Compliance</Label>
+                <div className="flex gap-2 mt-1.5">
+                  <span className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-sm leading-none tracking-wider ${ticket.terms_accepted ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    Terms: {ticket.terms_accepted ? "YES" : "NO"}
+                  </span>
+                  <span className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-sm leading-none tracking-wider ${ticket.data_wiped_consent ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                    Wipe: {ticket.data_wiped_consent ? "YES" : "NO"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -981,16 +981,16 @@ const RepairDetailPage = () => {
               )}
 
               {ticket.is_approved ? (
-                <div className="mt-3 pt-3 border-t">
+                <div className="mt-4 pt-3 border-t">
                   <div className="flex justify-between items-center">
-                    <Text className="text-sm font-medium">Status / Paid</Text>
+                    <Text className="text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider">Status / Paid</Text>
                     <div className="flex items-center gap-2">
-                      <Text className="text-xs text-ui-fg-muted">
-                        Appr: {new Date(ticket.approved_at!).toLocaleDateString()}
-                      </Text>
-                      <Badge color={ticket.payment_status === "paid" || ticket.payment_status === "captured" ? "green" : "orange"} size="small">
-                        {ticket.payment_status.toUpperCase()}
-                      </Badge>
+                      <span className="text-[9px] uppercase font-bold text-ui-fg-muted tracking-wider">
+                        APPR: {new Date(ticket.approved_at!).toLocaleDateString()}
+                      </span>
+                      <span className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-sm leading-none tracking-wider ${ticket.payment_status === "paid" || ticket.payment_status === "captured" ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                        {ticket.payment_status}
+                      </span>
                     </div>
                   </div>
                 </div>

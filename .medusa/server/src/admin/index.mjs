@@ -1206,15 +1206,15 @@ const RepairDetailPage = () => {
                 /* @__PURE__ */ jsx(Text, { children: new Date(ticket.created_at).toLocaleString() })
               ] }),
               /* @__PURE__ */ jsxs("div", { className: "pt-3 border-t", children: [
-                /* @__PURE__ */ jsx(Text, { className: "text-xs text-ui-fg-muted mb-1", children: "Compliance" }),
-                /* @__PURE__ */ jsxs("div", { className: "flex gap-2", children: [
-                  /* @__PURE__ */ jsxs(Badge, { color: ticket.terms_accepted ? "green" : "red", size: "small", children: [
+                /* @__PURE__ */ jsx(Label, { children: "Compliance" }),
+                /* @__PURE__ */ jsxs("div", { className: "flex gap-2 mt-1.5", children: [
+                  /* @__PURE__ */ jsxs("span", { className: `text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-sm leading-none tracking-wider ${ticket.terms_accepted ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`, children: [
                     "Terms: ",
-                    ticket.terms_accepted ? "Yes" : "No"
+                    ticket.terms_accepted ? "YES" : "NO"
                   ] }),
-                  /* @__PURE__ */ jsxs(Badge, { color: ticket.data_wiped_consent ? "green" : "grey", size: "small", children: [
+                  /* @__PURE__ */ jsxs("span", { className: `text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-sm leading-none tracking-wider ${ticket.data_wiped_consent ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`, children: [
                     "Wipe: ",
-                    ticket.data_wiped_consent ? "Yes" : "No"
+                    ticket.data_wiped_consent ? "YES" : "NO"
                   ] })
                 ] })
               ] })
@@ -1582,14 +1582,14 @@ const RepairDetailPage = () => {
                   }
                 )
               ] }),
-              ticket.is_approved ? /* @__PURE__ */ jsx("div", { className: "mt-3 pt-3 border-t", children: /* @__PURE__ */ jsxs("div", { className: "flex justify-between items-center", children: [
-                /* @__PURE__ */ jsx(Text, { className: "text-sm font-medium", children: "Status / Paid" }),
+              ticket.is_approved ? /* @__PURE__ */ jsx("div", { className: "mt-4 pt-3 border-t", children: /* @__PURE__ */ jsxs("div", { className: "flex justify-between items-center", children: [
+                /* @__PURE__ */ jsx(Text, { className: "text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider", children: "Status / Paid" }),
                 /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
-                  /* @__PURE__ */ jsxs(Text, { className: "text-xs text-ui-fg-muted", children: [
-                    "Appr: ",
+                  /* @__PURE__ */ jsxs("span", { className: "text-[9px] uppercase font-bold text-ui-fg-muted tracking-wider", children: [
+                    "APPR: ",
                     new Date(ticket.approved_at).toLocaleDateString()
                   ] }),
-                  /* @__PURE__ */ jsx(Badge, { color: ticket.payment_status === "paid" || ticket.payment_status === "captured" ? "green" : "orange", size: "small", children: ticket.payment_status.toUpperCase() })
+                  /* @__PURE__ */ jsx("span", { className: `text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-sm leading-none tracking-wider ${ticket.payment_status === "paid" || ticket.payment_status === "captured" ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`, children: ticket.payment_status })
                 ] })
               ] }) }) : /* @__PURE__ */ jsx("div", { className: "mt-4 pt-3 border-t", children: /* @__PURE__ */ jsx(
                 "button",
