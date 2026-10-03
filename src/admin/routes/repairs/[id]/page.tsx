@@ -539,6 +539,32 @@ const RepairDetailPage = () => {
               </Text>
             )}
           </div>
+          <div className="flex flex-wrap items-center justify-end gap-x-5 gap-y-2">
+            <a href={`/admin/repairs/${id}/document?type=job_card`} target="_blank" className="text-[11px] uppercase tracking-wider font-semibold text-ui-fg-subtle hover:text-ui-fg-base transition-colors">
+              Job Card
+            </a>
+            <a href={`/admin/repairs/${id}/document?type=quote`} target="_blank" className="text-[11px] uppercase tracking-wider font-semibold text-ui-fg-subtle hover:text-ui-fg-base transition-colors">
+              Quote
+            </a>
+            <a href={`/admin/repairs/${id}/document?type=invoice`} target="_blank" className="text-[11px] uppercase tracking-wider font-semibold text-ui-fg-subtle hover:text-ui-fg-base transition-colors">
+              Invoice
+            </a>
+            {(ticket.payment_status === "captured" || ticket.payment_status === "paid") && (
+              <a href={`/admin/repairs/${id}/document?type=receipt`} target="_blank" className="text-[11px] uppercase tracking-wider font-semibold text-ui-fg-subtle hover:text-ui-fg-base transition-colors">
+                Receipt
+              </a>
+            )}
+            <button 
+              onClick={handleSendReminder}
+              disabled={isSendingReminder}
+              className="text-[11px] uppercase tracking-wider font-semibold text-ui-fg-interactive hover:text-ui-fg-interactive-hover transition-colors flex items-center gap-1 disabled:opacity-50"
+            >
+              <BellAlert className="w-3 h-3" /> Reminder
+            </button>
+            <button onClick={() => navigate('/repairs')} className="text-[11px] uppercase tracking-wider font-semibold text-ui-fg-subtle hover:text-ui-fg-base transition-colors pl-2 border-l border-ui-border-base ml-2">
+              Back
+            </button>
+          </div>
         </div>
       </Container>
 

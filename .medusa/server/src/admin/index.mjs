@@ -2,7 +2,7 @@ import { jsx, jsxs, Fragment } from "react/jsx-runtime";
 import { defineWidgetConfig, defineRouteConfig } from "@medusajs/admin-sdk";
 import { Container, Text, Heading, Badge, FocusModal, Button, Label, Input, Textarea, Select, Checkbox, Table, Switch, Toaster, toast } from "@medusajs/ui";
 import { useState, useEffect } from "react";
-import { Wrench, Trash, ArrowUpRightOnBox, ChatBubbleLeftRight, ChartBar } from "@medusajs/icons";
+import { Wrench, BellAlert, Trash, ArrowUpRightOnBox, ChatBubbleLeftRight, ChartBar } from "@medusajs/icons";
 import { useNavigate } from "react-router-dom";
 import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar } from "recharts";
 const useStoreCurrency = () => {
@@ -805,7 +805,7 @@ const useParams = () => {
 };
 const RepairDetailPage = () => {
   const { id } = useParams();
-  useNavigate();
+  const navigate = useNavigate();
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
   const { formatCurrency } = useStoreCurrency();
@@ -1027,6 +1027,20 @@ const RepairDetailPage = () => {
       toast.error("Failed to add entry");
     }
   };
+  const handleSendReminder = async () => {
+    try {
+      setIsSendingReminder(true);
+      await fetch(`/admin/repairs/${id}/remind`, {
+        method: "POST",
+        credentials: "include"
+      });
+      toast.success("Reminder sent successfully");
+    } catch (err) {
+      toast.error("Failed to send reminder");
+    } finally {
+      setIsSendingReminder(false);
+    }
+  };
   const handleUpdateCosts = async (overrides) => {
     try {
       const promises = [];
@@ -1137,21 +1151,42 @@ const RepairDetailPage = () => {
   }
   return /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsx(Toaster, {}),
-    /* @__PURE__ */ jsx(Container, { children: /* @__PURE__ */ jsx("div", { className: "flex items-start justify-between", children: /* @__PURE__ */ jsxs("div", { children: [
-      /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsx(Heading, { level: "h1", children: ticket.ticket_number }),
-        /* @__PURE__ */ jsx(Badge, { color: getStatusColor(ticket.status), children: ticket.status.replace("_", " ") }),
-        ticket.technician_name && /* @__PURE__ */ jsx(Badge, { color: "purple", children: ticket.technician_name })
+    /* @__PURE__ */ jsx(Container, { children: /* @__PURE__ */ jsxs("div", { className: "flex items-start justify-between", children: [
+      /* @__PURE__ */ jsxs("div", { children: [
+        /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3", children: [
+          /* @__PURE__ */ jsx(Heading, { level: "h1", children: ticket.ticket_number }),
+          /* @__PURE__ */ jsx(Badge, { color: getStatusColor(ticket.status), children: ticket.status.replace("_", " ") }),
+          ticket.technician_name && /* @__PURE__ */ jsx(Badge, { color: "purple", children: ticket.technician_name })
+        ] }),
+        ticket.device && /* @__PURE__ */ jsxs(Text, { className: "text-ui-fg-subtle mt-2", children: [
+          ticket.device.brand,
+          " ",
+          ticket.device.model_name,
+          " - S/N:",
+          " ",
+          ticket.device.serial_number
+        ] })
       ] }),
-      ticket.device && /* @__PURE__ */ jsxs(Text, { className: "text-ui-fg-subtle mt-2", children: [
-        ticket.device.brand,
-        " ",
-        ticket.device.model_name,
-        " - S/N:",
-        " ",
-        ticket.device.serial_number
+      /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap items-center justify-end gap-x-5 gap-y-2", children: [
+        /* @__PURE__ */ jsx("a", { href: `/admin/repairs/${id}/document?type=job_card`, target: "_blank", className: "text-[11px] uppercase tracking-wider font-semibold text-ui-fg-subtle hover:text-ui-fg-base transition-colors", children: "Job Card" }),
+        /* @__PURE__ */ jsx("a", { href: `/admin/repairs/${id}/document?type=quote`, target: "_blank", className: "text-[11px] uppercase tracking-wider font-semibold text-ui-fg-subtle hover:text-ui-fg-base transition-colors", children: "Quote" }),
+        /* @__PURE__ */ jsx("a", { href: `/admin/repairs/${id}/document?type=invoice`, target: "_blank", className: "text-[11px] uppercase tracking-wider font-semibold text-ui-fg-subtle hover:text-ui-fg-base transition-colors", children: "Invoice" }),
+        (ticket.payment_status === "captured" || ticket.payment_status === "paid") && /* @__PURE__ */ jsx("a", { href: `/admin/repairs/${id}/document?type=receipt`, target: "_blank", className: "text-[11px] uppercase tracking-wider font-semibold text-ui-fg-subtle hover:text-ui-fg-base transition-colors", children: "Receipt" }),
+        /* @__PURE__ */ jsxs(
+          "button",
+          {
+            onClick: handleSendReminder,
+            disabled: isSendingReminder,
+            className: "text-[11px] uppercase tracking-wider font-semibold text-ui-fg-interactive hover:text-ui-fg-interactive-hover transition-colors flex items-center gap-1 disabled:opacity-50",
+            children: [
+              /* @__PURE__ */ jsx(BellAlert, { className: "w-3 h-3" }),
+              " Reminder"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsx("button", { onClick: () => navigate("/repairs"), className: "text-[11px] uppercase tracking-wider font-semibold text-ui-fg-subtle hover:text-ui-fg-base transition-colors pl-2 border-l border-ui-border-base ml-2", children: "Back" })
       ] })
-    ] }) }) }),
+    ] }) }),
     /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-12 gap-6 items-start", children: [
       /* @__PURE__ */ jsxs("div", { className: "lg:col-span-7 space-y-6", children: [
         /* @__PURE__ */ jsxs("div", { className: "bg-ui-bg-base border border-ui-border-base rounded-lg shadow-sm", children: [
