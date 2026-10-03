@@ -145,6 +145,15 @@ To verify the system's integrations (such as price formatting, Zoho Books tax ha
 
 ## Changelog
 
+### v0.1.86
+- **Storefront URL Shortlinks**: Updated the native URL shortener to construct short links using the `storefront_url` setting instead of the backend API URL, ensuring customers receive fully branded links (e.g., `https://urbandevicecare.co.uk/r/Xy29P`).
+
+### v0.1.85
+- **Native URL Shortener**: Built a custom URL shortener straight into the backend. Generates and stores 6-character shortcodes in a new `repair_link` table and redirects dynamically, completely eliminating the unreliable `tinyurl` external dependency for SMS/WhatsApp notifications.
+
+### v0.1.84
+- **SMS Payload & Duplicate Fix**: Resolved an issue where SMS notifications defaulted to sending template names instead of the actual message. Completely removed the legacy `repair-customer-reminder` subscriber, eliminating duplicate notifications.
+- **Removed TinyURL**: Replaced all `tinyurl` API calls with full tracking/PDF URLs before the native shortener was introduced.
 ### v0.1.70 (Current)
 - **Unified Minimalist Admin Dashboard**: Completely overhauled the Repair Ticket admin layout. Consolidated 'Issue Details', 'Update Details', 'Parts & Inventory', and 'Cost Breakdown' into a single, seamless, physical-ticket-style document. Restyled the Timeline & Communication feed into an open, borderless list for high legibility.
 - **Unified Parts Input**: Merged the "Add Custom Part" and "Add Inventory Part" components into a single, multifunctional, compact input field with a dropdown mode toggle.
