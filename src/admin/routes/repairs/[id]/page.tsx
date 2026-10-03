@@ -880,119 +880,127 @@ const RepairDetailPage = () => {
               Update Details
             </Heading>
             <div className="space-y-4">
-              <div className="relative">
-                <Label>Technician</Label>
-                <div className="flex flex-col gap-2 mt-1">
-                  {technicianName && (
-                    <div className="flex items-center justify-between p-2 bg-ui-bg-subtle border rounded-md">
-                      <Text>{technicianName}</Text>
-                      <Button variant="transparent" size="small" onClick={() => { setTechnicianName(""); setTechnicianId(""); }}>Clear</Button>
-                    </div>
-                  )}
-                  {!technicianName && (
-                    <div>
-                      <Input
-                        placeholder="Search by name or email..."
-                        value={technicianSearch}
-                        onChange={(e) => {
-                          setTechnicianSearch(e.target.value);
-                          setShowTechnicianDropdown(true);
-                        }}
-                        onFocus={() => setShowTechnicianDropdown(true)}
-                        onBlur={() => setTimeout(() => setShowTechnicianDropdown(false), 200)}
-                      />
-                      {showTechnicianDropdown && technicianOptions.length > 0 && (
-                        <div className="absolute z-50 w-full mt-1 bg-ui-bg-base border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                          {technicianOptions.map((opt) => (
-                            <div
-                              key={opt.id}
-                              className="p-2 cursor-pointer hover:bg-ui-bg-subtle-hover flex justify-between items-center"
-                              onClick={() => {
-                                setTechnicianName(`${opt.first_name} ${opt.last_name}`);
-                                setTechnicianId(opt.id);
-                                setTechnicianSearch("");
-                                setShowTechnicianDropdown(false);
-                              }}
-                            >
-                              <Text>{opt.first_name} {opt.last_name}</Text>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Technician */}
+                <div className="relative">
+                  <span className="text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block">Technician</span>
+                  <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all">
+                    {technicianName ? (
+                      <>
+                        <div className="flex-1 px-3 py-[9px] text-sm text-ui-fg-base truncate">{technicianName}</div>
+                        <button className="px-3 text-ui-fg-muted hover:text-ui-fg-base" onClick={() => { setTechnicianName(""); setTechnicianId(""); }}>×</button>
+                      </>
+                    ) : (
+                      <>
+                        <input
+                          placeholder="Search tech..."
+                          className="w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base placeholder-ui-fg-muted"
+                          value={technicianSearch}
+                          onChange={(e) => {
+                            setTechnicianSearch(e.target.value);
+                            setShowTechnicianDropdown(true);
+                          }}
+                          onFocus={() => setShowTechnicianDropdown(true)}
+                          onBlur={() => setTimeout(() => setShowTechnicianDropdown(false), 200)}
+                        />
+                        {showTechnicianDropdown && technicianOptions.length > 0 && (
+                          <div className="absolute top-full left-0 z-50 w-full mt-1 bg-ui-bg-base border border-ui-border-base rounded-md shadow-lg max-h-60 overflow-y-auto">
+                            {technicianOptions.map((opt) => (
+                              <div
+                                key={opt.id}
+                                className="p-2 text-sm cursor-pointer hover:bg-ui-bg-subtle-hover flex justify-between items-center"
+                                onClick={() => {
+                                  setTechnicianName(`${opt.first_name} ${opt.last_name}`);
+                                  setTechnicianId(opt.id);
+                                  setTechnicianSearch("");
+                                  setShowTechnicianDropdown(false);
+                                }}
+                              >
+                                {opt.first_name} {opt.last_name}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Status */}
+                <div className="relative">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider block">Status</span>
+                    {(ticket?.status === "completed" || ticket?.status === "collected") && 
+                     ticket?.payment_status !== "captured" && ticket?.payment_status !== "paid" && (
+                      <span className="text-[9px] font-bold px-1 py-0.5 bg-red-100 text-red-700 rounded-sm leading-none">UNPAID</span>
+                    )}
+                  </div>
+                  <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all">
+                    <select 
+                      className="w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base appearance-none cursor-pointer"
+                      value={newStatus}
+                      onChange={(e) => setNewStatus(e.target.value)}
+                    >
+                      <option value="pending_dropoff">Pending Dropoff</option>
+                      <option value="received">Received</option>
+                      <option value="diagnosing">Diagnosing</option>
+                      <option value="awaiting_approval">Awaiting Approval</option>
+                      <option value="repairing" disabled={!ticket?.is_approved}>Repairing {!ticket?.is_approved && "(Req Approval)"}</option>
+                      <option value="ready" disabled={!ticket?.is_approved}>Ready {!ticket?.is_approved && "(Req Approval)"}</option>
+                      <option value="completed" disabled={!ticket?.is_approved}>Completed {!ticket?.is_approved && "(Req Approval)"}</option>
+                      <option value="collected" disabled={!ticket?.is_approved}>Collected {!ticket?.is_approved && "(Req Approval)"}</option>
+                      <option value="cancelled">Cancelled</option>
+                      <option value="refunded">Refunded</option>
+                    </select>
+                  </div>
                 </div>
               </div>
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <Label>Status</Label>
-                  {(ticket?.status === "completed" || ticket?.status === "collected") && 
-                   ticket?.payment_status !== "captured" && ticket?.payment_status !== "paid" && (
-                    <Badge color="red" size="small">
-                      Unpaid
-                    </Badge>
-                  )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Labor Cost */}
+                <div className="relative">
+                  <span className="text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block">Labor Cost (KES)</span>
+                  <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all">
+                    <span className="text-ui-fg-muted pl-3 text-sm">KES</span>
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      placeholder="0.00" 
+                      className="w-full bg-transparent text-sm px-2 py-[9px] outline-none text-ui-fg-base placeholder-ui-fg-muted"
+                      value={laborCost}
+                      onChange={(e) => setLaborCost(e.target.value)}
+                    />
+                  </div>
                 </div>
-                <Select value={newStatus} onValueChange={setNewStatus}>
-                  <Select.Trigger>
-                    <Select.Value />
-                  </Select.Trigger>
-                  <Select.Content>
-                    <Select.Item value="pending_dropoff">Pending Dropoff</Select.Item>
-                    <Select.Item value="received">Received</Select.Item>
-                    <Select.Item value="diagnosing">Diagnosing</Select.Item>
-                    <Select.Item value="awaiting_approval">
-                      Awaiting Approval
-                    </Select.Item>
-                    <Select.Item value="repairing" disabled={!ticket?.is_approved}>
-                      Repairing {!ticket?.is_approved && "(Requires Approval)"}
-                    </Select.Item>
-                    <Select.Item value="ready" disabled={!ticket?.is_approved}>
-                      Ready {!ticket?.is_approved && "(Requires Approval)"}
-                    </Select.Item>
-                    <Select.Item value="completed" disabled={!ticket?.is_approved}>
-                      Completed {!ticket?.is_approved && "(Requires Approval)"}
-                    </Select.Item>
-                    <Select.Item value="collected" disabled={!ticket?.is_approved}>
-                      Collected {!ticket?.is_approved && "(Requires Approval)"}
-                    </Select.Item>
-                    <Select.Item value="cancelled">Cancelled</Select.Item>
-                    <Select.Item value="refunded">Refunded</Select.Item>
-                  </Select.Content>
-                </Select>
-                {!ticket?.is_approved && (
-                  <Text size="xsmall" className="text-ui-fg-error mt-1">
-                    Customer must approve estimate before starting work.
-                  </Text>
-                )}
+
+                {/* Estimated Completion */}
+                <div className="relative">
+                  <span className="text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block">Est. Completion</span>
+                  <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all">
+                    <input 
+                      type="date" 
+                      className="w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base text-ui-fg-muted"
+                      value={etc}
+                      min={new Date().toISOString().split("T")[0]}
+                      onChange={(e) => setEtc(e.target.value)}
+                    />
+                  </div>
+                </div>
               </div>
-              <div>
-                <Label>Labor Cost</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={laborCost}
-                  onChange={(e) => setLaborCost(e.target.value)}
-                  placeholder="0.00"
-                />
-              </div>
-              <div>
-                <Label>Estimated Completion</Label>
-                <Input
-                  type="date"
-                  value={etc}
-                  onChange={(e) => setEtc(e.target.value)}
-                />
-              </div>
-              <div className="flex gap-2 mt-4">
-                <Button
-                  onClick={handleUpdateCosts}
-                  variant="primary"
-                  className="w-full"
-                >
-                  Save Details
-                </Button>
-              </div>
+              
+              {!ticket?.is_approved && (
+                <div className="text-xs text-ui-fg-error -mt-1">
+                  Customer must approve estimate before starting work.
+                </div>
+              )}
+
+              <Button
+                onClick={handleUpdateCosts}
+                variant="primary"
+                className="w-full mt-2"
+              >
+                Save Details
+              </Button>
             </div>
           </Container>
 

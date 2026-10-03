@@ -1465,21 +1465,21 @@ const RepairDetailPage = () => {
         /* @__PURE__ */ jsxs(Container, { children: [
           /* @__PURE__ */ jsx(Heading, { level: "h2", className: "mb-4", children: "Update Details" }),
           /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
-            /* @__PURE__ */ jsxs("div", { className: "relative", children: [
-              /* @__PURE__ */ jsx(Label, { children: "Technician" }),
-              /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2 mt-1", children: [
-                technicianName && /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between p-2 bg-ui-bg-subtle border rounded-md", children: [
-                  /* @__PURE__ */ jsx(Text, { children: technicianName }),
-                  /* @__PURE__ */ jsx(Button, { variant: "transparent", size: "small", onClick: () => {
+            /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+              /* @__PURE__ */ jsxs("div", { className: "relative", children: [
+                /* @__PURE__ */ jsx("span", { className: "text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block", children: "Technician" }),
+                /* @__PURE__ */ jsx("div", { className: "flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all", children: technicianName ? /* @__PURE__ */ jsxs(Fragment, { children: [
+                  /* @__PURE__ */ jsx("div", { className: "flex-1 px-3 py-[9px] text-sm text-ui-fg-base truncate", children: technicianName }),
+                  /* @__PURE__ */ jsx("button", { className: "px-3 text-ui-fg-muted hover:text-ui-fg-base", onClick: () => {
                     setTechnicianName("");
                     setTechnicianId("");
-                  }, children: "Clear" })
-                ] }),
-                !technicianName && /* @__PURE__ */ jsxs("div", { children: [
+                  }, children: "×" })
+                ] }) : /* @__PURE__ */ jsxs(Fragment, { children: [
                   /* @__PURE__ */ jsx(
-                    Input,
+                    "input",
                     {
-                      placeholder: "Search by name or email...",
+                      placeholder: "Search tech...",
+                      className: "w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base placeholder-ui-fg-muted",
                       value: technicianSearch,
                       onChange: (e) => {
                         setTechnicianSearch(e.target.value);
@@ -1489,94 +1489,107 @@ const RepairDetailPage = () => {
                       onBlur: () => setTimeout(() => setShowTechnicianDropdown(false), 200)
                     }
                   ),
-                  showTechnicianDropdown && technicianOptions.length > 0 && /* @__PURE__ */ jsx("div", { className: "absolute z-50 w-full mt-1 bg-ui-bg-base border rounded-md shadow-lg max-h-60 overflow-y-auto", children: technicianOptions.map((opt) => /* @__PURE__ */ jsx(
+                  showTechnicianDropdown && technicianOptions.length > 0 && /* @__PURE__ */ jsx("div", { className: "absolute top-full left-0 z-50 w-full mt-1 bg-ui-bg-base border border-ui-border-base rounded-md shadow-lg max-h-60 overflow-y-auto", children: technicianOptions.map((opt) => /* @__PURE__ */ jsxs(
                     "div",
                     {
-                      className: "p-2 cursor-pointer hover:bg-ui-bg-subtle-hover flex justify-between items-center",
+                      className: "p-2 text-sm cursor-pointer hover:bg-ui-bg-subtle-hover flex justify-between items-center",
                       onClick: () => {
                         setTechnicianName(`${opt.first_name} ${opt.last_name}`);
                         setTechnicianId(opt.id);
                         setTechnicianSearch("");
                         setShowTechnicianDropdown(false);
                       },
-                      children: /* @__PURE__ */ jsxs(Text, { children: [
+                      children: [
                         opt.first_name,
                         " ",
                         opt.last_name
-                      ] })
+                      ]
                     },
                     opt.id
                   )) })
-                ] })
+                ] }) })
+              ] }),
+              /* @__PURE__ */ jsxs("div", { className: "relative", children: [
+                /* @__PURE__ */ jsxs("div", { className: "flex justify-between items-center mb-1", children: [
+                  /* @__PURE__ */ jsx("span", { className: "text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider block", children: "Status" }),
+                  ((ticket == null ? void 0 : ticket.status) === "completed" || (ticket == null ? void 0 : ticket.status) === "collected") && (ticket == null ? void 0 : ticket.payment_status) !== "captured" && (ticket == null ? void 0 : ticket.payment_status) !== "paid" && /* @__PURE__ */ jsx("span", { className: "text-[9px] font-bold px-1 py-0.5 bg-red-100 text-red-700 rounded-sm leading-none", children: "UNPAID" })
+                ] }),
+                /* @__PURE__ */ jsx("div", { className: "flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all", children: /* @__PURE__ */ jsxs(
+                  "select",
+                  {
+                    className: "w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base appearance-none cursor-pointer",
+                    value: newStatus,
+                    onChange: (e) => setNewStatus(e.target.value),
+                    children: [
+                      /* @__PURE__ */ jsx("option", { value: "pending_dropoff", children: "Pending Dropoff" }),
+                      /* @__PURE__ */ jsx("option", { value: "received", children: "Received" }),
+                      /* @__PURE__ */ jsx("option", { value: "diagnosing", children: "Diagnosing" }),
+                      /* @__PURE__ */ jsx("option", { value: "awaiting_approval", children: "Awaiting Approval" }),
+                      /* @__PURE__ */ jsxs("option", { value: "repairing", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
+                        "Repairing ",
+                        !(ticket == null ? void 0 : ticket.is_approved) && "(Req Approval)"
+                      ] }),
+                      /* @__PURE__ */ jsxs("option", { value: "ready", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
+                        "Ready ",
+                        !(ticket == null ? void 0 : ticket.is_approved) && "(Req Approval)"
+                      ] }),
+                      /* @__PURE__ */ jsxs("option", { value: "completed", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
+                        "Completed ",
+                        !(ticket == null ? void 0 : ticket.is_approved) && "(Req Approval)"
+                      ] }),
+                      /* @__PURE__ */ jsxs("option", { value: "collected", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
+                        "Collected ",
+                        !(ticket == null ? void 0 : ticket.is_approved) && "(Req Approval)"
+                      ] }),
+                      /* @__PURE__ */ jsx("option", { value: "cancelled", children: "Cancelled" }),
+                      /* @__PURE__ */ jsx("option", { value: "refunded", children: "Refunded" })
+                    ]
+                  }
+                ) })
               ] })
             ] }),
-            /* @__PURE__ */ jsxs("div", { children: [
-              /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 mb-2", children: [
-                /* @__PURE__ */ jsx(Label, { children: "Status" }),
-                ((ticket == null ? void 0 : ticket.status) === "completed" || (ticket == null ? void 0 : ticket.status) === "collected") && (ticket == null ? void 0 : ticket.payment_status) !== "captured" && (ticket == null ? void 0 : ticket.payment_status) !== "paid" && /* @__PURE__ */ jsx(Badge, { color: "red", size: "small", children: "Unpaid" })
-              ] }),
-              /* @__PURE__ */ jsxs(Select, { value: newStatus, onValueChange: setNewStatus, children: [
-                /* @__PURE__ */ jsx(Select.Trigger, { children: /* @__PURE__ */ jsx(Select.Value, {}) }),
-                /* @__PURE__ */ jsxs(Select.Content, { children: [
-                  /* @__PURE__ */ jsx(Select.Item, { value: "pending_dropoff", children: "Pending Dropoff" }),
-                  /* @__PURE__ */ jsx(Select.Item, { value: "received", children: "Received" }),
-                  /* @__PURE__ */ jsx(Select.Item, { value: "diagnosing", children: "Diagnosing" }),
-                  /* @__PURE__ */ jsx(Select.Item, { value: "awaiting_approval", children: "Awaiting Approval" }),
-                  /* @__PURE__ */ jsxs(Select.Item, { value: "repairing", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
-                    "Repairing ",
-                    !(ticket == null ? void 0 : ticket.is_approved) && "(Requires Approval)"
-                  ] }),
-                  /* @__PURE__ */ jsxs(Select.Item, { value: "ready", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
-                    "Ready ",
-                    !(ticket == null ? void 0 : ticket.is_approved) && "(Requires Approval)"
-                  ] }),
-                  /* @__PURE__ */ jsxs(Select.Item, { value: "completed", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
-                    "Completed ",
-                    !(ticket == null ? void 0 : ticket.is_approved) && "(Requires Approval)"
-                  ] }),
-                  /* @__PURE__ */ jsxs(Select.Item, { value: "collected", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
-                    "Collected ",
-                    !(ticket == null ? void 0 : ticket.is_approved) && "(Requires Approval)"
-                  ] }),
-                  /* @__PURE__ */ jsx(Select.Item, { value: "cancelled", children: "Cancelled" }),
-                  /* @__PURE__ */ jsx(Select.Item, { value: "refunded", children: "Refunded" })
+            /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+              /* @__PURE__ */ jsxs("div", { className: "relative", children: [
+                /* @__PURE__ */ jsx("span", { className: "text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block", children: "Labor Cost (KES)" }),
+                /* @__PURE__ */ jsxs("div", { className: "flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all", children: [
+                  /* @__PURE__ */ jsx("span", { className: "text-ui-fg-muted pl-3 text-sm", children: "KES" }),
+                  /* @__PURE__ */ jsx(
+                    "input",
+                    {
+                      type: "number",
+                      step: "0.01",
+                      placeholder: "0.00",
+                      className: "w-full bg-transparent text-sm px-2 py-[9px] outline-none text-ui-fg-base placeholder-ui-fg-muted",
+                      value: laborCost,
+                      onChange: (e) => setLaborCost(e.target.value)
+                    }
+                  )
                 ] })
               ] }),
-              !(ticket == null ? void 0 : ticket.is_approved) && /* @__PURE__ */ jsx(Text, { size: "xsmall", className: "text-ui-fg-error mt-1", children: "Customer must approve estimate before starting work." })
+              /* @__PURE__ */ jsxs("div", { className: "relative", children: [
+                /* @__PURE__ */ jsx("span", { className: "text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block", children: "Est. Completion" }),
+                /* @__PURE__ */ jsx("div", { className: "flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all", children: /* @__PURE__ */ jsx(
+                  "input",
+                  {
+                    type: "date",
+                    className: "w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base text-ui-fg-muted",
+                    value: etc,
+                    min: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
+                    onChange: (e) => setEtc(e.target.value)
+                  }
+                ) })
+              ] })
             ] }),
-            /* @__PURE__ */ jsxs("div", { children: [
-              /* @__PURE__ */ jsx(Label, { children: "Labor Cost" }),
-              /* @__PURE__ */ jsx(
-                Input,
-                {
-                  type: "number",
-                  step: "0.01",
-                  value: laborCost,
-                  onChange: (e) => setLaborCost(e.target.value),
-                  placeholder: "0.00"
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxs("div", { children: [
-              /* @__PURE__ */ jsx(Label, { children: "Estimated Completion" }),
-              /* @__PURE__ */ jsx(
-                Input,
-                {
-                  type: "date",
-                  value: etc,
-                  onChange: (e) => setEtc(e.target.value)
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsx("div", { className: "flex gap-2 mt-4", children: /* @__PURE__ */ jsx(
+            !(ticket == null ? void 0 : ticket.is_approved) && /* @__PURE__ */ jsx("div", { className: "text-xs text-ui-fg-error -mt-1", children: "Customer must approve estimate before starting work." }),
+            /* @__PURE__ */ jsx(
               Button,
               {
                 onClick: handleUpdateCosts,
                 variant: "primary",
-                className: "w-full",
+                className: "w-full mt-2",
                 children: "Save Details"
               }
-            ) })
+            )
           ] })
         ] }),
         /* @__PURE__ */ jsxs(Container, { children: [
