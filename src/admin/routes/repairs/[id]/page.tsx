@@ -559,20 +559,13 @@ const RepairDetailPage = () => {
                 <Text>{new Date(ticket.created_at).toLocaleString()}</Text>
               </div>
               <div className="pt-3 border-t">
-                <Label>Legal & Compliance</Label>
-                <div className="flex flex-col gap-2 mt-2">
-                  <Badge
-                    color={ticket.terms_accepted ? "green" : "red"}
-                    size="small"
-                  >
-                    Terms {ticket.terms_accepted ? "Accepted" : "Not Accepted"}
+                <Text className="text-xs text-ui-fg-muted mb-1">Compliance</Text>
+                <div className="flex gap-2">
+                  <Badge color={ticket.terms_accepted ? "green" : "red"} size="small">
+                    Terms: {ticket.terms_accepted ? "Yes" : "No"}
                   </Badge>
-                  <Badge
-                    color={ticket.data_wiped_consent ? "green" : "grey"}
-                    size="small"
-                  >
-                    Data Wipe{" "}
-                    {ticket.data_wiped_consent ? "Consented" : "Not Consented"}
+                  <Badge color={ticket.data_wiped_consent ? "green" : "grey"} size="small">
+                    Wipe: {ticket.data_wiped_consent ? "Yes" : "No"}
                   </Badge>
                 </div>
               </div>
@@ -638,21 +631,18 @@ const RepairDetailPage = () => {
               )}
 
               {ticket.is_approved ? (
-                <div className="flex flex-col gap-2 mt-4 pt-4 border-t">
-                  <Badge color="green" size="small">
-                    Approved on {new Date(ticket.approved_at!).toLocaleDateString()}
-                  </Badge>
-                  <div className="flex justify-between items-center border-t pt-2 mt-2">
-                    <Text className="text-sm font-medium">Payment Status</Text>
-                    <Badge color={ticket.payment_status === "paid" || ticket.payment_status === "captured" ? "green" : "orange"} size="small">
-                      {ticket.payment_status.toUpperCase()}
-                    </Badge>
+                <div className="mt-3 pt-3 border-t">
+                  <div className="flex justify-between items-center">
+                    <Text className="text-sm font-medium">Status / Paid</Text>
+                    <div className="flex items-center gap-2">
+                      <Text className="text-xs text-ui-fg-muted">
+                        Appr: {new Date(ticket.approved_at!).toLocaleDateString()}
+                      </Text>
+                      <Badge color={ticket.payment_status === "paid" || ticket.payment_status === "captured" ? "green" : "orange"} size="small">
+                        {ticket.payment_status.toUpperCase()}
+                      </Badge>
+                    </div>
                   </div>
-                  {ticket.payment_collection_id && (
-                    <Text className="text-xs text-ui-fg-muted">
-                      Collection ID: {ticket.payment_collection_id}
-                    </Text>
-                  )}
                 </div>
               ) : (
                 <div className="mt-4 pt-4 border-t">

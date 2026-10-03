@@ -1165,31 +1165,16 @@ const RepairDetailPage = () => {
               /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: new Date(ticket.created_at).toLocaleString() })
             ] }),
             /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "pt-3 border-t", children: [
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { children: "Legal & Compliance" }),
-              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-2 mt-2", children: [
-                /* @__PURE__ */ jsxRuntime.jsxs(
-                  ui.Badge,
-                  {
-                    color: ticket.terms_accepted ? "green" : "red",
-                    size: "small",
-                    children: [
-                      "Terms ",
-                      ticket.terms_accepted ? "Accepted" : "Not Accepted"
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntime.jsxs(
-                  ui.Badge,
-                  {
-                    color: ticket.data_wiped_consent ? "green" : "grey",
-                    size: "small",
-                    children: [
-                      "Data Wipe",
-                      " ",
-                      ticket.data_wiped_consent ? "Consented" : "Not Consented"
-                    ]
-                  }
-                )
+              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "text-xs text-ui-fg-muted mb-1", children: "Compliance" }),
+              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex gap-2", children: [
+                /* @__PURE__ */ jsxRuntime.jsxs(ui.Badge, { color: ticket.terms_accepted ? "green" : "red", size: "small", children: [
+                  "Terms: ",
+                  ticket.terms_accepted ? "Yes" : "No"
+                ] }),
+                /* @__PURE__ */ jsxRuntime.jsxs(ui.Badge, { color: ticket.data_wiped_consent ? "green" : "grey", size: "small", children: [
+                  "Wipe: ",
+                  ticket.data_wiped_consent ? "Yes" : "No"
+                ] })
               ] })
             ] })
           ] })
@@ -1246,20 +1231,16 @@ const RepairDetailPage = () => {
                 }
               )
             ] }),
-            ticket.is_approved ? /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-2 mt-4 pt-4 border-t", children: [
-              /* @__PURE__ */ jsxRuntime.jsxs(ui.Badge, { color: "green", size: "small", children: [
-                "Approved on ",
-                new Date(ticket.approved_at).toLocaleDateString()
-              ] }),
-              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex justify-between items-center border-t pt-2 mt-2", children: [
-                /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "text-sm font-medium", children: "Payment Status" }),
+            ticket.is_approved ? /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-3 pt-3 border-t", children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex justify-between items-center", children: [
+              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "text-sm font-medium", children: "Status / Paid" }),
+              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-2", children: [
+                /* @__PURE__ */ jsxRuntime.jsxs(ui.Text, { className: "text-xs text-ui-fg-muted", children: [
+                  "Appr: ",
+                  new Date(ticket.approved_at).toLocaleDateString()
+                ] }),
                 /* @__PURE__ */ jsxRuntime.jsx(ui.Badge, { color: ticket.payment_status === "paid" || ticket.payment_status === "captured" ? "green" : "orange", size: "small", children: ticket.payment_status.toUpperCase() })
-              ] }),
-              ticket.payment_collection_id && /* @__PURE__ */ jsxRuntime.jsxs(ui.Text, { className: "text-xs text-ui-fg-muted", children: [
-                "Collection ID: ",
-                ticket.payment_collection_id
               ] })
-            ] }) : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-4 pt-4 border-t", children: /* @__PURE__ */ jsxRuntime.jsx(
+            ] }) }) : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-4 pt-4 border-t", children: /* @__PURE__ */ jsxRuntime.jsx(
               ui.Button,
               {
                 variant: "primary",
