@@ -923,25 +923,21 @@ const RepairDetailPage = () => {
               </div>
 
               {ticket.payment_status !== "paid" && ticket.payment_status !== "captured" && ticket.status !== "cancelled" && (
-                <div className="mt-3 flex items-center gap-2">
-                  <Button 
-                    variant="secondary" 
-                    size="small" 
+                <div className="mt-4 pt-3 border-t grid grid-cols-2 gap-2">
+                  <button 
                     onClick={handleStkPush}
                     disabled={loading || isPushingStk}
-                    className="flex-1"
+                    className="py-1.5 text-[11px] uppercase tracking-wider font-semibold text-ui-fg-interactive bg-ui-bg-subtle hover:bg-ui-bg-subtle-hover rounded-md transition-colors disabled:opacity-50"
                   >
-                    {isPushingStk ? "Pushing..." : "Push STK (M-PESA)"}
-                  </Button>
-                  <Button 
-                    variant="secondary" 
-                    size="small" 
+                    {isPushingStk ? "Pushing..." : "Push STK"}
+                  </button>
+                  <button 
                     onClick={handleMarkPaid}
                     disabled={loading}
-                    className="flex-1"
+                    className="py-1.5 text-[11px] uppercase tracking-wider font-semibold text-ui-fg-base bg-ui-bg-subtle hover:bg-ui-bg-subtle-hover rounded-md transition-colors disabled:opacity-50"
                   >
                     Mark Paid (Cash)
-                  </Button>
+                  </button>
                 </div>
               )}
 
@@ -960,16 +956,14 @@ const RepairDetailPage = () => {
                   </div>
                 </div>
               ) : (
-                <div className="mt-4 pt-4 border-t">
-                  <Button 
-                    variant="primary" 
-                    size="small" 
+                <div className="mt-4 pt-3 border-t">
+                  <button 
                     onClick={handleManualApprove}
                     disabled={loading}
-                    className="w-full"
+                    className="w-full py-2 text-[11px] uppercase tracking-wider font-semibold text-ui-fg-on-inverted bg-ui-button-inverted hover:bg-ui-button-inverted-hover rounded-md transition-colors disabled:opacity-50"
                   >
                     Manually Approve & Create Payment
-                  </Button>
+                  </button>
                 </div>
               )}
             </div>
