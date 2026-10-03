@@ -536,11 +536,12 @@ const RepairDetailPage = () => {
         </div>
       </Container>
 
-      <div className="grid grid-cols-2 gap-6">
-        {/* Left Column */}
-        <div className="space-y-6">
-          {/* Issue Details */}
-          <Container>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="lg:col-span-7 space-y-6">
+          <div className="bg-ui-bg-base border border-ui-border-base rounded-lg shadow-sm">
+            {/* Issue Details */}
+            <div className="p-6 border-b border-ui-border-base">
+
             <Heading level="h2" className="mb-4">
               Issue Details
             </Heading>
@@ -571,98 +572,142 @@ const RepairDetailPage = () => {
                 </div>
               </div>
             </div>
-          </Container>
+          
+            </div>
+            {/* Update Details */}
+            <div className="p-6 border-b border-ui-border-base bg-ui-bg-subtle/20">
 
-          {/* Cost Breakdown */}
-          <Container>
             <Heading level="h2" className="mb-4">
-              Cost Breakdown
+              Update Details
             </Heading>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <Text>Parts Estimate:</Text>
-                <Text className="font-medium">
-                  {formatCurrency(ticket.parts_estimate)}
-                </Text>
-              </div>
-              <div className="flex justify-between">
-                <Text>Labor Estimate:</Text>
-                <Text className="font-medium">
-                  {formatCurrency(ticket.labor_estimate)}
-                </Text>
-              </div>
-              <div className="flex justify-between items-center py-2">
-                <Label htmlFor="global-vat-toggle" className="text-sm cursor-pointer text-ui-fg-subtle">
-                  + Add 16% VAT to Total
-                </Label>
-                <input
-                  type="checkbox"
-                  id="global-vat-toggle"
-                  checked={ticket.apply_tax ?? false}
-                  onChange={(e) => handleToggleTax(e.target.checked)}
-                  disabled={loading}
-                />
-              </div>
-              <div className="flex justify-between text-lg font-semibold border-t pt-2">
-                <Text>Total Estimate:</Text>
-                <Text>{formatCurrency(ticket.total_estimate)}</Text>
-              </div>
-
-              {ticket.payment_status !== "paid" && ticket.payment_status !== "captured" && ticket.status !== "cancelled" && (
-                <div className="mt-3 flex items-center gap-2">
-                  <Button 
-                    variant="secondary" 
-                    size="small" 
-                    onClick={handleStkPush}
-                    disabled={loading || isPushingStk}
-                    className="flex-1"
-                  >
-                    {isPushingStk ? "Pushing..." : "Push STK (M-PESA)"}
-                  </Button>
-                  <Button 
-                    variant="secondary" 
-                    size="small" 
-                    onClick={handleMarkPaid}
-                    disabled={loading}
-                    className="flex-1"
-                  >
-                    Mark Paid (Cash)
-                  </Button>
-                </div>
-              )}
-
-              {ticket.is_approved ? (
-                <div className="mt-3 pt-3 border-t">
-                  <div className="flex justify-between items-center">
-                    <Text className="text-sm font-medium">Status / Paid</Text>
-                    <div className="flex items-center gap-2">
-                      <Text className="text-xs text-ui-fg-muted">
-                        Appr: {new Date(ticket.approved_at!).toLocaleDateString()}
-                      </Text>
-                      <Badge color={ticket.payment_status === "paid" || ticket.payment_status === "captured" ? "green" : "orange"} size="small">
-                        {ticket.payment_status.toUpperCase()}
-                      </Badge>
-                    </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Technician */}
+                <div className="relative">
+                  <span className="text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block">Technician</span>
+                  <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all">
+                    {technicianName ? (
+                      <>
+                        <div className="flex-1 px-3 py-[9px] text-sm text-ui-fg-base truncate">{technicianName}</div>
+                        <button className="px-3 text-ui-fg-muted hover:text-ui-fg-base" onClick={() => { setTechnicianName(""); setTechnicianId(""); }}>×</button>
+                      </>
+                    ) : (
+                      <>
+                        <input
+                          placeholder="Search tech..."
+                          className="w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base placeholder-ui-fg-muted"
+                          value={technicianSearch}
+                          onChange={(e) => {
+                            setTechnicianSearch(e.target.value);
+                            setShowTechnicianDropdown(true);
+                          }}
+                          onFocus={() => setShowTechnicianDropdown(true)}
+                          onBlur={() => setTimeout(() => setShowTechnicianDropdown(false), 200)}
+                        />
+                        {showTechnicianDropdown && technicianOptions.length > 0 && (
+                          <div className="absolute top-full left-0 z-50 w-full mt-1 bg-ui-bg-base border border-ui-border-base rounded-md shadow-lg max-h-60 overflow-y-auto">
+                            {technicianOptions.map((opt) => (
+                              <div
+                                key={opt.id}
+                                className="p-2 text-sm cursor-pointer hover:bg-ui-bg-subtle-hover flex justify-between items-center"
+                                onClick={() => {
+                                  setTechnicianName(`${opt.first_name} ${opt.last_name}`);
+                                  setTechnicianId(opt.id);
+                                  setTechnicianSearch("");
+                                  setShowTechnicianDropdown(false);
+                                }}
+                              >
+                                {opt.first_name} {opt.last_name}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
-              ) : (
-                <div className="mt-4 pt-4 border-t">
-                  <Button 
-                    variant="primary" 
-                    size="small" 
-                    onClick={handleManualApprove}
-                    disabled={loading}
-                    className="w-full"
-                  >
-                    Manually Approve & Create Payment
-                  </Button>
+
+                {/* Status */}
+                <div className="relative">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider block">Status</span>
+                    {(ticket?.status === "completed" || ticket?.status === "collected") && 
+                     ticket?.payment_status !== "captured" && ticket?.payment_status !== "paid" && (
+                      <span className="text-[9px] font-bold px-1 py-0.5 bg-red-100 text-red-700 rounded-sm leading-none">UNPAID</span>
+                    )}
+                  </div>
+                  <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all">
+                    <select 
+                      className="w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base appearance-none cursor-pointer"
+                      value={newStatus}
+                      onChange={(e) => setNewStatus(e.target.value)}
+                    >
+                      <option value="pending_dropoff">Pending Dropoff</option>
+                      <option value="received">Received</option>
+                      <option value="diagnosing">Diagnosing</option>
+                      <option value="awaiting_approval">Awaiting Approval</option>
+                      <option value="repairing" disabled={!ticket?.is_approved}>Repairing {!ticket?.is_approved && "(Req Approval)"}</option>
+                      <option value="ready" disabled={!ticket?.is_approved}>Ready {!ticket?.is_approved && "(Req Approval)"}</option>
+                      <option value="completed" disabled={!ticket?.is_approved}>Completed {!ticket?.is_approved && "(Req Approval)"}</option>
+                      <option value="collected" disabled={!ticket?.is_approved}>Collected {!ticket?.is_approved && "(Req Approval)"}</option>
+                      <option value="cancelled">Cancelled</option>
+                      <option value="refunded">Refunded</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Labor Cost */}
+                <div className="relative">
+                  <span className="text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block">Labor Cost (KES)</span>
+                  <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all">
+                    <span className="text-ui-fg-muted pl-3 text-sm">KES</span>
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      placeholder="0.00" 
+                      className="w-full bg-transparent text-sm px-2 py-[9px] outline-none text-ui-fg-base placeholder-ui-fg-muted"
+                      value={laborCost}
+                      onChange={(e) => setLaborCost(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Estimated Completion */}
+                <div className="relative">
+                  <span className="text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block">Est. Completion</span>
+                  <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all">
+                    <input 
+                      type="date" 
+                      className="w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base text-ui-fg-muted"
+                      value={etc}
+                      min={new Date().toISOString().split("T")[0]}
+                      onChange={(e) => setEtc(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              {!ticket?.is_approved && (
+                <div className="text-xs text-ui-fg-error -mt-1">
+                  Customer must approve estimate before starting work.
                 </div>
               )}
-            </div>
-          </Container>
 
-          {/* Parts */}
-          <Container>
+              <Button
+                onClick={handleUpdateCosts}
+                variant="primary"
+                className="w-full mt-2"
+              >
+                Save Details
+              </Button>
+            </div>
+          
+            </div>
+            {/* Parts & Inventory */}
+            <div className="p-6 border-b border-ui-border-base">
+
             <Heading level="h2" className="mb-4">
               Parts & Inventory
             </Heading>
@@ -839,9 +884,100 @@ const RepairDetailPage = () => {
                 </div>
               </div>
             </div>
-          </Container>
+          
+            </div>
+            {/* Cost Breakdown */}
+            <div className="p-6">
 
-          {/* Media */}
+            <Heading level="h2" className="mb-4">
+              Cost Breakdown
+            </Heading>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <Text>Parts Estimate:</Text>
+                <Text className="font-medium">
+                  {formatCurrency(ticket.parts_estimate)}
+                </Text>
+              </div>
+              <div className="flex justify-between">
+                <Text>Labor Estimate:</Text>
+                <Text className="font-medium">
+                  {formatCurrency(ticket.labor_estimate)}
+                </Text>
+              </div>
+              <div className="flex justify-between items-center py-2">
+                <Label htmlFor="global-vat-toggle" className="text-sm cursor-pointer text-ui-fg-subtle">
+                  + Add 16% VAT to Total
+                </Label>
+                <input
+                  type="checkbox"
+                  id="global-vat-toggle"
+                  checked={ticket.apply_tax ?? false}
+                  onChange={(e) => handleToggleTax(e.target.checked)}
+                  disabled={loading}
+                />
+              </div>
+              <div className="flex justify-between text-lg font-semibold border-t pt-2">
+                <Text>Total Estimate:</Text>
+                <Text>{formatCurrency(ticket.total_estimate)}</Text>
+              </div>
+
+              {ticket.payment_status !== "paid" && ticket.payment_status !== "captured" && ticket.status !== "cancelled" && (
+                <div className="mt-3 flex items-center gap-2">
+                  <Button 
+                    variant="secondary" 
+                    size="small" 
+                    onClick={handleStkPush}
+                    disabled={loading || isPushingStk}
+                    className="flex-1"
+                  >
+                    {isPushingStk ? "Pushing..." : "Push STK (M-PESA)"}
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    size="small" 
+                    onClick={handleMarkPaid}
+                    disabled={loading}
+                    className="flex-1"
+                  >
+                    Mark Paid (Cash)
+                  </Button>
+                </div>
+              )}
+
+              {ticket.is_approved ? (
+                <div className="mt-3 pt-3 border-t">
+                  <div className="flex justify-between items-center">
+                    <Text className="text-sm font-medium">Status / Paid</Text>
+                    <div className="flex items-center gap-2">
+                      <Text className="text-xs text-ui-fg-muted">
+                        Appr: {new Date(ticket.approved_at!).toLocaleDateString()}
+                      </Text>
+                      <Badge color={ticket.payment_status === "paid" || ticket.payment_status === "captured" ? "green" : "orange"} size="small">
+                        {ticket.payment_status.toUpperCase()}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-4 pt-4 border-t">
+                  <Button 
+                    variant="primary" 
+                    size="small" 
+                    onClick={handleManualApprove}
+                    disabled={loading}
+                    className="w-full"
+                  >
+                    Manually Approve & Create Payment
+                  </Button>
+                </div>
+              )}
+            </div>
+          
+            </div>
+          </div>
+
+{/* Media */}
           {ticket.media && ticket.media.length > 0 && (
             <Container>
               <Heading level="h2" className="mb-4">
@@ -871,148 +1007,16 @@ const RepairDetailPage = () => {
             </Container>
           )}
         </div>
+        <div className="lg:col-span-5">
+          {/* Timeline & Communication */}<div>
 
-        {/* Right Column */}
-        <div className="space-y-6">
-          {/* Update Status */}
-          <Container>
-            <Heading level="h2" className="mb-4">
-              Update Details
-            </Heading>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {/* Technician */}
-                <div className="relative">
-                  <span className="text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block">Technician</span>
-                  <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all">
-                    {technicianName ? (
-                      <>
-                        <div className="flex-1 px-3 py-[9px] text-sm text-ui-fg-base truncate">{technicianName}</div>
-                        <button className="px-3 text-ui-fg-muted hover:text-ui-fg-base" onClick={() => { setTechnicianName(""); setTechnicianId(""); }}>×</button>
-                      </>
-                    ) : (
-                      <>
-                        <input
-                          placeholder="Search tech..."
-                          className="w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base placeholder-ui-fg-muted"
-                          value={technicianSearch}
-                          onChange={(e) => {
-                            setTechnicianSearch(e.target.value);
-                            setShowTechnicianDropdown(true);
-                          }}
-                          onFocus={() => setShowTechnicianDropdown(true)}
-                          onBlur={() => setTimeout(() => setShowTechnicianDropdown(false), 200)}
-                        />
-                        {showTechnicianDropdown && technicianOptions.length > 0 && (
-                          <div className="absolute top-full left-0 z-50 w-full mt-1 bg-ui-bg-base border border-ui-border-base rounded-md shadow-lg max-h-60 overflow-y-auto">
-                            {technicianOptions.map((opt) => (
-                              <div
-                                key={opt.id}
-                                className="p-2 text-sm cursor-pointer hover:bg-ui-bg-subtle-hover flex justify-between items-center"
-                                onClick={() => {
-                                  setTechnicianName(`${opt.first_name} ${opt.last_name}`);
-                                  setTechnicianId(opt.id);
-                                  setTechnicianSearch("");
-                                  setShowTechnicianDropdown(false);
-                                }}
-                              >
-                                {opt.first_name} {opt.last_name}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Status */}
-                <div className="relative">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider block">Status</span>
-                    {(ticket?.status === "completed" || ticket?.status === "collected") && 
-                     ticket?.payment_status !== "captured" && ticket?.payment_status !== "paid" && (
-                      <span className="text-[9px] font-bold px-1 py-0.5 bg-red-100 text-red-700 rounded-sm leading-none">UNPAID</span>
-                    )}
-                  </div>
-                  <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all">
-                    <select 
-                      className="w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base appearance-none cursor-pointer"
-                      value={newStatus}
-                      onChange={(e) => setNewStatus(e.target.value)}
-                    >
-                      <option value="pending_dropoff">Pending Dropoff</option>
-                      <option value="received">Received</option>
-                      <option value="diagnosing">Diagnosing</option>
-                      <option value="awaiting_approval">Awaiting Approval</option>
-                      <option value="repairing" disabled={!ticket?.is_approved}>Repairing {!ticket?.is_approved && "(Req Approval)"}</option>
-                      <option value="ready" disabled={!ticket?.is_approved}>Ready {!ticket?.is_approved && "(Req Approval)"}</option>
-                      <option value="completed" disabled={!ticket?.is_approved}>Completed {!ticket?.is_approved && "(Req Approval)"}</option>
-                      <option value="collected" disabled={!ticket?.is_approved}>Collected {!ticket?.is_approved && "(Req Approval)"}</option>
-                      <option value="cancelled">Cancelled</option>
-                      <option value="refunded">Refunded</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {/* Labor Cost */}
-                <div className="relative">
-                  <span className="text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block">Labor Cost (KES)</span>
-                  <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all">
-                    <span className="text-ui-fg-muted pl-3 text-sm">KES</span>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      placeholder="0.00" 
-                      className="w-full bg-transparent text-sm px-2 py-[9px] outline-none text-ui-fg-base placeholder-ui-fg-muted"
-                      value={laborCost}
-                      onChange={(e) => setLaborCost(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {/* Estimated Completion */}
-                <div className="relative">
-                  <span className="text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block">Est. Completion</span>
-                  <div className="flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all">
-                    <input 
-                      type="date" 
-                      className="w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base text-ui-fg-muted"
-                      value={etc}
-                      min={new Date().toISOString().split("T")[0]}
-                      onChange={(e) => setEtc(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              {!ticket?.is_approved && (
-                <div className="text-xs text-ui-fg-error -mt-1">
-                  Customer must approve estimate before starting work.
-                </div>
-              )}
-
-              <Button
-                onClick={handleUpdateCosts}
-                variant="primary"
-                className="w-full mt-2"
-              >
-                Save Details
-              </Button>
-            </div>
-          </Container>
-
-          {/* Timeline & Communication */}
-          <Container>
             <div className="flex items-center gap-2 mb-4">
               <ChatBubbleLeftRight size={20} />
               <Heading level="h2">Timeline & Communication</Heading>
             </div>
 
             <div className="space-y-4">
-              <div className="space-y-2 max-h-80 overflow-y-auto mb-4 border rounded bg-ui-bg-subtle/50 p-2">
+              <div className="space-y-2 max-h-[600px] overflow-y-auto mb-4 pl-4 border-l-2 border-ui-border-base ml-2">
                 {(() => {
                   const items = [
                     ...((ticket.notes || []) as any[]).map((n) => ({
@@ -1086,7 +1090,7 @@ const RepairDetailPage = () => {
                 })()}
               </div>
 
-              <div className="flex flex-col gap-2 p-3 bg-ui-bg-subtle rounded border">
+              <div className="flex flex-col gap-2 p-3">
                 <Textarea
                   value={unifiedMessage}
                   onChange={(e) => setUnifiedMessage(e.target.value)}
@@ -1120,8 +1124,9 @@ const RepairDetailPage = () => {
                 </div>
               </div>
             </div>
-          </Container>
-        </div>
+          
+
+          </div></div>
       </div>
     </div>
   );

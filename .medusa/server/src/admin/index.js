@@ -1148,288 +1148,420 @@ const RepairDetailPage = () => {
         ticket.device.serial_number
       ] })
     ] }) }) }),
-    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "grid grid-cols-2 gap-6", children: [
-      /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-6", children: [
-        /* @__PURE__ */ jsxRuntime.jsxs(ui.Container, { children: [
-          /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h2", className: "mb-4", children: "Issue Details" }),
-          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-3", children: [
-            /* @__PURE__ */ jsxRuntime.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { children: "Description" }),
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: ticket.issue_description })
-            ] }),
-            ticket.accessories && /* @__PURE__ */ jsxRuntime.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { children: "Accessories" }),
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: ticket.accessories })
-            ] }),
-            /* @__PURE__ */ jsxRuntime.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { children: "Created" }),
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: new Date(ticket.created_at).toLocaleString() })
-            ] }),
-            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "pt-3 border-t", children: [
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "text-xs text-ui-fg-muted mb-1", children: "Compliance" }),
-              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex gap-2", children: [
-                /* @__PURE__ */ jsxRuntime.jsxs(ui.Badge, { color: ticket.terms_accepted ? "green" : "red", size: "small", children: [
-                  "Terms: ",
-                  ticket.terms_accepted ? "Yes" : "No"
-                ] }),
-                /* @__PURE__ */ jsxRuntime.jsxs(ui.Badge, { color: ticket.data_wiped_consent ? "green" : "grey", size: "small", children: [
-                  "Wipe: ",
-                  ticket.data_wiped_consent ? "Yes" : "No"
+    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-12 gap-6 items-start", children: [
+      /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "lg:col-span-7 space-y-6", children: [
+        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "bg-ui-bg-base border border-ui-border-base rounded-lg shadow-sm", children: [
+          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "p-6 border-b border-ui-border-base", children: [
+            /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h2", className: "mb-4", children: "Issue Details" }),
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-3", children: [
+              /* @__PURE__ */ jsxRuntime.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { children: "Description" }),
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: ticket.issue_description })
+              ] }),
+              ticket.accessories && /* @__PURE__ */ jsxRuntime.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { children: "Accessories" }),
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: ticket.accessories })
+              ] }),
+              /* @__PURE__ */ jsxRuntime.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { children: "Created" }),
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: new Date(ticket.created_at).toLocaleString() })
+              ] }),
+              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "pt-3 border-t", children: [
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "text-xs text-ui-fg-muted mb-1", children: "Compliance" }),
+                /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex gap-2", children: [
+                  /* @__PURE__ */ jsxRuntime.jsxs(ui.Badge, { color: ticket.terms_accepted ? "green" : "red", size: "small", children: [
+                    "Terms: ",
+                    ticket.terms_accepted ? "Yes" : "No"
+                  ] }),
+                  /* @__PURE__ */ jsxRuntime.jsxs(ui.Badge, { color: ticket.data_wiped_consent ? "green" : "grey", size: "small", children: [
+                    "Wipe: ",
+                    ticket.data_wiped_consent ? "Yes" : "No"
+                  ] })
                 ] })
               ] })
             ] })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntime.jsxs(ui.Container, { children: [
-          /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h2", className: "mb-4", children: "Cost Breakdown" }),
-          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex justify-between", children: [
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: "Parts Estimate:" }),
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "font-medium", children: formatCurrency(ticket.parts_estimate) })
-            ] }),
-            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex justify-between", children: [
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: "Labor Estimate:" }),
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "font-medium", children: formatCurrency(ticket.labor_estimate) })
-            ] }),
-            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex justify-between items-center py-2", children: [
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { htmlFor: "global-vat-toggle", className: "text-sm cursor-pointer text-ui-fg-subtle", children: "+ Add 16% VAT to Total" }),
-              /* @__PURE__ */ jsxRuntime.jsx(
-                "input",
-                {
-                  type: "checkbox",
-                  id: "global-vat-toggle",
-                  checked: ticket.apply_tax ?? false,
-                  onChange: (e) => handleToggleTax(e.target.checked),
-                  disabled: loading
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex justify-between text-lg font-semibold border-t pt-2", children: [
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: "Total Estimate:" }),
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: formatCurrency(ticket.total_estimate) })
-            ] }),
-            ticket.payment_status !== "paid" && ticket.payment_status !== "captured" && ticket.status !== "cancelled" && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "mt-3 flex items-center gap-2", children: [
-              /* @__PURE__ */ jsxRuntime.jsx(
-                ui.Button,
-                {
-                  variant: "secondary",
-                  size: "small",
-                  onClick: handleStkPush,
-                  disabled: loading || isPushingStk,
-                  className: "flex-1",
-                  children: isPushingStk ? "Pushing..." : "Push STK (M-PESA)"
-                }
-              ),
-              /* @__PURE__ */ jsxRuntime.jsx(
-                ui.Button,
-                {
-                  variant: "secondary",
-                  size: "small",
-                  onClick: handleMarkPaid,
-                  disabled: loading,
-                  className: "flex-1",
-                  children: "Mark Paid (Cash)"
-                }
-              )
-            ] }),
-            ticket.is_approved ? /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-3 pt-3 border-t", children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex justify-between items-center", children: [
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "text-sm font-medium", children: "Status / Paid" }),
-              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-2", children: [
-                /* @__PURE__ */ jsxRuntime.jsxs(ui.Text, { className: "text-xs text-ui-fg-muted", children: [
-                  "Appr: ",
-                  new Date(ticket.approved_at).toLocaleDateString()
+          ] }),
+          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "p-6 border-b border-ui-border-base bg-ui-bg-subtle/20", children: [
+            /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h2", className: "mb-4", children: "Update Details" }),
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-4", children: [
+              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+                /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative", children: [
+                  /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block", children: "Technician" }),
+                  /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all", children: technicianName ? /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+                    /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex-1 px-3 py-[9px] text-sm text-ui-fg-base truncate", children: technicianName }),
+                    /* @__PURE__ */ jsxRuntime.jsx("button", { className: "px-3 text-ui-fg-muted hover:text-ui-fg-base", onClick: () => {
+                      setTechnicianName("");
+                      setTechnicianId("");
+                    }, children: "×" })
+                  ] }) : /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+                    /* @__PURE__ */ jsxRuntime.jsx(
+                      "input",
+                      {
+                        placeholder: "Search tech...",
+                        className: "w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base placeholder-ui-fg-muted",
+                        value: technicianSearch,
+                        onChange: (e) => {
+                          setTechnicianSearch(e.target.value);
+                          setShowTechnicianDropdown(true);
+                        },
+                        onFocus: () => setShowTechnicianDropdown(true),
+                        onBlur: () => setTimeout(() => setShowTechnicianDropdown(false), 200)
+                      }
+                    ),
+                    showTechnicianDropdown && technicianOptions.length > 0 && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "absolute top-full left-0 z-50 w-full mt-1 bg-ui-bg-base border border-ui-border-base rounded-md shadow-lg max-h-60 overflow-y-auto", children: technicianOptions.map((opt) => /* @__PURE__ */ jsxRuntime.jsxs(
+                      "div",
+                      {
+                        className: "p-2 text-sm cursor-pointer hover:bg-ui-bg-subtle-hover flex justify-between items-center",
+                        onClick: () => {
+                          setTechnicianName(`${opt.first_name} ${opt.last_name}`);
+                          setTechnicianId(opt.id);
+                          setTechnicianSearch("");
+                          setShowTechnicianDropdown(false);
+                        },
+                        children: [
+                          opt.first_name,
+                          " ",
+                          opt.last_name
+                        ]
+                      },
+                      opt.id
+                    )) })
+                  ] }) })
                 ] }),
-                /* @__PURE__ */ jsxRuntime.jsx(ui.Badge, { color: ticket.payment_status === "paid" || ticket.payment_status === "captured" ? "green" : "orange", size: "small", children: ticket.payment_status.toUpperCase() })
-              ] })
-            ] }) }) : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-4 pt-4 border-t", children: /* @__PURE__ */ jsxRuntime.jsx(
-              ui.Button,
-              {
-                variant: "primary",
-                size: "small",
-                onClick: handleManualApprove,
-                disabled: loading,
-                className: "w-full",
-                children: "Manually Approve & Create Payment"
-              }
-            ) })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntime.jsxs(ui.Container, { children: [
-          /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h2", className: "mb-4", children: "Parts & Inventory" }),
-          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-4 mb-6", children: [
-            ticket.parts && ticket.parts.length > 0 && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-2", children: [
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { children: "Inventory Parts Used" }),
-              ticket.parts.map((p) => {
-                var _a, _b, _c;
-                return /* @__PURE__ */ jsxRuntime.jsxs(
+                /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative", children: [
+                  /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex justify-between items-center mb-1", children: [
+                    /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider block", children: "Status" }),
+                    ((ticket == null ? void 0 : ticket.status) === "completed" || (ticket == null ? void 0 : ticket.status) === "collected") && (ticket == null ? void 0 : ticket.payment_status) !== "captured" && (ticket == null ? void 0 : ticket.payment_status) !== "paid" && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[9px] font-bold px-1 py-0.5 bg-red-100 text-red-700 rounded-sm leading-none", children: "UNPAID" })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all", children: /* @__PURE__ */ jsxRuntime.jsxs(
+                    "select",
+                    {
+                      className: "w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base appearance-none cursor-pointer",
+                      value: newStatus,
+                      onChange: (e) => setNewStatus(e.target.value),
+                      children: [
+                        /* @__PURE__ */ jsxRuntime.jsx("option", { value: "pending_dropoff", children: "Pending Dropoff" }),
+                        /* @__PURE__ */ jsxRuntime.jsx("option", { value: "received", children: "Received" }),
+                        /* @__PURE__ */ jsxRuntime.jsx("option", { value: "diagnosing", children: "Diagnosing" }),
+                        /* @__PURE__ */ jsxRuntime.jsx("option", { value: "awaiting_approval", children: "Awaiting Approval" }),
+                        /* @__PURE__ */ jsxRuntime.jsxs("option", { value: "repairing", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
+                          "Repairing ",
+                          !(ticket == null ? void 0 : ticket.is_approved) && "(Req Approval)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntime.jsxs("option", { value: "ready", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
+                          "Ready ",
+                          !(ticket == null ? void 0 : ticket.is_approved) && "(Req Approval)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntime.jsxs("option", { value: "completed", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
+                          "Completed ",
+                          !(ticket == null ? void 0 : ticket.is_approved) && "(Req Approval)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntime.jsxs("option", { value: "collected", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
+                          "Collected ",
+                          !(ticket == null ? void 0 : ticket.is_approved) && "(Req Approval)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntime.jsx("option", { value: "cancelled", children: "Cancelled" }),
+                        /* @__PURE__ */ jsxRuntime.jsx("option", { value: "refunded", children: "Refunded" })
+                      ]
+                    }
+                  ) })
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+                /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative", children: [
+                  /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block", children: "Labor Cost (KES)" }),
+                  /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all", children: [
+                    /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-ui-fg-muted pl-3 text-sm", children: "KES" }),
+                    /* @__PURE__ */ jsxRuntime.jsx(
+                      "input",
+                      {
+                        type: "number",
+                        step: "0.01",
+                        placeholder: "0.00",
+                        className: "w-full bg-transparent text-sm px-2 py-[9px] outline-none text-ui-fg-base placeholder-ui-fg-muted",
+                        value: laborCost,
+                        onChange: (e) => setLaborCost(e.target.value)
+                      }
+                    )
+                  ] })
+                ] }),
+                /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative", children: [
+                  /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block", children: "Est. Completion" }),
+                  /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all", children: /* @__PURE__ */ jsxRuntime.jsx(
+                    "input",
+                    {
+                      type: "date",
+                      className: "w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base text-ui-fg-muted",
+                      value: etc,
+                      min: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
+                      onChange: (e) => setEtc(e.target.value)
+                    }
+                  ) })
+                ] })
+              ] }),
+              !(ticket == null ? void 0 : ticket.is_approved) && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "text-xs text-ui-fg-error -mt-1", children: "Customer must approve estimate before starting work." }),
+              /* @__PURE__ */ jsxRuntime.jsx(
+                ui.Button,
+                {
+                  onClick: handleUpdateCosts,
+                  variant: "primary",
+                  className: "w-full mt-2",
+                  children: "Save Details"
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "p-6 border-b border-ui-border-base", children: [
+            /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h2", className: "mb-4", children: "Parts & Inventory" }),
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-4 mb-6", children: [
+              ticket.parts && ticket.parts.length > 0 && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { children: "Inventory Parts Used" }),
+                ticket.parts.map((p) => {
+                  var _a, _b, _c;
+                  return /* @__PURE__ */ jsxRuntime.jsxs(
+                    "div",
+                    {
+                      className: "flex items-center justify-between p-2 bg-ui-bg-subtle rounded border text-sm",
+                      children: [
+                        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col", children: [
+                          /* @__PURE__ */ jsxRuntime.jsxs(ui.Text, { children: [
+                            ((_a = p.product) == null ? void 0 : _a.title) ? `${p.product.title} - ` : "",
+                            p.title
+                          ] }),
+                          /* @__PURE__ */ jsxRuntime.jsxs(ui.Text, { className: "text-ui-fg-subtle text-xs", children: [
+                            p.sku || "-",
+                            " ",
+                            ((_c = (_b = p.prices) == null ? void 0 : _b[0]) == null ? void 0 : _c.amount) != null ? ` • ${formatCurrency(p.prices[0].amount)}` : ""
+                          ] })
+                        ] }),
+                        /* @__PURE__ */ jsxRuntime.jsx(
+                          ui.Button,
+                          {
+                            variant: "transparent",
+                            className: "text-ui-fg-muted hover:text-ui-fg-base",
+                            onClick: () => handleRemoveInventoryPart(p.id),
+                            disabled: isAddingPart,
+                            children: /* @__PURE__ */ jsxRuntime.jsx(icons.Trash, {})
+                          }
+                        )
+                      ]
+                    },
+                    p.id
+                  );
+                })
+              ] }),
+              ticket.custom_parts && ticket.custom_parts.length > 0 && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { children: "Custom Parts" }),
+                ticket.custom_parts.map((cp, idx) => /* @__PURE__ */ jsxRuntime.jsxs(
                   "div",
                   {
                     className: "flex items-center justify-between p-2 bg-ui-bg-subtle rounded border text-sm",
                     children: [
                       /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col", children: [
-                        /* @__PURE__ */ jsxRuntime.jsxs(ui.Text, { children: [
-                          ((_a = p.product) == null ? void 0 : _a.title) ? `${p.product.title} - ` : "",
-                          p.title
-                        ] }),
-                        /* @__PURE__ */ jsxRuntime.jsxs(ui.Text, { className: "text-ui-fg-subtle text-xs", children: [
-                          p.sku || "-",
-                          " ",
-                          ((_c = (_b = p.prices) == null ? void 0 : _b[0]) == null ? void 0 : _c.amount) != null ? ` • ${formatCurrency(p.prices[0].amount)}` : ""
-                        ] })
+                        /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: cp.name }),
+                        /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "font-medium text-xs", children: formatCurrency(cp.price) })
                       ] }),
                       /* @__PURE__ */ jsxRuntime.jsx(
                         ui.Button,
                         {
                           variant: "transparent",
                           className: "text-ui-fg-muted hover:text-ui-fg-base",
-                          onClick: () => handleRemoveInventoryPart(p.id),
+                          onClick: async () => {
+                            try {
+                              setIsAddingPart(true);
+                              await fetch(`/admin/repairs/${id}/custom-parts/${idx}`, {
+                                method: "DELETE",
+                                credentials: "include"
+                              });
+                              ui.toast.success("Custom part removed");
+                              loadTicket();
+                            } catch (e) {
+                              ui.toast.error("Failed to remove custom part");
+                            } finally {
+                              setIsAddingPart(false);
+                            }
+                          },
                           disabled: isAddingPart,
                           children: /* @__PURE__ */ jsxRuntime.jsx(icons.Trash, {})
                         }
                       )
                     ]
                   },
-                  p.id
-                );
-              })
-            ] }),
-            ticket.custom_parts && ticket.custom_parts.length > 0 && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-2", children: [
-              /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { children: "Custom Parts" }),
-              ticket.custom_parts.map((cp, idx) => /* @__PURE__ */ jsxRuntime.jsxs(
-                "div",
-                {
-                  className: "flex items-center justify-between p-2 bg-ui-bg-subtle rounded border text-sm",
-                  children: [
-                    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col", children: [
-                      /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: cp.name }),
-                      /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "font-medium text-xs", children: formatCurrency(cp.price) })
-                    ] }),
-                    /* @__PURE__ */ jsxRuntime.jsx(
-                      ui.Button,
-                      {
-                        variant: "transparent",
-                        className: "text-ui-fg-muted hover:text-ui-fg-base",
-                        onClick: async () => {
-                          try {
-                            setIsAddingPart(true);
-                            await fetch(`/admin/repairs/${id}/custom-parts/${idx}`, {
-                              method: "DELETE",
-                              credentials: "include"
-                            });
-                            ui.toast.success("Custom part removed");
-                            loadTicket();
-                          } catch (e) {
-                            ui.toast.error("Failed to remove custom part");
-                          } finally {
-                            setIsAddingPart(false);
-                          }
-                        },
-                        disabled: isAddingPart,
-                        children: /* @__PURE__ */ jsxRuntime.jsx(icons.Trash, {})
-                      }
-                    )
-                  ]
-                },
-                idx
-              ))
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxRuntime.jsx("div", { className: "pt-4 border-t", children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center border border-ui-border-base rounded-md overflow-visible bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all", children: [
-            /* @__PURE__ */ jsxRuntime.jsx("div", { className: "border-r border-ui-border-base px-2 py-[7px] bg-ui-bg-subtle h-full", children: /* @__PURE__ */ jsxRuntime.jsxs(
-              "select",
-              {
-                className: "bg-transparent text-xs font-medium text-ui-fg-subtle outline-none cursor-pointer appearance-none pr-1",
-                value: partInputMode,
-                onChange: (e) => {
-                  setPartInputMode(e.target.value);
-                  setPartSearch("");
-                  setSelectedInventoryPart("");
-                  setCustomPartName("");
-                  setCustomPartPrice("");
-                },
-                children: [
-                  /* @__PURE__ */ jsxRuntime.jsx("option", { value: "inventory", children: "Inventory ▾" }),
-                  /* @__PURE__ */ jsxRuntime.jsx("option", { value: "custom", children: "Custom ▾" })
-                ]
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex-1 px-3 relative", children: partInputMode === "inventory" ? /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
-              /* @__PURE__ */ jsxRuntime.jsx(
-                "input",
-                {
-                  placeholder: "Search variant...",
-                  className: "w-full bg-transparent text-sm outline-none text-ui-fg-base placeholder-ui-fg-muted",
-                  value: partSearch,
-                  onChange: (e) => {
-                    setPartSearch(e.target.value);
-                    setSelectedInventoryPart("");
-                  }
-                }
-              ),
-              partSearch && !selectedInventoryPart && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "absolute left-0 z-50 w-full mt-2 bg-ui-bg-base border border-ui-border-base rounded-md shadow-md max-h-48 overflow-y-auto", children: [
-                inventoryParts.filter(
-                  (p) => {
-                    var _a;
-                    return p.title.toLowerCase().includes(partSearch.toLowerCase()) || ((_a = p.sku) == null ? void 0 : _a.toLowerCase().includes(partSearch.toLowerCase()));
-                  }
-                ).map((p) => /* @__PURE__ */ jsxRuntime.jsxs(
-                  "div",
-                  {
-                    className: "p-2 text-sm hover:bg-ui-bg-subtle-hover cursor-pointer",
-                    onClick: () => {
-                      setSelectedInventoryPart(p.id);
-                      setPartSearch(`${p.title} ${p.sku ? `(${p.sku})` : ""}`);
-                    },
-                    children: [
-                      p.title,
-                      " ",
-                      p.sku ? `(${p.sku})` : ""
-                    ]
-                  },
-                  p.id
-                )),
-                inventoryParts.filter(
-                  (p) => {
-                    var _a;
-                    return p.title.toLowerCase().includes(partSearch.toLowerCase()) || ((_a = p.sku) == null ? void 0 : _a.toLowerCase().includes(partSearch.toLowerCase()));
-                  }
-                ).length === 0 && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "p-2 text-sm text-ui-fg-subtle", children: "No parts found" })
+                  idx
+                ))
               ] })
-            ] }) : /* @__PURE__ */ jsxRuntime.jsx(
-              "input",
-              {
-                placeholder: "Part description...",
-                className: "w-full bg-transparent text-sm outline-none text-ui-fg-base placeholder-ui-fg-muted",
-                value: customPartName,
-                onChange: (e) => setCustomPartName(e.target.value)
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center border-l border-ui-border-base bg-ui-bg-subtle pl-2", children: [
-              partInputMode === "custom" && /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
-                /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-ui-fg-subtle text-xs mr-1", children: "KES" }),
+            ] }),
+            /* @__PURE__ */ jsxRuntime.jsx("div", { className: "pt-4 border-t", children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center border border-ui-border-base rounded-md overflow-visible bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all", children: [
+              /* @__PURE__ */ jsxRuntime.jsx("div", { className: "border-r border-ui-border-base px-2 py-[7px] bg-ui-bg-subtle h-full", children: /* @__PURE__ */ jsxRuntime.jsxs(
+                "select",
+                {
+                  className: "bg-transparent text-xs font-medium text-ui-fg-subtle outline-none cursor-pointer appearance-none pr-1",
+                  value: partInputMode,
+                  onChange: (e) => {
+                    setPartInputMode(e.target.value);
+                    setPartSearch("");
+                    setSelectedInventoryPart("");
+                    setCustomPartName("");
+                    setCustomPartPrice("");
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntime.jsx("option", { value: "inventory", children: "Inventory ▾" }),
+                    /* @__PURE__ */ jsxRuntime.jsx("option", { value: "custom", children: "Custom ▾" })
+                  ]
+                }
+              ) }),
+              /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex-1 px-3 relative", children: partInputMode === "inventory" ? /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
                 /* @__PURE__ */ jsxRuntime.jsx(
                   "input",
                   {
-                    type: "number",
-                    step: "0.01",
-                    placeholder: "0.00",
-                    className: "w-16 bg-transparent text-sm text-right outline-none text-ui-fg-base placeholder-ui-fg-muted py-[7px]",
-                    value: customPartPrice,
-                    onChange: (e) => setCustomPartPrice(e.target.value)
+                    placeholder: "Search variant...",
+                    className: "w-full bg-transparent text-sm outline-none text-ui-fg-base placeholder-ui-fg-muted",
+                    value: partSearch,
+                    onChange: (e) => {
+                      setPartSearch(e.target.value);
+                      setSelectedInventoryPart("");
+                    }
+                  }
+                ),
+                partSearch && !selectedInventoryPart && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "absolute left-0 z-50 w-full mt-2 bg-ui-bg-base border border-ui-border-base rounded-md shadow-md max-h-48 overflow-y-auto", children: [
+                  inventoryParts.filter(
+                    (p) => {
+                      var _a;
+                      return p.title.toLowerCase().includes(partSearch.toLowerCase()) || ((_a = p.sku) == null ? void 0 : _a.toLowerCase().includes(partSearch.toLowerCase()));
+                    }
+                  ).map((p) => /* @__PURE__ */ jsxRuntime.jsxs(
+                    "div",
+                    {
+                      className: "p-2 text-sm hover:bg-ui-bg-subtle-hover cursor-pointer",
+                      onClick: () => {
+                        setSelectedInventoryPart(p.id);
+                        setPartSearch(`${p.title} ${p.sku ? `(${p.sku})` : ""}`);
+                      },
+                      children: [
+                        p.title,
+                        " ",
+                        p.sku ? `(${p.sku})` : ""
+                      ]
+                    },
+                    p.id
+                  )),
+                  inventoryParts.filter(
+                    (p) => {
+                      var _a;
+                      return p.title.toLowerCase().includes(partSearch.toLowerCase()) || ((_a = p.sku) == null ? void 0 : _a.toLowerCase().includes(partSearch.toLowerCase()));
+                    }
+                  ).length === 0 && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "p-2 text-sm text-ui-fg-subtle", children: "No parts found" })
+                ] })
+              ] }) : /* @__PURE__ */ jsxRuntime.jsx(
+                "input",
+                {
+                  placeholder: "Part description...",
+                  className: "w-full bg-transparent text-sm outline-none text-ui-fg-base placeholder-ui-fg-muted",
+                  value: customPartName,
+                  onChange: (e) => setCustomPartName(e.target.value)
+                }
+              ) }),
+              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center border-l border-ui-border-base bg-ui-bg-subtle pl-2", children: [
+                partInputMode === "custom" && /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
+                  /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-ui-fg-subtle text-xs mr-1", children: "KES" }),
+                  /* @__PURE__ */ jsxRuntime.jsx(
+                    "input",
+                    {
+                      type: "number",
+                      step: "0.01",
+                      placeholder: "0.00",
+                      className: "w-16 bg-transparent text-sm text-right outline-none text-ui-fg-base placeholder-ui-fg-muted py-[7px]",
+                      value: customPartPrice,
+                      onChange: (e) => setCustomPartPrice(e.target.value)
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntime.jsx(
+                  "button",
+                  {
+                    className: `ml-2 px-3 py-[7px] text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${partInputMode === "custom" ? "border-l border-ui-border-base" : ""} text-ui-fg-base hover:bg-ui-bg-base-hover`,
+                    onClick: partInputMode === "inventory" ? handleAddInventoryPart : handleAddCustomPart,
+                    disabled: isAddingPart || partInputMode === "inventory" && !selectedInventoryPart || partInputMode === "custom" && (!customPartName || !customPartPrice),
+                    children: "Add"
+                  }
+                )
+              ] })
+            ] }) })
+          ] }),
+          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "p-6", children: [
+            /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h2", className: "mb-4", children: "Cost Breakdown" }),
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-2", children: [
+              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex justify-between", children: [
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: "Parts Estimate:" }),
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "font-medium", children: formatCurrency(ticket.parts_estimate) })
+              ] }),
+              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex justify-between", children: [
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: "Labor Estimate:" }),
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "font-medium", children: formatCurrency(ticket.labor_estimate) })
+              ] }),
+              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex justify-between items-center py-2", children: [
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Label, { htmlFor: "global-vat-toggle", className: "text-sm cursor-pointer text-ui-fg-subtle", children: "+ Add 16% VAT to Total" }),
+                /* @__PURE__ */ jsxRuntime.jsx(
+                  "input",
+                  {
+                    type: "checkbox",
+                    id: "global-vat-toggle",
+                    checked: ticket.apply_tax ?? false,
+                    onChange: (e) => handleToggleTax(e.target.checked),
+                    disabled: loading
                   }
                 )
               ] }),
-              /* @__PURE__ */ jsxRuntime.jsx(
-                "button",
+              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex justify-between text-lg font-semibold border-t pt-2", children: [
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: "Total Estimate:" }),
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { children: formatCurrency(ticket.total_estimate) })
+              ] }),
+              ticket.payment_status !== "paid" && ticket.payment_status !== "captured" && ticket.status !== "cancelled" && /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "mt-3 flex items-center gap-2", children: [
+                /* @__PURE__ */ jsxRuntime.jsx(
+                  ui.Button,
+                  {
+                    variant: "secondary",
+                    size: "small",
+                    onClick: handleStkPush,
+                    disabled: loading || isPushingStk,
+                    className: "flex-1",
+                    children: isPushingStk ? "Pushing..." : "Push STK (M-PESA)"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntime.jsx(
+                  ui.Button,
+                  {
+                    variant: "secondary",
+                    size: "small",
+                    onClick: handleMarkPaid,
+                    disabled: loading,
+                    className: "flex-1",
+                    children: "Mark Paid (Cash)"
+                  }
+                )
+              ] }),
+              ticket.is_approved ? /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-3 pt-3 border-t", children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex justify-between items-center", children: [
+                /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "text-sm font-medium", children: "Status / Paid" }),
+                /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-2", children: [
+                  /* @__PURE__ */ jsxRuntime.jsxs(ui.Text, { className: "text-xs text-ui-fg-muted", children: [
+                    "Appr: ",
+                    new Date(ticket.approved_at).toLocaleDateString()
+                  ] }),
+                  /* @__PURE__ */ jsxRuntime.jsx(ui.Badge, { color: ticket.payment_status === "paid" || ticket.payment_status === "captured" ? "green" : "orange", size: "small", children: ticket.payment_status.toUpperCase() })
+                ] })
+              ] }) }) : /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-4 pt-4 border-t", children: /* @__PURE__ */ jsxRuntime.jsx(
+                ui.Button,
                 {
-                  className: `ml-2 px-3 py-[7px] text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${partInputMode === "custom" ? "border-l border-ui-border-base" : ""} text-ui-fg-base hover:bg-ui-bg-base-hover`,
-                  onClick: partInputMode === "inventory" ? handleAddInventoryPart : handleAddCustomPart,
-                  disabled: isAddingPart || partInputMode === "inventory" && !selectedInventoryPart || partInputMode === "custom" && (!customPartName || !customPartPrice),
-                  children: "Add"
+                  variant: "primary",
+                  size: "small",
+                  onClick: handleManualApprove,
+                  disabled: loading,
+                  className: "w-full",
+                  children: "Manually Approve & Create Payment"
                 }
-              )
+              ) })
             ] })
-          ] }) })
+          ] })
         ] }),
         ticket.media && ticket.media.length > 0 && /* @__PURE__ */ jsxRuntime.jsxs(ui.Container, { children: [
           /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h2", className: "mb-4", children: "Media" }),
@@ -1462,229 +1594,97 @@ const RepairDetailPage = () => {
           )) })
         ] })
       ] }),
-      /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-6", children: [
-        /* @__PURE__ */ jsxRuntime.jsxs(ui.Container, { children: [
-          /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h2", className: "mb-4", children: "Update Details" }),
-          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-4", children: [
-            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
-              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative", children: [
-                /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block", children: "Technician" }),
-                /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all", children: technicianName ? /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
-                  /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex-1 px-3 py-[9px] text-sm text-ui-fg-base truncate", children: technicianName }),
-                  /* @__PURE__ */ jsxRuntime.jsx("button", { className: "px-3 text-ui-fg-muted hover:text-ui-fg-base", onClick: () => {
-                    setTechnicianName("");
-                    setTechnicianId("");
-                  }, children: "×" })
-                ] }) : /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [
-                  /* @__PURE__ */ jsxRuntime.jsx(
-                    "input",
-                    {
-                      placeholder: "Search tech...",
-                      className: "w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base placeholder-ui-fg-muted",
-                      value: technicianSearch,
-                      onChange: (e) => {
-                        setTechnicianSearch(e.target.value);
-                        setShowTechnicianDropdown(true);
-                      },
-                      onFocus: () => setShowTechnicianDropdown(true),
-                      onBlur: () => setTimeout(() => setShowTechnicianDropdown(false), 200)
-                    }
-                  ),
-                  showTechnicianDropdown && technicianOptions.length > 0 && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "absolute top-full left-0 z-50 w-full mt-1 bg-ui-bg-base border border-ui-border-base rounded-md shadow-lg max-h-60 overflow-y-auto", children: technicianOptions.map((opt) => /* @__PURE__ */ jsxRuntime.jsxs(
-                    "div",
-                    {
-                      className: "p-2 text-sm cursor-pointer hover:bg-ui-bg-subtle-hover flex justify-between items-center",
-                      onClick: () => {
-                        setTechnicianName(`${opt.first_name} ${opt.last_name}`);
-                        setTechnicianId(opt.id);
-                        setTechnicianSearch("");
-                        setShowTechnicianDropdown(false);
-                      },
-                      children: [
-                        opt.first_name,
-                        " ",
-                        opt.last_name
-                      ]
-                    },
-                    opt.id
-                  )) })
-                ] }) })
-              ] }),
-              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative", children: [
-                /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex justify-between items-center mb-1", children: [
-                  /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider block", children: "Status" }),
-                  ((ticket == null ? void 0 : ticket.status) === "completed" || (ticket == null ? void 0 : ticket.status) === "collected") && (ticket == null ? void 0 : ticket.payment_status) !== "captured" && (ticket == null ? void 0 : ticket.payment_status) !== "paid" && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[9px] font-bold px-1 py-0.5 bg-red-100 text-red-700 rounded-sm leading-none", children: "UNPAID" })
-                ] }),
-                /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all", children: /* @__PURE__ */ jsxRuntime.jsxs(
-                  "select",
-                  {
-                    className: "w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base appearance-none cursor-pointer",
-                    value: newStatus,
-                    onChange: (e) => setNewStatus(e.target.value),
-                    children: [
-                      /* @__PURE__ */ jsxRuntime.jsx("option", { value: "pending_dropoff", children: "Pending Dropoff" }),
-                      /* @__PURE__ */ jsxRuntime.jsx("option", { value: "received", children: "Received" }),
-                      /* @__PURE__ */ jsxRuntime.jsx("option", { value: "diagnosing", children: "Diagnosing" }),
-                      /* @__PURE__ */ jsxRuntime.jsx("option", { value: "awaiting_approval", children: "Awaiting Approval" }),
-                      /* @__PURE__ */ jsxRuntime.jsxs("option", { value: "repairing", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
-                        "Repairing ",
-                        !(ticket == null ? void 0 : ticket.is_approved) && "(Req Approval)"
-                      ] }),
-                      /* @__PURE__ */ jsxRuntime.jsxs("option", { value: "ready", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
-                        "Ready ",
-                        !(ticket == null ? void 0 : ticket.is_approved) && "(Req Approval)"
-                      ] }),
-                      /* @__PURE__ */ jsxRuntime.jsxs("option", { value: "completed", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
-                        "Completed ",
-                        !(ticket == null ? void 0 : ticket.is_approved) && "(Req Approval)"
-                      ] }),
-                      /* @__PURE__ */ jsxRuntime.jsxs("option", { value: "collected", disabled: !(ticket == null ? void 0 : ticket.is_approved), children: [
-                        "Collected ",
-                        !(ticket == null ? void 0 : ticket.is_approved) && "(Req Approval)"
-                      ] }),
-                      /* @__PURE__ */ jsxRuntime.jsx("option", { value: "cancelled", children: "Cancelled" }),
-                      /* @__PURE__ */ jsxRuntime.jsx("option", { value: "refunded", children: "Refunded" })
-                    ]
-                  }
-                ) })
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
-              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative", children: [
-                /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block", children: "Labor Cost (KES)" }),
-                /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all", children: [
-                  /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-ui-fg-muted pl-3 text-sm", children: "KES" }),
-                  /* @__PURE__ */ jsxRuntime.jsx(
-                    "input",
-                    {
-                      type: "number",
-                      step: "0.01",
-                      placeholder: "0.00",
-                      className: "w-full bg-transparent text-sm px-2 py-[9px] outline-none text-ui-fg-base placeholder-ui-fg-muted",
-                      value: laborCost,
-                      onChange: (e) => setLaborCost(e.target.value)
-                    }
-                  )
-                ] })
-              ] }),
-              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "relative", children: [
-                /* @__PURE__ */ jsxRuntime.jsx("span", { className: "text-[10px] uppercase font-semibold text-ui-fg-muted tracking-wider mb-1 block", children: "Est. Completion" }),
-                /* @__PURE__ */ jsxRuntime.jsx("div", { className: "flex items-center border border-ui-border-base rounded-md overflow-hidden bg-ui-bg-base focus-within:ring-2 focus-within:ring-ui-fg-interactive transition-all", children: /* @__PURE__ */ jsxRuntime.jsx(
-                  "input",
-                  {
-                    type: "date",
-                    className: "w-full bg-transparent text-sm px-3 py-[9px] outline-none text-ui-fg-base text-ui-fg-muted",
-                    value: etc,
-                    min: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
-                    onChange: (e) => setEtc(e.target.value)
-                  }
-                ) })
-              ] })
-            ] }),
-            !(ticket == null ? void 0 : ticket.is_approved) && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "text-xs text-ui-fg-error -mt-1", children: "Customer must approve estimate before starting work." }),
-            /* @__PURE__ */ jsxRuntime.jsx(
-              ui.Button,
-              {
-                onClick: handleUpdateCosts,
-                variant: "primary",
-                className: "w-full mt-2",
-                children: "Save Details"
-              }
-            )
-          ] })
+      /* @__PURE__ */ jsxRuntime.jsx("div", { className: "lg:col-span-5", children: /* @__PURE__ */ jsxRuntime.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-2 mb-4", children: [
+          /* @__PURE__ */ jsxRuntime.jsx(icons.ChatBubbleLeftRight, { size: 20 }),
+          /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h2", children: "Timeline & Communication" })
         ] }),
-        /* @__PURE__ */ jsxRuntime.jsxs(ui.Container, { children: [
-          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-2 mb-4", children: [
-            /* @__PURE__ */ jsxRuntime.jsx(icons.ChatBubbleLeftRight, { size: 20 }),
-            /* @__PURE__ */ jsxRuntime.jsx(ui.Heading, { level: "h2", children: "Timeline & Communication" })
-          ] }),
-          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-4", children: [
-            /* @__PURE__ */ jsxRuntime.jsx("div", { className: "space-y-2 max-h-80 overflow-y-auto mb-4 border rounded bg-ui-bg-subtle/50 p-2", children: (() => {
-              const items = [
-                ...(ticket.notes || []).map((n) => ({
-                  ...n,
-                  entryType: "note"
-                })),
-                ...(ticket.updates || []).map((u) => ({
-                  ...u,
-                  entryType: "update"
-                }))
-              ].sort(
-                (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-              );
-              if (items.length === 0) {
-                return /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "text-ui-fg-muted p-2 text-center text-sm", children: "No activity yet." });
+        /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsxRuntime.jsx("div", { className: "space-y-2 max-h-[600px] overflow-y-auto mb-4 pl-4 border-l-2 border-ui-border-base ml-2", children: (() => {
+            const items = [
+              ...(ticket.notes || []).map((n) => ({
+                ...n,
+                entryType: "note"
+              })),
+              ...(ticket.updates || []).map((u) => ({
+                ...u,
+                entryType: "update"
+              }))
+            ].sort(
+              (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            );
+            if (items.length === 0) {
+              return /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { className: "text-ui-fg-muted p-2 text-center text-sm", children: "No activity yet." });
+            }
+            return items.map((item) => /* @__PURE__ */ jsxRuntime.jsxs(
+              "div",
+              {
+                className: `p-3 rounded border bg-ui-bg-base ${item.entryType === "update" && item.author_type !== "customer" ? "ml-8" : item.entryType === "update" && item.author_type === "customer" ? "mr-8" : ""}`,
+                children: [
+                  /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
+                    item.entryType === "note" ? /* @__PURE__ */ jsxRuntime.jsx(
+                      ui.Badge,
+                      {
+                        color: item.is_internal ? "orange" : "blue",
+                        size: "small",
+                        children: item.is_internal ? "Internal Note" : "Public Note"
+                      }
+                    ) : /* @__PURE__ */ jsxRuntime.jsx(
+                      ui.Badge,
+                      {
+                        color: item.author_type === "customer" ? "green" : "purple",
+                        size: "small",
+                        children: item.author_type === "customer" ? "Customer Msg" : "Technician Msg"
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: "xsmall", className: "text-ui-fg-muted", children: new Date(item.created_at).toLocaleString() })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: "small", className: "whitespace-pre-wrap", children: item.entryType === "note" ? item.content : item.message })
+                ]
+              },
+              `${item.entryType}_${item.id}`
+            ));
+          })() }),
+          /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-2 p-3", children: [
+            /* @__PURE__ */ jsxRuntime.jsx(
+              ui.Textarea,
+              {
+                value: unifiedMessage,
+                onChange: (e) => setUnifiedMessage(e.target.value),
+                placeholder: "Type a message or note...",
+                rows: 3,
+                className: "bg-ui-bg-base"
               }
-              return items.map((item) => /* @__PURE__ */ jsxRuntime.jsxs(
-                "div",
+            ),
+            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-2 mt-2", children: [
+              /* @__PURE__ */ jsxRuntime.jsxs(
+                ui.Select,
                 {
-                  className: `p-3 rounded border bg-ui-bg-base ${item.entryType === "update" && item.author_type !== "customer" ? "ml-8" : item.entryType === "update" && item.author_type === "customer" ? "mr-8" : ""}`,
+                  value: messageType,
+                  onValueChange: (val) => setMessageType(val),
                   children: [
-                    /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
-                      item.entryType === "note" ? /* @__PURE__ */ jsxRuntime.jsx(
-                        ui.Badge,
-                        {
-                          color: item.is_internal ? "orange" : "blue",
-                          size: "small",
-                          children: item.is_internal ? "Internal Note" : "Public Note"
-                        }
-                      ) : /* @__PURE__ */ jsxRuntime.jsx(
-                        ui.Badge,
-                        {
-                          color: item.author_type === "customer" ? "green" : "purple",
-                          size: "small",
-                          children: item.author_type === "customer" ? "Customer Msg" : "Technician Msg"
-                        }
-                      ),
-                      /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: "xsmall", className: "text-ui-fg-muted", children: new Date(item.created_at).toLocaleString() })
-                    ] }),
-                    /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: "small", className: "whitespace-pre-wrap", children: item.entryType === "note" ? item.content : item.message })
+                    /* @__PURE__ */ jsxRuntime.jsx(ui.Select.Trigger, { className: "w-[180px] bg-ui-bg-base", children: /* @__PURE__ */ jsxRuntime.jsx(ui.Select.Value, {}) }),
+                    /* @__PURE__ */ jsxRuntime.jsxs(ui.Select.Content, { children: [
+                      /* @__PURE__ */ jsxRuntime.jsx(ui.Select.Item, { value: "chat", children: "Message Customer" }),
+                      /* @__PURE__ */ jsxRuntime.jsx(ui.Select.Item, { value: "internal_note", children: "Internal Note" }),
+                      /* @__PURE__ */ jsxRuntime.jsx(ui.Select.Item, { value: "public_note", children: "Public Note" })
+                    ] })
                   ]
-                },
-                `${item.entryType}_${item.id}`
-              ));
-            })() }),
-            /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex flex-col gap-2 p-3 bg-ui-bg-subtle rounded border", children: [
-              /* @__PURE__ */ jsxRuntime.jsx(
-                ui.Textarea,
-                {
-                  value: unifiedMessage,
-                  onChange: (e) => setUnifiedMessage(e.target.value),
-                  placeholder: "Type a message or note...",
-                  rows: 3,
-                  className: "bg-ui-bg-base"
                 }
               ),
-              /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex items-center gap-2 mt-2", children: [
-                /* @__PURE__ */ jsxRuntime.jsxs(
-                  ui.Select,
-                  {
-                    value: messageType,
-                    onValueChange: (val) => setMessageType(val),
-                    children: [
-                      /* @__PURE__ */ jsxRuntime.jsx(ui.Select.Trigger, { className: "w-[180px] bg-ui-bg-base", children: /* @__PURE__ */ jsxRuntime.jsx(ui.Select.Value, {}) }),
-                      /* @__PURE__ */ jsxRuntime.jsxs(ui.Select.Content, { children: [
-                        /* @__PURE__ */ jsxRuntime.jsx(ui.Select.Item, { value: "chat", children: "Message Customer" }),
-                        /* @__PURE__ */ jsxRuntime.jsx(ui.Select.Item, { value: "internal_note", children: "Internal Note" }),
-                        /* @__PURE__ */ jsxRuntime.jsx(ui.Select.Item, { value: "public_note", children: "Public Note" })
-                      ] })
-                    ]
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntime.jsx(
-                  ui.Button,
-                  {
-                    onClick: handleSendUnified,
-                    variant: "primary",
-                    className: "flex-1",
-                    children: "Send / Add"
-                  }
-                )
-              ] })
+              /* @__PURE__ */ jsxRuntime.jsx(
+                ui.Button,
+                {
+                  onClick: handleSendUnified,
+                  variant: "primary",
+                  className: "flex-1",
+                  children: "Send / Add"
+                }
+              )
             ] })
           ] })
         ] })
-      ] })
+      ] }) })
     ] })
   ] });
 };
