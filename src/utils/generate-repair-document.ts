@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import PDFDocument from "pdfkit";
+import { PDFDocument as PDFLibDoc, rgb, degrees, StandardFonts } from "pdf-lib";
 import QRCode from "qrcode";
 import { REPAIR_MODULE } from "../modules/repair";
 import RepairModuleService from "../modules/repair/service";
@@ -13,6 +14,93 @@ const formatCurrency = (amount: number) => {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
+};
+
+const postProcessZohoPdf = async (pdfBuffer: Buffer, ticket: any, docType: string): Promise<Buffer> => {
+  try {
+    const pdfDoc = await PDFLibDoc.load(pdfBuffer);
+    
+    // 1. Generate & Embed QR Code Safely
+    let qrImage: any = null;
+    try {
+      const qrUrl = `${process.env.STORE_URL || "http://localhost:3000"}/store/repairs/track?number=${ticket.ticket_number}`;
+      const qrBufferLib = await QRCode.toBuffer(qrUrl, {
+        errorCorrectionLevel: "H",
+        type: "png",
+        margin: 1,
+        width: 70,
+      });
+      qrImage = await pdfDoc.embedPng(qrBufferLib);
+    } catch (qrErr) {
+      console.error("[postProcessZohoPdf] QR Code generation skipped due to error:", qrErr);
+    }
+    
+    // 2. Determine Watermark
+    let watermarkText = "";
+    let watermarkColor = rgb(0.8, 0.8, 0.8);
+    const isPaid = ticket.payment_status === "captured" || ticket.payment_status === "paid" || docType === "receipt";
+    
+    if (docType === "invoice" || docType === "receipt") {
+      watermarkText = isPaid ? "PAID" : "UNPAID";
+      watermarkColor = isPaid ? rgb(0.13, 0.77, 0.36) : rgb(0.93, 0.26, 0.26); // green vs red
+    } else if (docType === "quote") {
+      watermarkText = "QUOTATION";
+      watermarkColor = rgb(0.8, 0.8, 0.8);
+    }
+    
+    // Override if cancelled
+    if (ticket.status === "cancelled") {
+      watermarkText = "CANCELLED";
+      watermarkColor = rgb(0.93, 0.26, 0.26);
+    }
+    
+    const helveticaFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const pages = pdfDoc.getPages();
+    
+    if (pages.length > 0) {
+      const firstPage = pages[0];
+      
+      // Draw QR Code
+      if (qrImage) {
+        firstPage.drawImage(qrImage, {
+          x: firstPage.getWidth() - 110,
+          y: 40,
+          width: 70,
+          height: 70,
+        });
+      }
+      
+      // Draw Watermark
+      if (watermarkText) {
+        firstPage.drawText(watermarkText, {
+          x: firstPage.getWidth() / 2 - 120,
+          y: firstPage.getHeight() / 2 - 120,
+          size: 80,
+          font: helveticaFont,
+          color: watermarkColor,
+          opacity: 0.15,
+          rotate: degrees(45),
+        });
+      }
+    }
+    
+    // Obscure "Powered by Zoho Books" at the bottom of all pages
+    for (const page of pages) {
+      page.drawRectangle({
+        x: 0,
+        y: 0,
+        width: page.getWidth(),
+        height: 35,
+        color: rgb(1, 1, 1),
+      });
+    }
+
+    const modifiedPdfBytes = await pdfDoc.save();
+    return Buffer.from(modifiedPdfBytes);
+  } catch (e: any) {
+    console.error("[postProcessZohoPdf] CRITICAL Error processing PDF:", e?.message || e);
+    return pdfBuffer; // fallback to original
+  }
 };
 
 const formatDate = (dateString: string | Date) => {
@@ -59,7 +147,7 @@ export async function generateRepairDocument(
       
       const contactId = await zoho.syncContact(customerObj);
       
-      // 2. Generate Estimate or Invoice or Receipt (just to sync to Zoho, we discard the PDF now)
+      // 2. Generate Estimate or Invoice or Receipt
       const metadata = ticket.metadata || {};
 
       if (docType === "quote") {
@@ -68,14 +156,30 @@ export async function generateRepairDocument(
           estId = await zoho.createEstimate(contactId, ticket);
           await repairService.updateRepairTickets({ id: ticket.id, metadata: { ...metadata, zoho_estimate_id: estId } });
         }
+        const pdfBuffer = await zoho.getDocumentPdf(estId, "estimate");
+        const modifiedBuffer = await postProcessZohoPdf(Buffer.from(pdfBuffer), ticket, docType);
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `inline; filename="Repair-Quote-${ticket.ticket_number}.pdf"`);
+        return res.send(modifiedBuffer);
+      } else if (docType === "receipt" && metadata.zoho_payment_id) {
+        const pdfBuffer = await zoho.getPaymentReceiptPdf(metadata.zoho_payment_id as string);
+        const modifiedBuffer = await postProcessZohoPdf(Buffer.from(pdfBuffer), ticket, docType);
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `inline; filename="Repair-Receipt-${ticket.ticket_number}.pdf"`);
+        return res.send(modifiedBuffer);
       } else if (docType === "invoice") {
         let invId = metadata.zoho_invoice_id as string;
         if (!invId) {
           invId = await zoho.createInvoice(contactId, ticket);
           await repairService.updateRepairTickets({ id: ticket.id, metadata: { ...metadata, zoho_invoice_id: invId } });
         }
+        const pdfBuffer = await zoho.getDocumentPdf(invId, "invoice");
+        const modifiedBuffer = await postProcessZohoPdf(Buffer.from(pdfBuffer), ticket, docType);
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `inline; filename="Repair-Invoice-${ticket.ticket_number}.pdf"`);
+        return res.send(modifiedBuffer);
       }
-      // Bypassing Zoho PDF fetch entirely to generate minimalist local versions for everything.
+      // If docType is "job_card" or anything else, it bypasses Zoho and generates locally using PDFKit
     } catch (e: any) {
       zohoError = `Zoho Sync Error: ${e.message}`; 
       logger.error(`Zoho Books Integration failed: ${e.message}.`);
