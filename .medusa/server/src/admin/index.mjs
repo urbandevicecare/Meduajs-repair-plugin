@@ -2,9 +2,9 @@ import { jsx, jsxs, Fragment } from "react/jsx-runtime";
 import { defineWidgetConfig, defineRouteConfig } from "@medusajs/admin-sdk";
 import { Container, Text, Heading, Badge, FocusModal, Button, Label, Input, Textarea, Select, Checkbox, Table, Switch, Toaster, toast } from "@medusajs/ui";
 import { useState, useEffect } from "react";
-import { Wrench, BellAlert, Trash, ArrowUpRightOnBox, ChatBubbleLeftRight, ChartBar } from "@medusajs/icons";
+import { Wrench, BellAlert, Trash, ArrowUpRightOnBox, ChatBubbleLeftRight, ChartBar, ArrowDownTray } from "@medusajs/icons";
 import { useNavigate } from "react-router-dom";
-import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar } from "recharts";
+import { ResponsiveContainer, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, Area, BarChart, Bar } from "recharts";
 const useStoreCurrency = () => {
   const [currencyCode, setCurrencyCode] = useState("KES");
   useEffect(() => {
@@ -1851,98 +1851,196 @@ const RepairDetailPage = () => {
 };
 const ReportsPage = () => {
   const [data, setData] = useState(null);
+  const [rawTickets, setRawTickets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [timeframe, setTimeframe] = useState("all");
   const { formatCurrency } = useStoreCurrency();
   useEffect(() => {
-    fetch(`/admin/repairs/analytics`, {
+    setLoading(true);
+    fetch(`/admin/repairs/analytics?timeframe=${timeframe}`, {
       credentials: "include"
     }).then((res) => res.json()).then((resData) => {
       setData(resData.analytics);
+      setRawTickets(resData.raw_tickets || []);
       setLoading(false);
     }).catch((err) => {
       console.error("Failed to load analytics:", err);
       setLoading(false);
     });
-  }, []);
-  if (loading) {
-    return /* @__PURE__ */ jsx(Container, { className: "p-8", children: /* @__PURE__ */ jsx(Text, { children: "Loading reports..." }) });
+  }, [timeframe]);
+  const handleExportCSV = (allTime = false) => {
+    let url = `/admin/repairs/analytics?timeframe=all`;
+    if (!allTime) {
+      url = `/admin/repairs/analytics?timeframe=${timeframe}`;
+    }
+    fetch(url, { credentials: "include" }).then((res) => res.json()).then((resData) => {
+      const tickets = resData.raw_tickets || [];
+      if (!tickets.length) {
+        alert("No data to export");
+        return;
+      }
+      const headers = ["Ticket Number", "Status", "Created At", "Customer Name", "Technician", "Parts Estimate", "Labor Estimate", "Total Estimate"];
+      const rows = tickets.map((t) => {
+        var _a, _b, _c;
+        return [
+          t.ticket_number,
+          t.status,
+          new Date(t.created_at).toLocaleDateString(),
+          t.customer_id || "N/A",
+          // This might need mapping if customer names are fetched differently
+          t.technician_name || "Unassigned",
+          ((_a = t.parts_estimate) == null ? void 0 : _a.value) || t.parts_estimate || 0,
+          ((_b = t.labor_estimate) == null ? void 0 : _b.value) || t.labor_estimate || 0,
+          ((_c = t.total_estimate) == null ? void 0 : _c.value) || t.total_estimate || 0
+        ];
+      });
+      const csvContent = [
+        headers.join(","),
+        ...rows.map((r) => r.map((cell) => `"${cell}"`).join(","))
+      ].join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const urlObj = URL.createObjectURL(blob);
+      link.setAttribute("href", urlObj);
+      link.setAttribute("download", `repair_export_${allTime ? "all" : timeframe}_${(/* @__PURE__ */ new Date()).toISOString().split("T")[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+  };
+  if (loading && !data) {
+    return /* @__PURE__ */ jsx(Container, { className: "p-8 h-screen flex items-center justify-center", children: /* @__PURE__ */ jsx(Text, { className: "text-ui-fg-subtle animate-pulse", children: "Loading analytics..." }) });
   }
-  if (!data) {
-    return /* @__PURE__ */ jsx(Container, { className: "p-8", children: /* @__PURE__ */ jsx(Text, { children: "No analytics data available." }) });
-  }
-  const chartData = Object.keys(data.status_counts).map((key) => ({
+  const chartData = data ? Object.keys(data.status_counts).map((key) => ({
     name: key.charAt(0).toUpperCase() + key.slice(1).replace("_", " "),
     count: data.status_counts[key]
-  }));
-  return /* @__PURE__ */ jsxs(Container, { className: "p-8", children: [
-    /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 mb-8", children: [
-      /* @__PURE__ */ jsx(ChartBar, { className: "text-ui-fg-subtle" }),
-      /* @__PURE__ */ jsx(Heading, { level: "h1", children: "Repair Analytics & Reports" })
-    ] }),
-    /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12", children: [
-      /* @__PURE__ */ jsxs("div", { className: "p-6 border rounded-lg bg-ui-bg-base border-ui-border-base shadow-sm", children: [
-        /* @__PURE__ */ jsx(Text, { className: "text-ui-fg-subtle mb-1", children: "Total Repairs" }),
-        /* @__PURE__ */ jsx(Heading, { level: "h2", className: "text-3xl", children: data.total_repairs })
+  })) : [];
+  return /* @__PURE__ */ jsxs(Container, { className: "p-8 bg-transparent border-none shadow-none", children: [
+    /* @__PURE__ */ jsxs("div", { className: "flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10", children: [
+      /* @__PURE__ */ jsxs("div", { children: [
+        /* @__PURE__ */ jsx(Heading, { level: "h1", className: "text-2xl font-semibold text-ui-fg-base mb-1", children: "Performance Overview" }),
+        /* @__PURE__ */ jsx(Text, { className: "text-ui-fg-subtle text-sm", children: "Monitor your repair operations and revenue trends." })
       ] }),
-      /* @__PURE__ */ jsxs("div", { className: "p-6 border rounded-lg bg-ui-bg-base border-ui-border-base shadow-sm", children: [
-        /* @__PURE__ */ jsx(Text, { className: "text-ui-fg-subtle mb-1", children: "Total Revenue (Estimated)" }),
-        /* @__PURE__ */ jsx(Heading, { level: "h2", className: "text-3xl", children: formatCurrency(data.total_expected_revenue) })
-      ] }),
-      /* @__PURE__ */ jsxs("div", { className: "p-6 border rounded-lg bg-ui-bg-base border-ui-border-base shadow-sm", children: [
-        /* @__PURE__ */ jsx(Text, { className: "text-ui-fg-subtle mb-1", children: "Completed Repairs" }),
-        /* @__PURE__ */ jsx(Heading, { level: "h2", className: "text-3xl", children: data.completed_count })
-      ] }),
-      /* @__PURE__ */ jsxs("div", { className: "p-6 border rounded-lg bg-ui-bg-base border-ui-border-base shadow-sm", children: [
-        /* @__PURE__ */ jsx(Text, { className: "text-ui-fg-subtle mb-1", children: "Avg Repair Time (Days)" }),
-        /* @__PURE__ */ jsx(Heading, { level: "h2", className: "text-3xl", children: data.avg_repair_time_days.toFixed(1) })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8", children: [
-      /* @__PURE__ */ jsxs("div", { className: "bg-ui-bg-base border border-ui-border-base rounded-lg p-6 shadow-sm h-96", children: [
-        /* @__PURE__ */ jsx(Heading, { level: "h2", className: "mb-6", children: "Repairs by Status" }),
-        /* @__PURE__ */ jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxs(BarChart, { data: chartData, children: [
-          /* @__PURE__ */ jsx(CartesianGrid, { strokeDasharray: "3 3" }),
-          /* @__PURE__ */ jsx(XAxis, { dataKey: "name" }),
-          /* @__PURE__ */ jsx(YAxis, {}),
-          /* @__PURE__ */ jsx(Tooltip, {}),
-          /* @__PURE__ */ jsx(Legend, {}),
-          /* @__PURE__ */ jsx(Bar, { dataKey: "count", fill: "#8884d8", name: "Tickets" })
-        ] }) })
-      ] }),
-      /* @__PURE__ */ jsxs("div", { className: "bg-ui-bg-base border border-ui-border-base rounded-lg p-6 shadow-sm h-96", children: [
-        /* @__PURE__ */ jsx(Heading, { level: "h2", className: "mb-6", children: "Revenue by Month (Parts vs Labor)" }),
-        /* @__PURE__ */ jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxs(
-          BarChart,
+      /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3", children: [
+        /* @__PURE__ */ jsxs(Select, { value: timeframe, onValueChange: setTimeframe, size: "small", children: [
+          /* @__PURE__ */ jsx(Select.Trigger, { className: "w-32", children: /* @__PURE__ */ jsx(Select.Value, {}) }),
+          /* @__PURE__ */ jsxs(Select.Content, { children: [
+            /* @__PURE__ */ jsx(Select.Item, { value: "all", children: "All Time" }),
+            /* @__PURE__ */ jsx(Select.Item, { value: "year", children: "Past Year" }),
+            /* @__PURE__ */ jsx(Select.Item, { value: "month", children: "Past 30 Days" }),
+            /* @__PURE__ */ jsx(Select.Item, { value: "week", children: "Past 7 Days" }),
+            /* @__PURE__ */ jsx(Select.Item, { value: "day", children: "Today" })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxs(
+          "button",
           {
-            data: data.monthly_revenue,
-            margin: { top: 20, right: 30, left: 20, bottom: 5 },
+            onClick: () => handleExportCSV(false),
+            className: "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-ui-bg-base border border-ui-border-base rounded-md hover:bg-ui-bg-subtle transition-colors text-ui-fg-base shadow-sm",
             children: [
-              /* @__PURE__ */ jsx(CartesianGrid, { strokeDasharray: "3 3" }),
-              /* @__PURE__ */ jsx(XAxis, { dataKey: "month" }),
-              /* @__PURE__ */ jsx(YAxis, {}),
-              /* @__PURE__ */ jsx(Tooltip, { formatter: (value) => `$${Number(value).toFixed(2)}` }),
-              /* @__PURE__ */ jsx(Legend, {}),
-              /* @__PURE__ */ jsx(
-                Bar,
-                {
-                  dataKey: "partsRevenue",
-                  stackId: "a",
-                  fill: "#82ca9d",
-                  name: "Parts Revenue"
-                }
-              ),
-              /* @__PURE__ */ jsx(
-                Bar,
-                {
-                  dataKey: "laborRevenue",
-                  stackId: "a",
-                  fill: "#ffc658",
-                  name: "Labor Revenue"
-                }
-              )
+              /* @__PURE__ */ jsx(ArrowDownTray, { className: "w-3 h-3" }),
+              "Export Filtered"
             ]
           }
-        ) })
+        ),
+        /* @__PURE__ */ jsx(
+          "button",
+          {
+            onClick: () => handleExportCSV(true),
+            className: "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-ui-fg-interactive hover:text-ui-fg-interactive-hover transition-colors",
+            children: "Export All Data"
+          }
+        )
+      ] })
+    ] }),
+    loading && data && /* @__PURE__ */ jsx("div", { className: "w-full h-1 bg-ui-bg-base mb-4 overflow-hidden rounded-full", children: /* @__PURE__ */ jsx("div", { className: "h-full bg-ui-bg-interactive animate-pulse w-1/3" }) }),
+    data && /* @__PURE__ */ jsxs(Fragment, { children: [
+      /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-2 md:grid-cols-4 gap-4 mb-10", children: [
+        /* @__PURE__ */ jsxs("div", { className: "flex flex-col p-4 bg-ui-bg-base rounded-xl border border-ui-border-base shadow-sm", children: [
+          /* @__PURE__ */ jsx(Text, { className: "text-[11px] font-semibold text-ui-fg-subtle uppercase tracking-wider mb-2", children: "Total Volume" }),
+          /* @__PURE__ */ jsx(Heading, { level: "h2", className: "text-2xl font-medium", children: data.total_repairs }),
+          /* @__PURE__ */ jsx(Text, { className: "text-[10px] text-ui-fg-muted mt-2", children: "Tickets in period" })
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "flex flex-col p-4 bg-ui-bg-base rounded-xl border border-ui-border-base shadow-sm relative overflow-hidden", children: [
+          /* @__PURE__ */ jsx(Text, { className: "text-[11px] font-semibold text-ui-fg-subtle uppercase tracking-wider mb-2", children: "Est. Revenue" }),
+          /* @__PURE__ */ jsx(Heading, { level: "h2", className: "text-2xl font-medium text-ui-fg-interactive", children: formatCurrency(data.total_expected_revenue) }),
+          /* @__PURE__ */ jsx(Text, { className: "text-[10px] text-ui-fg-muted mt-2", children: "Pipeline value" })
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "flex flex-col p-4 bg-ui-bg-base rounded-xl border border-ui-border-base shadow-sm", children: [
+          /* @__PURE__ */ jsx(Text, { className: "text-[11px] font-semibold text-ui-fg-subtle uppercase tracking-wider mb-2", children: "Completed" }),
+          /* @__PURE__ */ jsx(Heading, { level: "h2", className: "text-2xl font-medium text-green-600", children: data.completed_count }),
+          /* @__PURE__ */ jsx(Text, { className: "text-[10px] text-ui-fg-muted mt-2", children: "Successfully finished" })
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "flex flex-col p-4 bg-ui-bg-base rounded-xl border border-ui-border-base shadow-sm", children: [
+          /* @__PURE__ */ jsx(Text, { className: "text-[11px] font-semibold text-ui-fg-subtle uppercase tracking-wider mb-2", children: "Turnaround" }),
+          /* @__PURE__ */ jsx(Heading, { level: "h2", className: "text-2xl font-medium", children: data.avg_repair_time_days > 0 ? data.avg_repair_time_days.toFixed(1) : "-" }),
+          /* @__PURE__ */ jsx(Text, { className: "text-[10px] text-ui-fg-muted mt-2", children: "Average days to complete" })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8", children: [
+        /* @__PURE__ */ jsxs("div", { className: "lg:col-span-2 bg-ui-bg-base border border-ui-border-base rounded-xl p-6 shadow-sm", children: [
+          /* @__PURE__ */ jsx("div", { className: "flex justify-between items-center mb-6", children: /* @__PURE__ */ jsx(Text, { className: "text-sm font-medium text-ui-fg-base", children: "Revenue Trend (Parts vs Labor)" }) }),
+          /* @__PURE__ */ jsx("div", { className: "h-[300px]", children: /* @__PURE__ */ jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxs(AreaChart, { data: data.monthly_revenue, margin: { top: 10, right: 10, left: -20, bottom: 0 }, children: [
+            /* @__PURE__ */ jsxs("defs", { children: [
+              /* @__PURE__ */ jsxs("linearGradient", { id: "colorParts", x1: "0", y1: "0", x2: "0", y2: "1", children: [
+                /* @__PURE__ */ jsx("stop", { offset: "5%", stopColor: "#3b82f6", stopOpacity: 0.3 }),
+                /* @__PURE__ */ jsx("stop", { offset: "95%", stopColor: "#3b82f6", stopOpacity: 0 })
+              ] }),
+              /* @__PURE__ */ jsxs("linearGradient", { id: "colorLabor", x1: "0", y1: "0", x2: "0", y2: "1", children: [
+                /* @__PURE__ */ jsx("stop", { offset: "5%", stopColor: "#10b981", stopOpacity: 0.3 }),
+                /* @__PURE__ */ jsx("stop", { offset: "95%", stopColor: "#10b981", stopOpacity: 0 })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsx(CartesianGrid, { strokeDasharray: "3 3", vertical: false, stroke: "#e5e7eb" }),
+            /* @__PURE__ */ jsx(
+              XAxis,
+              {
+                dataKey: "month",
+                axisLine: false,
+                tickLine: false,
+                tick: { fontSize: 10, fill: "#6b7280" },
+                dy: 10
+              }
+            ),
+            /* @__PURE__ */ jsx(
+              YAxis,
+              {
+                axisLine: false,
+                tickLine: false,
+                tick: { fontSize: 10, fill: "#6b7280" },
+                tickFormatter: (val) => `$${val}`
+              }
+            ),
+            /* @__PURE__ */ jsx(
+              Tooltip,
+              {
+                contentStyle: { borderRadius: "8px", border: "none", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" },
+                labelStyle: { fontSize: "12px", fontWeight: "bold", color: "#111827", marginBottom: "4px" },
+                itemStyle: { fontSize: "12px" },
+                formatter: (value) => [formatCurrency(Number(value)), ""]
+              }
+            ),
+            /* @__PURE__ */ jsx(Area, { type: "monotone", dataKey: "partsRevenue", name: "Parts", stroke: "#3b82f6", strokeWidth: 2, fillOpacity: 1, fill: "url(#colorParts)", stackId: "1" }),
+            /* @__PURE__ */ jsx(Area, { type: "monotone", dataKey: "laborRevenue", name: "Labor", stroke: "#10b981", strokeWidth: 2, fillOpacity: 1, fill: "url(#colorLabor)", stackId: "1" })
+          ] }) }) })
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "bg-ui-bg-base border border-ui-border-base rounded-xl p-6 shadow-sm", children: [
+          /* @__PURE__ */ jsx(Text, { className: "text-sm font-medium text-ui-fg-base mb-6", children: "Status Distribution" }),
+          /* @__PURE__ */ jsx("div", { className: "h-[300px]", children: /* @__PURE__ */ jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxs(BarChart, { data: chartData, layout: "vertical", margin: { top: 0, right: 0, left: 10, bottom: 0 }, children: [
+            /* @__PURE__ */ jsx(CartesianGrid, { strokeDasharray: "3 3", horizontal: true, vertical: false, stroke: "#e5e7eb" }),
+            /* @__PURE__ */ jsx(XAxis, { type: "number", hide: true }),
+            /* @__PURE__ */ jsx(YAxis, { dataKey: "name", type: "category", axisLine: false, tickLine: false, tick: { fontSize: 10, fill: "#374151" }, width: 90 }),
+            /* @__PURE__ */ jsx(
+              Tooltip,
+              {
+                cursor: { fill: "#f3f4f6" },
+                contentStyle: { borderRadius: "8px", border: "none", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" },
+                itemStyle: { fontSize: "12px" }
+              }
+            ),
+            /* @__PURE__ */ jsx(Bar, { dataKey: "count", fill: "#6366f1", radius: [0, 4, 4, 0], barSize: 20 })
+          ] }) }) })
+        ] })
       ] })
     ] })
   ] });

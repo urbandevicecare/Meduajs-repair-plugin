@@ -6,9 +6,34 @@ import RepairModuleService from "../../../../modules/repair/service";
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY);
 
+  const timeframe = req.query.timeframe as string; // 'day', 'week', 'month', 'year', 'all'
+  let filters: any = {};
+
+  if (timeframe && timeframe !== 'all') {
+    const now = new Date();
+    let startDate = new Date();
+
+    if (timeframe === 'day') {
+      startDate.setHours(0, 0, 0, 0);
+    } else if (timeframe === 'week') {
+      startDate.setDate(now.getDate() - 7);
+    } else if (timeframe === 'month') {
+      startDate.setMonth(now.getMonth() - 1);
+    } else if (timeframe === 'year') {
+      startDate.setFullYear(now.getFullYear() - 1);
+    }
+    
+    filters = {
+      created_at: {
+        $gte: startDate.toISOString()
+      }
+    };
+  }
+
   const { data: tickets } = await query.graph({
     entity: "repair_ticket",
     fields: ["*", "device.*"],
+    filters
   });
 
   const totalRepairs = tickets.length;
@@ -110,5 +135,6 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       completed_count: completedTickets.length,
       monthly_revenue: monthlyRevenueArray,
     },
+    raw_tickets: tickets,
   });
 }
