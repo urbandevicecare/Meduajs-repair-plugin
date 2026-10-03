@@ -12,8 +12,15 @@ async function shortenUrl(url: string, container: any): Promise<string> {
   if (!url) return url;
   try {
     const repairModule: any = container.resolve("repair");
-    let backendUrl = process.env.MEDUSA_BACKEND_URL || "http://localhost:9000";
-    backendUrl = backendUrl.replace(/\/$/, "");
+    
+    let storeUrl = process.env.STORE_URL || "http://localhost:3000";
+    try {
+      const [settings] = await repairModule.listRepairSettings({});
+      if (settings && settings.storefront_url) {
+        storeUrl = settings.storefront_url;
+      }
+    } catch (e) {}
+    storeUrl = storeUrl.replace(/\/$/, "");
 
     const shortcode = Math.random().toString(36).substring(2, 8);
     await repairModule.createRepairLinks({
@@ -21,7 +28,7 @@ async function shortenUrl(url: string, container: any): Promise<string> {
       url,
     });
     
-    return `${backendUrl}/api/store/repairs/r/${shortcode}`;
+    return `${storeUrl}/r/${shortcode}`;
   } catch (e) {
     // Silently fail and return original
     return url;
