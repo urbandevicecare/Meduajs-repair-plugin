@@ -82,13 +82,9 @@ const ReportsPage = () => {
       });
   };
 
-  if (loading && !data) {
-    return (
-      <Container className="p-8 h-screen flex items-center justify-center">
-        <Text className="text-ui-fg-subtle animate-pulse">Loading analytics...</Text>
-      </Container>
-    );
-  }
+
+
+
 
   const chartData = data ? Object.keys(data.status_counts).map((key) => ({
     name: key.charAt(0).toUpperCase() + key.slice(1).replace("_", " "),
@@ -109,6 +105,14 @@ const ReportsPage = () => {
       count
     })).sort((a, b) => b.count - a.count);
   }, [rawTickets]);
+
+  if (loading && !data) {
+    return (
+      <Container className="p-8 h-screen flex items-center justify-center">
+        <Text className="text-ui-fg-subtle animate-pulse">Loading analytics...</Text>
+      </Container>
+    );
+  }
 
   return (
     <Container className="p-8 bg-transparent border-none shadow-none">
