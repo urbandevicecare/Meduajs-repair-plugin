@@ -213,8 +213,8 @@ export class ZohoBooksService {
     return await this.request("GET", `${endpoint}?accept=pdf`, undefined, true);
   }
 
-  async registerPayment(invoiceId: string, amount: number, contactId: string, paymentMode: string): Promise<string> {
-    const payload = {
+  async registerPayment(invoiceId: string, amount: number, contactId: string, paymentMode: string, referenceNumber?: string): Promise<string> {
+    const payload: any = {
       customer_id: contactId,
       payment_mode: paymentMode || "Stripe",
       amount: (amount ).toFixed(2),
@@ -226,6 +226,9 @@ export class ZohoBooksService {
         }
       ]
     };
+    if (referenceNumber) {
+      payload.reference_number = referenceNumber;
+    }
     const res = await this.request("POST", "/customerpayments", payload);
     return res.payment.payment_id;
   }

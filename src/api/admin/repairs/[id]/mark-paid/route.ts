@@ -5,7 +5,7 @@ import { syncPaymentToZoho } from "../../../../../utils/zoho-payment-sync.js";
 
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
   const { id } = req.params;
-  const { amount, method } = req.body as { amount?: number, method?: string };
+  const { amount, method, reference } = req.body as { amount?: number, method?: string, reference?: string };
   const repairService: RepairModuleService = req.scope.resolve(REPAIR_MODULE);
   
   const tickets = await repairService.listRepairTickets({ id });
@@ -36,12 +36,13 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     id,
     amount_paid: newAmountPaid,
     payment_status: isFullyPaid ? "captured" : "pending",
-    status: newStatus
+    status: newStatus,
+    payment_collection_id: reference || ticket.payment_collection_id
   });
   
   try {
      // Trigger Zoho sync as a cash/manual payment
-     await syncPaymentToZoho(req.scope as any, id, amountToPay, method || "Cash");
+     await syncPaymentToZoho(req.scope as any, id, amountToPay, method || "Cash", reference);
   } catch(e) {
      req.scope.resolve("logger").error(`[Mark Paid] Zoho sync failed: ${e}`);
   }

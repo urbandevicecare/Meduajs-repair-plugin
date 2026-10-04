@@ -318,13 +318,16 @@ const RepairDetailPage = () => {
   };
 
   const handleMarkPaid = async () => {
-    if (!confirm("Are you sure you want to mark this ticket as Paid manually (e.g. Cash in store)? This will sync the payment to Zoho Books.")) return;
+    const reference = window.prompt("Enter payment reference (e.g. Cash Receipt, M-PESA Code). Leave blank if none:", "Cash");
+    if (reference === null) return; // User cancelled
+
+    if (!confirm("Are you sure you want to mark this ticket as Paid? This will sync the payment to Zoho Books.")) return;
 
     try {
       const response = await fetch(`/admin/repairs/${id}/mark-paid`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ method: "Cash" })
+        body: JSON.stringify({ method: reference ? "Cash/Other" : "Cash", reference })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Failed to mark paid");

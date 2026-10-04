@@ -24,6 +24,7 @@ export const verifyPaystackPaymentWorkflow = createWorkflow(
     syncPaymentZohoStep({
       ticket_id: updatedTicket.id,
       amount: verifiedData.actualPaidAmount,
+      reference: verifiedData.reference,
     });
 
     return new WorkflowResponse(updatedTicket);

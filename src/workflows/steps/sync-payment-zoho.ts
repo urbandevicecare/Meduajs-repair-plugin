@@ -4,6 +4,7 @@ import { syncPaymentToZoho } from "../../utils/zoho-payment-sync.js";
 type SyncPaymentZohoInput = {
   ticket_id: string;
   amount: number;
+  reference?: string;
 };
 
 export const syncPaymentZohoStep = createStep(
@@ -11,7 +12,7 @@ export const syncPaymentZohoStep = createStep(
   async (input: SyncPaymentZohoInput, { container }) => {
     // We intentionally wrap this so it doesn't throw and cause a rollback.
     // If we roll back the local ticket, we lose record of a successful Paystack charge!
-    await syncPaymentToZoho(container as any, input.ticket_id, input.amount, "Paystack");
+    await syncPaymentToZoho(container as any, input.ticket_id, input.amount, "Paystack", input.reference);
     return new StepResponse(true);
   }
 );

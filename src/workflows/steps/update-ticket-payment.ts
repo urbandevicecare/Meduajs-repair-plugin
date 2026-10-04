@@ -51,7 +51,8 @@ export const updateTicketPaymentStep = createStep(
       id: ticket.id,
       amount_paid: newAmountPaid,
       payment_status: isFullyPaid ? "captured" : "pending",
-      status: newStatus
+      status: newStatus,
+      payment_collection_id: input.reference
     });
 
     return new StepResponse(updatedTicket, previousData);

@@ -6,7 +6,8 @@ export async function syncPaymentToZoho(
   container: MedusaContainer,
   ticketId: string,
   amount: number,
-  paymentMode: string = "PaymentCollection"
+  paymentMode: string = "PaymentCollection",
+  referenceNumber?: string
 ) {
   const repairService: RepairModuleService = container.resolve(REPAIR_MODULE);
   const ticket = await repairService.retrieveRepairTicket(ticketId);
@@ -43,7 +44,7 @@ export async function syncPaymentToZoho(
       invId = await zoho.createInvoice(contactId, ticket);
     }
 
-    const paymentId = await zoho.registerPayment(invId, amount, contactId, paymentMode);
+    const paymentId = await zoho.registerPayment(invId, amount, contactId, paymentMode, referenceNumber);
     await repairService.updateRepairTickets({
       id: ticket.id,
       metadata: { ...metadata, zoho_invoice_id: invId, zoho_payment_id: paymentId }
